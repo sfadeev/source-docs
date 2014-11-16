@@ -137,13 +137,24 @@
     <Content Include="Content\bootstrap\bootstrap.less" />
     <Content Include="Content\bootstrap\badges.less" />
     <Content Include="Content\bootstrap\alerts.less" />
+    <Content Include="Content\source-docs.css">
+      <DependentUpon>source-docs.less</DependentUpon>
+    </Content>
     <Content Include="Content\source-docs.less" />
+    <Content Include="Content\source-docs.css.map">
+      <DependentUpon>source-docs.css</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.9.0.intellisense.js" />
+    <Content Include="Content\source-docs.min.css">
+      <DependentUpon>source-docs.css</DependentUpon>
+    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-1.9.0.js" />
     <Content Include="Scripts\jquery-1.9.0.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
@@ -154,6 +165,7 @@
     <Content Include="packages.config" />
     <Content Include="Views\index.cshtml" />
     <Content Include="Scripts\jquery-1.9.0.min.map" />
+    <Content Include="Views\Dashboard.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

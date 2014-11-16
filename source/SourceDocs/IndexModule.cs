@@ -1,14 +1,14 @@
-﻿namespace SourceDocs
-{
-    using Nancy;
+﻿using Nancy;
 
+namespace SourceDocs
+{
     public class IndexModule : NancyModule
     {
         public IndexModule()
         {
             Get["/"] = parameters =>
             {
-                return View["index"];
+                return View["Dashboard"];
             };
         }
     }

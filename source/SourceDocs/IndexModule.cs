@@ -11,14 +11,9 @@ namespace SourceDocs
                 return View["index"];
             };
 
-            Get["/dashboard1"] = parameters =>
+            Get["/Dashboard{index}"] = x =>
             {
-                return View["Dashboard1"];
-            };
-
-            Get["/dashboard2"] = parameters =>
-            {
-                return View["Dashboard2"];
+                return View["Dashboard" + x.index];
             };
         }
     }

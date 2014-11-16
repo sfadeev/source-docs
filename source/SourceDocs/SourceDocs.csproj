@@ -72,6 +72,12 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\dashboard3.css">
+      <DependentUpon>dashboard3.less</DependentUpon>
+    </Content>
+    <Content Include="Content\dashboard3.min.css">
+      <DependentUpon>dashboard3.css</DependentUpon>
+    </Content>
     <Content Include="Content\dashboard1.css">
       <DependentUpon>dashboard1.less</DependentUpon>
     </Content>
@@ -179,6 +185,10 @@
     <Content Include="Content\dashboard1.css.map">
       <DependentUpon>dashboard1.css</DependentUpon>
     </Content>
+    <Content Include="Content\dashboard3.less" />
+    <Content Include="Content\dashboard3.css.map">
+      <DependentUpon>dashboard3.css</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
@@ -197,6 +207,7 @@
     <Content Include="Views\Dashboard2.cshtml" />
     <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Views\Dashboard1.cshtml" />
+    <Content Include="Views\Dashboard3.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

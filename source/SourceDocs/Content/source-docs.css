@@ -6312,12 +6312,12 @@ button.close {
     display: none !important;
   }
 }
-/*
- * Base structure
- */
-/* Move down content because we have a fixed navbar that is 50px tall */
 body {
   padding-top: 50px;
+}
+form {
+  margin: 0;
+  padding: 0;
 }
 /*
  * Global add-ons

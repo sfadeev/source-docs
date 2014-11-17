@@ -90,6 +90,37 @@
       <DependentUpon>dashboard1.css</DependentUpon>
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\source-docs.css">
+      <DependentUpon>source-docs.less</DependentUpon>
+    </Content>
+    <Content Include="Content\source-docs.min.css">
+      <DependentUpon>source-docs.css</DependentUpon>
+    </Content>
+    <Content Include="Content\dashboard2.css">
+      <DependentUpon>dashboard2.less</DependentUpon>
+    </Content>
+    <Content Include="Content\dashboard2.less" />
+    <Content Include="Content\dashboard2.css.map">
+      <DependentUpon>dashboard2.css</DependentUpon>
+    </Content>
+    <Content Include="Content\dashboard2.min.css">
+      <DependentUpon>dashboard2.css</DependentUpon>
+    </Content>
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\ie10-viewport-bug-workaround.js" />
+    <Content Include="Content\source-docs.less" />
+    <Content Include="Content\source-docs.css.map">
+      <DependentUpon>source-docs.css</DependentUpon>
+    </Content>
+    <Content Include="Content\dashboard1.less" />
+    <Content Include="Content\dashboard1.css.map">
+      <DependentUpon>dashboard1.css</DependentUpon>
+    </Content>
+    <Content Include="Content\dashboard3.less" />
+    <Content Include="Content\dashboard3.css.map">
+      <DependentUpon>dashboard3.css</DependentUpon>
+    </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
@@ -163,37 +194,6 @@
     <Content Include="Content\bootstrap\bootstrap.less" />
     <Content Include="Content\bootstrap\badges.less" />
     <Content Include="Content\bootstrap\alerts.less" />
-    <Content Include="Content\source-docs.css">
-      <DependentUpon>source-docs.less</DependentUpon>
-    </Content>
-    <Content Include="Content\source-docs.min.css">
-      <DependentUpon>source-docs.css</DependentUpon>
-    </Content>
-    <Content Include="Content\dashboard2.css">
-      <DependentUpon>dashboard2.less</DependentUpon>
-    </Content>
-    <Content Include="Content\dashboard2.less" />
-    <Content Include="Content\dashboard2.css.map">
-      <DependentUpon>dashboard2.css</DependentUpon>
-    </Content>
-    <Content Include="Content\dashboard2.min.css">
-      <DependentUpon>dashboard2.css</DependentUpon>
-    </Content>
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\ie10-viewport-bug-workaround.js" />
-    <Content Include="Content\source-docs.less" />
-    <Content Include="Content\source-docs.css.map">
-      <DependentUpon>source-docs.css</DependentUpon>
-    </Content>
-    <Content Include="Content\dashboard1.less" />
-    <Content Include="Content\dashboard1.css.map">
-      <DependentUpon>dashboard1.css</DependentUpon>
-    </Content>
-    <Content Include="Content\dashboard3.less" />
-    <Content Include="Content\dashboard3.css.map">
-      <DependentUpon>dashboard3.css</DependentUpon>
-    </Content>
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />

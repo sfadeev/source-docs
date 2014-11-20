@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using LibGit2Sharp;
 using NUnit.Framework;
@@ -30,7 +32,7 @@ namespace SourceDocs.Core.Tests
             // blocks
             var generateWords = new TransformBlock<int, string>(count =>
             {
-                Console.WriteLine("generating " + count + " words");
+                Console.WriteLine("generating " + count + " words (thread id: " + Thread.CurrentThread.ManagedThreadId + ")");
 
                 var result = new StringBuilder();
 
@@ -50,14 +52,14 @@ namespace SourceDocs.Core.Tests
 
             var splitWords = new TransformBlock<string, string[]>(s =>
             {
-                Console.WriteLine("splitting \n\t" + s);
+                Console.WriteLine("splitting " + s + " (thread id: " + Thread.CurrentThread.ManagedThreadId + ")\n\t");
 
                 return s.Split(new[] { ' ' });
             });
 
             var sortWords = new TransformBlock<string[], string[]>(strings =>
             {
-                Console.WriteLine("sorting");
+                Console.WriteLine("sorting (thread id: " + Thread.CurrentThread.ManagedThreadId + ")");
 
                 foreach (var s in strings)
                 {
@@ -69,7 +71,7 @@ namespace SourceDocs.Core.Tests
 
             var printWords = new ActionBlock<string[]>(strings =>
             {
-                Console.WriteLine("printing ");
+                Console.WriteLine("printing (thread id: " + Thread.CurrentThread.ManagedThreadId + ")");
 
                 foreach (var s in strings)
                 {
@@ -91,6 +93,55 @@ namespace SourceDocs.Core.Tests
             generateWords.Post(5);
             generateWords.Complete();
             printWords.Completion.Wait();
+        }
+
+        [Test]
+        public void TplDataflowSuccessAndError()
+        {
+            Action<Task> continuationAction = task =>
+            {
+                Console.WriteLine("Continuation Action");
+                Console.WriteLine("===================");
+                Console.WriteLine("task.Id              : " + task.Id);
+                Console.WriteLine("task.IsCanceled      : " + task.IsCanceled);
+                Console.WriteLine("task.IsCompleted     : " + task.IsCompleted);
+                Console.WriteLine("task.IsFaulted       : " + task.IsFaulted);
+                Console.WriteLine("task.Status          : " + task.Status);
+                Console.WriteLine("task.CreationOptions : " + task.CreationOptions);
+                Console.WriteLine("task.Exception       : " + task.Exception);
+            };
+
+            var block = new ActionBlock<int>(no =>
+            {
+                if (no == 13) throw new InvalidOperationException("Error # " + no);
+
+                Console.WriteLine("# " + no);
+            });
+
+            for (var i = 0; i < 15; i++)
+            {
+                block.Post(i);
+            }
+
+            block.Complete();
+            block.Completion.ContinueWith(continuationAction);
+
+            try
+            {
+                block.Completion.Wait();
+            }
+            catch (AggregateException ae)
+            {
+                Console.WriteLine("AggregateException");
+                Console.WriteLine("==================");
+
+                ae.Handle(e =>
+                {
+                    Console.WriteLine("\nHandled: " + e);
+                    Console.WriteLine();
+                    return true;
+                });
+            }
         }
 
         private static string GenerateWord(Random random, int length)

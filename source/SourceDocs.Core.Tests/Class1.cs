@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using LibGit2Sharp;
 using NUnit.Framework;
 
 namespace SourceDocs.Core.Tests
@@ -13,15 +12,22 @@ namespace SourceDocs.Core.Tests
     public class Class1
     {
         [Test]
-        public void CloneRepo()
+        public void WorkflowTest()
         {
-            var clonedRepoPath = Repository.Clone("https://github.com/sfadeev/source-docs.git", "./temp-repo/");
+            var workflow = new Workflow();
 
-            using (var repo = new Repository(clonedRepoPath))
+            var urls = new[]
             {
-                foreach (var item in repo.RetrieveStatus())
+                "https://github.com/sfadeev/NumberSpelling.NET.git",
+                "https://github.com/sfadeev/source-docs.git",
+                "https://github.com/sfadeev/renocco.git"
+            };
+
+            foreach (var url in urls)
+            {
+                foreach (var task in workflow.GetTasks(url).ToArray())
                 {
-                    Console.WriteLine(item.FilePath);
+                    workflow.Execute(task);
                 }
             }
         }

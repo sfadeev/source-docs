@@ -46,11 +46,14 @@ namespace SourceDocs.Core.Tests
 
         private static bool ShouldCheckout(Repository repo, Branch branch)
         {
-            return
-                // local with commits behind
-                (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0) ||
-                // remote not tracked
-                (branch.IsRemote && repo.Branches.All(x => x.TrackedBranch != branch));
+            // local with commits behind
+            if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
+            {
+                return true;
+            }
+
+            // remote not tracked
+            return (branch.IsRemote && repo.Branches.All(x => x.TrackedBranch != branch));
         }
 
         public void Execute(RepositoryTask task)
@@ -68,7 +71,7 @@ namespace SourceDocs.Core.Tests
             else
             {
                 Console.WriteLine("Checkout : " + branch);
-                task.Branch = repo.Checkout(branch.Tip);
+                task.Branch = repo.Checkout(branch.TrackedBranch.Tip);
             }
         }
 
@@ -83,7 +86,18 @@ namespace SourceDocs.Core.Tests
                 Repository.Clone(repoUrl, repositoryDir.FullName);
             }
 
-            return new Repository(repositoryDir.FullName);
+            var repository = new Repository(repositoryDir.FullName);
+
+            foreach (var remote in repository.Network.Remotes)
+            {
+                repository.Fetch(remote.Name, new FetchOptions { OnProgress = delegate(string output)
+                {
+                    Console.WriteLine("Fetch.OnProgress : " + output);
+                    return true;
+                }});
+            }
+
+            return repository;
         }
 
         private static DirectoryInfo GetRepositoryDirectory(string repoUrl, string workingDir)

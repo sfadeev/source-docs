@@ -18,9 +18,9 @@ namespace SourceDocs.Core.Tests
 
             var urls = new[]
             {
-                "https://github.com/sfadeev/NumberSpelling.NET.git",
-                "https://github.com/sfadeev/source-docs.git",
-                "https://github.com/sfadeev/renocco.git"
+                // "https://github.com/sfadeev/NumberSpelling.NET.git",
+                // "https://github.com/sfadeev/renocco.git",
+                "https://github.com/sfadeev/source-docs.git"
             };
 
             foreach (var url in urls)

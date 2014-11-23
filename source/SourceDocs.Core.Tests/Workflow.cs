@@ -71,7 +71,7 @@ namespace SourceDocs.Core.Tests
             else
             {
                 Console.WriteLine("Checkout : " + branch);
-                task.Branch = repo.Checkout(branch.TrackedBranch.Tip);
+                repo.Checkout(branch.TrackedBranch.Tip);
             }
         }
 
@@ -96,6 +96,16 @@ namespace SourceDocs.Core.Tests
                     return true;
                 }});
             }
+
+            repository.Network.Pull(
+                new Signature("A. U. Thor", "thor@valhalla.asgard.com",
+                    new DateTimeOffset(2011, 06, 16, 10, 58, 27, TimeSpan.FromHours(2))), new PullOptions
+                    {
+                        MergeOptions = new MergeOptions
+                        {
+                            FastForwardStrategy = FastForwardStrategy.FastForwardOnly
+                        }
+                    });
 
             return repository;
         }

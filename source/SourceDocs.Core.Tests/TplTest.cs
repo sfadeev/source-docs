@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -9,29 +9,8 @@ using NUnit.Framework;
 namespace SourceDocs.Core.Tests
 {
     [TestFixture]
-    public class Class1
+    public class TplTest
     {
-        [Test]
-        public void WorkflowTest()
-        {
-            var workflow = new Workflow();
-
-            var urls = new[]
-            {
-                "https://github.com/sfadeev/NumberSpelling.NET.git",
-                "https://github.com/sfadeev/renocco.git",
-                "https://github.com/sfadeev/source-docs.git"
-            };
-
-            foreach (var url in urls)
-            {
-                foreach (var task in workflow.GetTasks(url).ToArray())
-                {
-                    workflow.Execute(task);
-                }
-            }
-        }
-
         [Test]
         public void TplDataflow()
         {

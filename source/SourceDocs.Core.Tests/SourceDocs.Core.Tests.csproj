@@ -53,9 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="GitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Workflow.cs" />
+    <Compile Include="GitRepository.cs" />
+    <Compile Include="TplTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SourceDocs.Core\SourceDocs.Core.csproj">

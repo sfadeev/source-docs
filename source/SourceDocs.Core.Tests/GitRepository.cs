@@ -11,14 +11,14 @@ namespace SourceDocs.Core.Tests
         private readonly Repository _repo;
 
         // todo: set specified timeout to delayed generate
-        public GitRepository(string repoUrl)
+        public GitRepository(string repoUrl, string workingDir)
         {
             Console.WriteLine("\nRepo : " + repoUrl);
 
-            _repo = EnsureRepository(repoUrl, "./repos/");
+            _repo = GetRepository(repoUrl, workingDir);
         }
 
-        public IEnumerable<string> GetChangedBranches()
+        public void Fetch()
         {
             foreach (var remote in _repo.Network.Remotes)
             {
@@ -33,24 +33,44 @@ namespace SourceDocs.Core.Tests
                     }
                 });
             }
+        }
+
+        public string[] GetBranches(bool changedOnly = false)
+        {
+            Fetch();
+
+            var result = new List<string>();
 
             foreach (var branch in _repo.Branches)
             {
-                // local with commits behind
-                if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
+                if (changedOnly)
                 {
-                    Console.WriteLine("\t local : {0}, {1} behind", branch, branch.TrackingDetails.BehindBy);
+                    if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
+                    {
+                        Console.WriteLine("\t changed local : {0}, {1} behind", branch, branch.TrackingDetails.BehindBy);
 
-                    yield return branch.Name;
+                        result.Add(branch.Name);
+                    }
+                    else if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
+                    {
+                        Console.WriteLine("\t not tracked remote : {0}", branch);
+
+                        result.Add(branch.Name);
+                    }
                 }
-                // remote not tracked
-                else if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
+                else
                 {
-                    Console.WriteLine("\t remote : {0}", branch);
+                    // all local and remote not tracked
+                    if (branch.IsTracking || (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch)))
+                    {
+                        Console.WriteLine("\t branch : {0}", branch);
 
-                    yield return branch.Name;
+                        result.Add(branch.Name);
+                    }
                 }
             }
+
+            return result.ToArray();
         }
 
         public void Update(string branchName)
@@ -80,28 +100,23 @@ namespace SourceDocs.Core.Tests
                         }
                     });
             }
+
+            branch = _repo.Branches[branchName];
+
+            if (branch.Tip != null)
+            {
+                Console.WriteLine("\t tip @ {0} - {1} ", branch.Tip.Committer.When, branch.Tip.Message);
+            }
         }
 
-        private static Repository EnsureRepository(string repoUrl, string workingDir)
+        private static Repository GetRepository(string repoUrl, string workingDir)
         {
-            var repositoryDir = GetRepositoryDirectory(repoUrl, workingDir);
-
-            if (repositoryDir.Exists == false)
+            if (Directory.EnumerateFileSystemEntries(workingDir).Any() == false)
             {
-                repositoryDir.Create();
-
-                Repository.Clone(repoUrl, repositoryDir.FullName);
+                Repository.Clone(repoUrl, workingDir);
             }
 
-            return new Repository(repositoryDir.FullName);
-        }
-
-        private static DirectoryInfo GetRepositoryDirectory(string repoUrl, string workingDir)
-        {
-            var repositoryDirName = Path.GetInvalidFileNameChars()
-                .Aggregate(repoUrl, (current, invalidFileNameChar) => current.Replace(invalidFileNameChar, '_'));
-
-            return new DirectoryInfo(Path.Combine(workingDir, repositoryDirName, "repo"));
+            return new Repository(workingDir);
         }
     }
 }

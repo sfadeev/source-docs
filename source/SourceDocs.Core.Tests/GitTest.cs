@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 
@@ -7,23 +9,41 @@ namespace SourceDocs.Core.Tests
     [TestFixture]
     public class GitTest
     {
-        [Test, Ignore]
-        public void WorkflowTest()
+        // [TestCase("https://github.com/sfadeev/renocco.git")]
+        [TestCase("C:\\Data\\Projects\\temp\\SomeRepo")]
+        public void WorkflowTest(string repoUrl)
         {
-            // var repo = new GitRepository("https://github.com/sfadeev/renocco.git");
-            var repo = new GitRepository(@"C:\Data\Projects\temp\SomeRepo");
+            var repo = new GitRepository(repoUrl, GetWorkingDir("./repos/", repoUrl, "repo"));
+
+            foreach (var branchName in repo.GetBranches())
+            {
+                repo.Update(branchName);
+            }
 
             while (true)
             {
-                var branchNames = repo.GetChangedBranches().ToArray();
-
-                foreach (var branchName in branchNames)
+                foreach (var branchName in repo.GetBranches(changedOnly: true))
                 {
                     repo.Update(branchName);
                 }
 
-                Thread.Sleep(3000);
+                Thread.Sleep(5000);
             }
+        }
+
+        public static string GetWorkingDir(string workingRoot, string repoUrl, params string[] repoPaths)
+        {
+            Func<string, string> fixDirName = dirName =>
+                Path.GetInvalidFileNameChars().Aggregate(dirName, (current, c) => current.Replace(c, '_'));
+
+            var workingDir = Path.Combine(new[] { workingRoot, fixDirName(repoUrl) }.Concat(repoPaths).ToArray());
+
+            if (Directory.Exists(workingDir) == false)
+            {
+                Directory.CreateDirectory(workingDir);
+            }
+
+            return workingDir;
         }
     }
 }

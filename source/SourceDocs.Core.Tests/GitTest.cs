@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using SourceDocs.Core.Generation;
 
 namespace SourceDocs.Core.Tests
 {
@@ -10,7 +11,7 @@ namespace SourceDocs.Core.Tests
     public class GitTest
     {
         // [TestCase("https://github.com/sfadeev/renocco.git")]
-        [TestCase("C:\\Data\\Projects\\temp\\SomeRepo")]
+        [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
         public void WorkflowTest(string repoUrl)
         {
             var repo = new GitRepository(repoUrl, GetWorkingDir("./repos/", repoUrl, "repo"));

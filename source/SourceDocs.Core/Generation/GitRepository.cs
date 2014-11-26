@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using LibGit2Sharp;
 
-namespace SourceDocs.Core.Tests
+namespace SourceDocs.Core.Generation
 {
     public class GitRepository
     {

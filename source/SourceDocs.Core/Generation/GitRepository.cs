@@ -73,7 +73,7 @@ namespace SourceDocs.Core.Generation
             return result.ToArray();
         }
 
-        public void Update(string branchName)
+        public Commit Update(string branchName)
         {
             var branch = _repo.Branches[branchName];
 
@@ -83,7 +83,7 @@ namespace SourceDocs.Core.Generation
             if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
             {
                 Console.WriteLine("\t create and checkout : " + branch);
-                var newBranch = _repo.CreateBranch(branchName, branch.Tip);
+                var newBranch = _repo.CreateBranch(branchName/*, branch.Tip*/);
                 _repo.Branches.Update(newBranch, b => b.TrackedBranch = branch.CanonicalName);
             }
             else
@@ -107,6 +107,8 @@ namespace SourceDocs.Core.Generation
             {
                 Console.WriteLine("\t tip @ {0} - {1} ", branch.Tip.Committer.When, branch.Tip.Message);
             }
+
+            return branch.Tip;
         }
 
         private static Repository GetRepository(string repoUrl, string workingDir)

@@ -83,22 +83,25 @@ namespace SourceDocs.Core.Generation
             if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
             {
                 Console.WriteLine("\t create and checkout : " + branch);
-                var newBranch = _repo.CreateBranch(branchName/*, branch.Tip*/);
-                _repo.Branches.Update(newBranch, b => b.TrackedBranch = branch.CanonicalName);
+
+                var trackedBranch = branch;
+                var localBranch = _repo.CreateBranch(branchName, trackedBranch.Tip);
+
+                _repo.Branches.Update(localBranch, b => b.TrackedBranch = trackedBranch.CanonicalName);
             }
-            else
+            else if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
             {
                 Console.WriteLine("\t checkout and pull : " + branch);
-                _repo.Checkout(branchName);
-                _repo.Network.Pull(
-                    new Signature("sd", "sd", DateTimeOffset.Now),
-                    new PullOptions
-                    {
-                        MergeOptions = new MergeOptions
-                        {
-                            FastForwardStrategy = FastForwardStrategy.FastForwardOnly
-                        }
-                    });
+
+                _repo.Checkout(branchName, new CheckoutOptions
+                {
+                    OnCheckoutProgress = (path, steps, totalSteps)
+                        => Console.WriteLine("Checkout.OnCheckoutProgress : [{0}/{1}] {2},", steps, totalSteps, path)
+                });
+                var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now),
+                    new PullOptions { MergeOptions = new MergeOptions { FastForwardStrategy = FastForwardStrategy.FastForwardOnly } });
+
+                Console.WriteLine("merge result : {0}, {1}", mergeResult.Status, mergeResult.Commit);
             }
 
             branch = _repo.Branches[branchName];

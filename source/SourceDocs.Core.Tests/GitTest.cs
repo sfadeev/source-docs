@@ -16,7 +16,7 @@ namespace SourceDocs.Core.Tests
     {
         [TestCase("https://github.com/sfadeev/renocco.git")]
         [TestCase("https://github.com/sfadeev/source-docs.git")]
-        [TestCase("https://github.com/progit/progit2.git")]
+        [TestCase("git://github.com/progit/progit2.git")]
         [TestCase("https://hg@bitbucket.org/tortoisehg/thg")]
         [TestCase("http://repo.or.cz/sqlgg.git")]
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
@@ -46,7 +46,13 @@ namespace SourceDocs.Core.Tests
             {
                 var commit = repo.Update(branchName);
 
-                var branch = config.Branches[branchName] = new Branch();
+                Branch branch;
+
+                if (config.Branches.TryGetValue(branchName, out branch) == false)
+                {
+                    branch = config.Branches[branchName] = new Branch();
+                }
+
                 if (commit != null)
                 {
                     branch.Updated = commit.Committer.When;

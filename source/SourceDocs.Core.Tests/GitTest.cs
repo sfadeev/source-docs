@@ -15,6 +15,9 @@ namespace SourceDocs.Core.Tests
     {
         [TestCase("https://github.com/sfadeev/renocco.git")]
         [TestCase("https://github.com/sfadeev/source-docs.git")]
+        [TestCase("https://github.com/progit/progit2.git")]
+        [TestCase("https://hg@bitbucket.org/tortoisehg/thg")]
+        [TestCase("http://repo.or.cz/sqlgg.git")]
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
         public void WorkflowTest(string repoUrl)
         {
@@ -43,6 +46,7 @@ namespace SourceDocs.Core.Tests
                         {
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         }));
+                Thread.Sleep(1000);
             };
 
             foreach (var branchName in repo.GetBranches())
@@ -56,8 +60,7 @@ namespace SourceDocs.Core.Tests
                 {
                     update(branchName);
                 }
-
-                Thread.Sleep(5000);
+                Thread.Sleep(1000);
             }
         }
 

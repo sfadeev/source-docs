@@ -26,11 +26,7 @@ namespace SourceDocs.Core.Generation
 
                 _repo.Fetch(remote.Name, new FetchOptions
                 {
-                    OnProgress = delegate(string output)
-                    {
-                        Console.WriteLine("Fetch.OnProgress : " + output);
-                        return true;
-                    }
+                    OnProgress = OnProgress, OnTransferProgress = OnTransferProgress
                 });
             }
         }
@@ -95,11 +91,21 @@ namespace SourceDocs.Core.Generation
 
                 _repo.Checkout(branchName, new CheckoutOptions
                 {
-                    OnCheckoutProgress = (path, steps, totalSteps)
-                        => Console.WriteLine("Checkout.OnCheckoutProgress : [{0}/{1}] {2},", steps, totalSteps, path)
+                    OnCheckoutProgress = OnCheckoutProgress
                 });
-                var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now),
-                    new PullOptions { MergeOptions = new MergeOptions { FastForwardStrategy = FastForwardStrategy.FastForwardOnly } });
+
+                var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
+                {
+                    MergeOptions = new MergeOptions
+                    {
+                        FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
+                        OnCheckoutProgress = OnCheckoutProgress
+                    },
+                    FetchOptions = new FetchOptions
+                    {
+                        OnProgress = OnProgress, OnTransferProgress = OnTransferProgress
+                    }
+                });
 
                 Console.WriteLine("merge result : {0}, {1}", mergeResult.Status, mergeResult.Commit);
             }
@@ -118,10 +124,31 @@ namespace SourceDocs.Core.Generation
         {
             if (Directory.EnumerateFileSystemEntries(workingDir).Any() == false)
             {
-                Repository.Clone(repoUrl, workingDir);
+                Repository.Clone(repoUrl, workingDir, new CloneOptions
+                {
+                    OnCheckoutProgress = OnCheckoutProgress,
+                    OnTransferProgress = OnTransferProgress
+                });
             }
 
             return new Repository(workingDir);
+        }
+
+        private static bool OnProgress(string serverProgressOutput)
+        {
+            Console.WriteLine("OnProgress : {0}", serverProgressOutput);
+            return true;
+        }
+
+        private static void OnCheckoutProgress(string path, int steps, int totalSteps)
+        {
+            Console.WriteLine("OnCheckoutProgress : [{0}/{1}] {2}", steps, totalSteps, path);
+        }
+
+        private static bool OnTransferProgress(TransferProgress progress)
+        {
+            Console.WriteLine("OnTransferProgress : [{0}/{1}/{2}] {3}", progress.IndexedObjects, progress.ReceivedObjects, progress.TotalObjects, progress.ReceivedBytes);
+            return true;
         }
     }
 }

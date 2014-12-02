@@ -87,12 +87,9 @@ namespace SourceDocs.Core.Generation
             }
             else if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
             {
-                Console.WriteLine("\t checkout and pull : " + branch);
+                Checkout(branchName);
 
-                _repo.Checkout(branchName, new CheckoutOptions
-                {
-                    OnCheckoutProgress = OnCheckoutProgress
-                });
+                Console.WriteLine("\t pull : " + branch);
 
                 var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
                 {
@@ -118,6 +115,16 @@ namespace SourceDocs.Core.Generation
             }
 
             return branch.Tip;
+        }
+
+        public Branch Checkout(string branchName)
+        {
+            Console.WriteLine("\t checkout : " + branchName);
+            
+            return _repo.Checkout(branchName, new CheckoutOptions
+            {
+                OnCheckoutProgress = OnCheckoutProgress
+            });
         }
 
         private static Repository GetRepository(string repoUrl, string workingDir)

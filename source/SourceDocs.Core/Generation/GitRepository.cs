@@ -16,6 +16,15 @@ namespace SourceDocs.Core.Generation
             Console.WriteLine("\nRepo : " + repoUrl);
 
             _repo = GetRepository(repoUrl, workingDir);
+
+            foreach (var branch in _repo.Branches)
+            {
+                Console.WriteLine("\t[{0}] [{1}] {2} ({3}) {4} {5}",
+                    branch.IsRemote ? "R" : " ", branch.IsTracking ? "T" : " ",
+                    branch.Name, branch.CanonicalName,
+                    branch.Remote != null ? "\n\t +  \t " + branch.Remote.Name + " (" + branch.Remote.Url + ")" : string.Empty,
+                    branch.TrackedBranch != null ? "\n\t     + \t " + branch.TrackedBranch.Name : string.Empty);
+            }
         }
 
         public void Fetch()
@@ -78,10 +87,14 @@ namespace SourceDocs.Core.Generation
             // remote not tracked
             if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
             {
-                Console.WriteLine("\t create and checkout : " + branch);
+                var localBranchName = branchName.StartsWith(branch.Remote.Name + "/")
+                    ? branchName.Substring(branch.Remote.Name.Length + 1)
+                    : branchName;
+
+                Console.WriteLine("\t create and checkout {0} from {1} ({2})", localBranchName, branch.Name, branch.CanonicalName);
 
                 var trackedBranch = branch;
-                var localBranch = _repo.CreateBranch(branchName, trackedBranch.Tip);
+                var localBranch = _repo.CreateBranch(localBranchName, trackedBranch.Tip);
 
                 _repo.Branches.Update(localBranch, b => b.TrackedBranch = trackedBranch.CanonicalName);
             }
@@ -133,6 +146,7 @@ namespace SourceDocs.Core.Generation
             {
                 Repository.Clone(repoUrl, workingDir, new CloneOptions
                 {
+                    // Checkout = false,
                     OnCheckoutProgress = OnCheckoutProgress,
                     OnTransferProgress = OnTransferProgress
                 });

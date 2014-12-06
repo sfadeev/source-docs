@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,81 +24,85 @@ namespace SourceDocs.Core.Tests
             var repoDir = GetWorkingDir("./repos/", repoUrl, "repo");
             var configFile = Path.Combine(GetWorkingDir("./repos/", repoUrl), "config.json");
 
-            var repo = new GitRepository(repoUrl, repoDir);
-
-            var config = File.Exists(configFile)
-                ? JsonConvert.DeserializeObject<Config>(File.ReadAllText(configFile))
-                : new Config { Url = repoUrl };
-
-            Action writeConfig = () =>
+            using (var repo = new GitRepository(repoUrl, repoDir))
             {
-                var serializeObject = JsonConvert.SerializeObject(config, Formatting.Indented,
-                    new JsonSerializerSettings
+                var config = File.Exists(configFile)
+                    ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
+                    : new Repo();
+
+                Action writeConfig = () =>
+                {
+                    var serializeObject = JsonConvert.SerializeObject(config, Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        });
+
+                    File.WriteAllText(configFile, serializeObject);
+                };
+
+                Action<string> update = branchName =>
+                {
+                    var commit = repo.Update(branchName);
+
+                    var node = config.Nodes.FirstOrDefault(x => x.Name == branchName);
+
+                    var configChanged = false;
+                    if (node == null)
                     {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                    });
+                        config.Nodes.Add(node = new Node { Name = branchName });
+                        configChanged = true;
+                    }
 
-                File.WriteAllText(configFile, serializeObject);
-            };
+                    if (commit != null)
+                    {
+                        node.Updated = commit.Committer.When;
+                        configChanged = true;
+                    }
 
-            Action<string> update = branchName =>
-            {
-                var commit = repo.Update(branchName);
+                    if (configChanged) writeConfig();
 
-                Branch branch;
+                    Thread.Sleep(1000);
+                };
 
-                if (config.Branches.TryGetValue(branchName, out branch) == false)
-                {
-                    branch = config.Branches[branchName] = new Branch();
-                }
-
-                if (commit != null)
-                {
-                    branch.Updated = commit.Committer.When;
-                }
-
-                writeConfig();
-
-                Thread.Sleep(1000);
-            };
-
-            foreach (var branchName in repo.GetBranches())
-            {
-                update(branchName);
-            }
-
-            while (true)
-            {
-                foreach (var branchName in repo.GetBranches(changedOnly: true))
+                foreach (var branchName in repo.GetBranches())
                 {
                     update(branchName);
                 }
 
-                foreach (var branch in config.Branches)
+                while (true)
                 {
-                    if (branch.Value.Generated == null || branch.Value.Generated < branch.Value.Updated)
+                    foreach (var branchName in repo.GetBranches(changedOnly: true))
                     {
-                        repo.Checkout(branch.Key);
-
-                        var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");
-                        Console.WriteLine("Generating docs for {0} in {1}", branch.Key, tempDir);
-                        Empty(tempDir);
-                        CopyDirs(repoDir, tempDir); // generate
-
-                        var outDir = GetWorkingDir("./repos/", repoUrl, "docs", branch.Key);
-                        Console.WriteLine("Copying docs for {0} to {1}", branch.Key, outDir);
-                        Empty(outDir);
-                        CopyDirs(tempDir, outDir); // ready docs
-
-                        Empty(tempDir);
-
-                        branch.Value.Generated = branch.Value.Updated;
-
-                        writeConfig();
+                        update(branchName);
                     }
-                }
 
-                Thread.Sleep(1000);
+                    foreach (var branch in config.Nodes)
+                    {
+                        if (branch.Generated == null || branch.Generated < branch.Updated)
+                        {
+                            repo.Checkout(branch.Name);
+
+                            var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");
+                            Console.WriteLine("Generating docs for {0} in {1}", branch.Name, tempDir);
+                            Empty(tempDir);
+                            CopyDirs(repoDir, tempDir); // generate
+
+                            var outDir = GetWorkingDir("./repos/", repoUrl, "docs", branch.Name);
+                            Console.WriteLine("Copying docs for {0} to {1}", branch.Name, outDir);
+                            Empty(outDir);
+                            CopyDirs(tempDir, outDir); // ready docs
+
+                            Empty(tempDir);
+
+                            branch.Generated = branch.Updated;
+
+                            writeConfig();
+                        }
+                    }
+
+                    Thread.Sleep(1000);
+                }
             }
         }
 
@@ -172,24 +175,5 @@ namespace SourceDocs.Core.Tests
 
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
-    }
-
-    public class Config
-    {
-        public Config()
-        {
-            Branches = new Dictionary<string, Branch>();
-        }
-
-        public string Url { get; set; }
-
-        public IDictionary<string, Branch> Branches { get; set; }
-    }
-
-    public class Branch
-    {
-        public DateTimeOffset Updated { get; set; }
-
-        public DateTimeOffset? Generated { get; set; }
     }
 }

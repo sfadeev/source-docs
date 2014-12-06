@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Generation\GitRepository.cs" />
     <Compile Include="Generation\IGenerator.cs" />
+    <Compile Include="Generation\Node.cs" />
+    <Compile Include="Generation\Repo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

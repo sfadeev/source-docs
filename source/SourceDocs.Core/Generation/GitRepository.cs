@@ -6,7 +6,14 @@ using LibGit2Sharp;
 
 namespace SourceDocs.Core.Generation
 {
-    public class GitRepository
+    public interface IRepository
+    {
+        Node[] GetNodes(Node[] original = null);
+
+        bool Update(Node node);
+    }
+
+    public class GitRepository : IDisposable
     {
         private readonly Repository _repo;
 
@@ -27,7 +34,7 @@ namespace SourceDocs.Core.Generation
             }
         }
 
-        public void Fetch()
+        private void Fetch()
         {
             foreach (var remote in _repo.Network.Remotes)
             {
@@ -147,6 +154,7 @@ namespace SourceDocs.Core.Generation
                 Repository.Clone(repoUrl, workingDir, new CloneOptions
                 {
                     // Checkout = false,
+                    // IsBare = true,
                     OnCheckoutProgress = OnCheckoutProgress,
                     OnTransferProgress = OnTransferProgress
                 });
@@ -170,6 +178,11 @@ namespace SourceDocs.Core.Generation
         {
             Console.WriteLine("OnTransferProgress : [{0}/{1}/{2}] {3}", progress.IndexedObjects, progress.ReceivedObjects, progress.TotalObjects, progress.ReceivedBytes);
             return true;
+        }
+
+        public void Dispose()
+        {
+            _repo.Dispose();
         }
     }
 }

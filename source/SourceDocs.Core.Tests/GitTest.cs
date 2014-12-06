@@ -83,10 +83,14 @@ namespace SourceDocs.Core.Tests
 
                     Thread.Sleep(1000);
 
-                    foreach (var node in config.Nodes.Where(node => node.Generated == null || node.Updated > node.Generated))
+                    Node node;
+
+                    while ((node = config.Nodes.FirstOrDefault(x => x.Generated == null || x.Updated > x.Generated)) != null)
                     {
                         // repo.Checkout(node.Name);
+                        // Console.WriteLine("Generating docs for {0} (Updated: {1}, Generated: {2})", node.Name, node.Updated, node.Generated);
                         repo.UpdateNode(node);
+                        // Console.WriteLine("Generating docs for {0} (Updated: {1}, Generated: {2})", node.Name, node.Updated, node.Generated);
 
                         // generate docs
                         var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");

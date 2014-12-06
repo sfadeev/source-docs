@@ -24,14 +24,14 @@ namespace SourceDocs.Core.Generation
 
             _repo = GetRepository(repoUrl, workingDir);
 
-            foreach (var branch in _repo.Branches)
+            /*foreach (var branch in _repo.Branches)
             {
                 Console.WriteLine("\t[{0}] [{1}] {2} ({3}) {4} {5}",
                     branch.IsRemote ? "R" : " ", branch.IsTracking ? "T" : " ",
                     branch.Name, branch.CanonicalName,
                     branch.Remote != null ? "\n\t +  \t " + branch.Remote.Name + " (" + branch.Remote.Url + ")" : string.Empty,
                     branch.TrackedBranch != null ? "\n\t     + \t " + branch.TrackedBranch.Name : string.Empty);
-            }
+            }*/
         }
 
         public IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes)
@@ -83,7 +83,7 @@ namespace SourceDocs.Core.Generation
                 if (node.Name == null)
                     node.Name = GenerateLocalBranchName(remoteBranch);
 
-                Console.WriteLine("\t create and checkout {0} from {1} ({2})", node.Name, remoteBranch.Name,
+                Console.WriteLine("Create and checkout {0} from {1} ({2})", node.Name, remoteBranch.Name,
                     remoteBranch.CanonicalName);
 
                 localBranch = _repo.Branches.Update(
@@ -99,7 +99,7 @@ namespace SourceDocs.Core.Generation
             {
                 Checkout(localBranch.Name);
 
-                Console.WriteLine("\t pull : " + localBranch);
+                Console.WriteLine("Pull : " + localBranch);
 
                 var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
                 {
@@ -110,6 +110,11 @@ namespace SourceDocs.Core.Generation
                     },
                     FetchOptions = new FetchOptions
                     {
+                        OnUpdateTips = (name, id, newId) =>
+                        {
+                            Console.WriteLine("Fetch.OnUpdateTips : {0},  {1},  {2}", name, id, newId);
+                            return true;
+                        },
                         OnProgress = OnProgress,
                         OnTransferProgress = OnTransferProgress
                     }
@@ -117,7 +122,7 @@ namespace SourceDocs.Core.Generation
 
                 Console.WriteLine("merge result : {0}, {1}", mergeResult.Status, mergeResult.Commit);
 
-                node.Updated = GetDateUpdated(localBranch);
+                node.Updated = GetDateUpdated(remoteBranch);
 
                 return true;
             }
@@ -129,12 +134,24 @@ namespace SourceDocs.Core.Generation
         {
             foreach (var remote in _repo.Network.Remotes)
             {
-                Console.WriteLine("\n Fetching from : " + remote.Name);
+                // Console.WriteLine("Fetching from : " + remote.Name);
 
-                _repo.Fetch(remote.Name, new FetchOptions
+                // Removed on origin is not removed in local repo
+                // Remote prune #2700 - status is Open as of 12/07/2014
+                // https://github.com/libgit2/libgit2/pull/2700
+
+                var fetchOptions = new FetchOptions
                 {
-                    OnProgress = OnProgress, OnTransferProgress = OnTransferProgress
-                });
+                    OnUpdateTips = (name, id, newId) =>
+                    {
+                        Console.WriteLine("Fetch.OnUpdateTips : {0},  {1},  {2}", name, id, newId);
+                        return true;
+                    },
+                    OnProgress = OnProgress,
+                    OnTransferProgress = OnTransferProgress
+                };
+
+                _repo.Network.Fetch(remote, fetchOptions);
             }
         }
 
@@ -150,13 +167,13 @@ namespace SourceDocs.Core.Generation
                 {
                     if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
                     {
-                        Console.WriteLine("\t changed local : {0}, {1} behind", branch, branch.TrackingDetails.BehindBy);
+                        Console.WriteLine("Changed local : {0}, {1} behind", branch, branch.TrackingDetails.BehindBy);
 
                         result.Add(branch.Name);
                     }
                     else if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
                     {
-                        Console.WriteLine("\t not tracked remote : {0}", branch);
+                        Console.WriteLine("Not tracked remote : {0}", branch);
 
                         result.Add(branch.Name);
                     }
@@ -166,7 +183,7 @@ namespace SourceDocs.Core.Generation
                     // all local and remote not tracked
                     if (branch.IsTracking || (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch)))
                     {
-                        Console.WriteLine("\t branch : {0}", branch);
+                        Console.WriteLine("Branch : {0}", branch);
 
                         result.Add(branch.Name);
                     }
@@ -240,7 +257,7 @@ namespace SourceDocs.Core.Generation
 
         public Branch Checkout(string branchName)
         {
-            Console.WriteLine("\t checkout : " + branchName);
+            Console.WriteLine("Checkout : " + branchName);
             
             return _repo.Checkout(branchName, new CheckoutOptions
             {

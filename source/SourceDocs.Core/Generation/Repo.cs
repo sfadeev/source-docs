@@ -6,7 +6,7 @@ namespace SourceDocs.Core.Generation
     {
         public Repo()
         {
-            Nodes = new List<Node>();
+            // Nodes = new List<Node>();
         }
 
         public IList<Node> Nodes { get; set; }

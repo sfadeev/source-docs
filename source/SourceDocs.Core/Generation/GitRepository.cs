@@ -6,14 +6,14 @@ using LibGit2Sharp;
 
 namespace SourceDocs.Core.Generation
 {
-    public interface IRepository
+    public interface IRepository : IDisposable
     {
-        Node[] GetNodes(Node[] original = null);
+        IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes);
 
-        bool Update(Node node);
+        bool UpdateNode(Node node);
     }
 
-    public class GitRepository : IDisposable
+    public class GitRepository : IRepository
     {
         private readonly Repository _repo;
 
@@ -32,6 +32,97 @@ namespace SourceDocs.Core.Generation
                     branch.Remote != null ? "\n\t +  \t " + branch.Remote.Name + " (" + branch.Remote.Url + ")" : string.Empty,
                     branch.TrackedBranch != null ? "\n\t     + \t " + branch.TrackedBranch.Name : string.Empty);
             }
+        }
+
+        public IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes)
+        {
+            Fetch();
+
+            var branches = _repo.Branches.ToList();
+
+            // exclude local branches removed on remote
+            var result = (nodes ?? Enumerable.Empty<Node>())
+                .Where(x => branches.Any(b => b.IsRemote && b.CanonicalName == x.RemoteName)).ToList();
+
+            foreach (var branch in branches)
+            {
+                if (branch.IsRemote)
+                {
+                    var resultNode = result.FirstOrDefault(x => x.RemoteName == branch.CanonicalName);
+
+                    if (resultNode == null)
+                    {
+                        result.Add(resultNode = new Node
+                        {
+                            RemoteName = branch.CanonicalName,
+                        });
+                    }
+
+                    if (resultNode.Name == null)
+                        resultNode.Name = GenerateLocalBranchName(branch);
+
+                    resultNode.Updated = GetDateUpdated(branch);
+                }
+            }
+
+            return result;
+        }
+
+        public bool UpdateNode(Node node)
+        {
+            if (node == null) throw new ArgumentNullException("node");
+
+            var branches = _repo.Branches.ToList();
+
+            var remoteBranch = branches.FirstOrDefault(x => x.IsRemote && x.CanonicalName == node.RemoteName);
+            var localBranch = branches.FirstOrDefault(x => x.IsTracking && x.TrackedBranch.CanonicalName == node.RemoteName);
+
+            // remote not tracked
+            if (remoteBranch != null && localBranch == null)
+            {
+                if (node.Name == null)
+                    node.Name = GenerateLocalBranchName(remoteBranch);
+
+                Console.WriteLine("\t create and checkout {0} from {1} ({2})", node.Name, remoteBranch.Name,
+                    remoteBranch.CanonicalName);
+
+                localBranch = _repo.Branches.Update(
+                    _repo.CreateBranch(node.Name, remoteBranch.Tip),
+                    b => b.TrackedBranch = remoteBranch.CanonicalName);
+
+                node.Updated = GetDateUpdated(localBranch);
+
+                return true;
+            }
+
+            if (localBranch != null && localBranch.TrackingDetails.BehindBy > 0)
+            {
+                Checkout(localBranch.Name);
+
+                Console.WriteLine("\t pull : " + localBranch);
+
+                var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
+                {
+                    MergeOptions = new MergeOptions
+                    {
+                        FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
+                        OnCheckoutProgress = OnCheckoutProgress
+                    },
+                    FetchOptions = new FetchOptions
+                    {
+                        OnProgress = OnProgress,
+                        OnTransferProgress = OnTransferProgress
+                    }
+                });
+
+                Console.WriteLine("merge result : {0}, {1}", mergeResult.Status, mergeResult.Commit);
+
+                node.Updated = GetDateUpdated(localBranch);
+
+                return true;
+            }
+
+            return false;
         }
 
         private void Fetch()
@@ -94,9 +185,7 @@ namespace SourceDocs.Core.Generation
             // remote not tracked
             if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
             {
-                var localBranchName = branchName.StartsWith(branch.Remote.Name + "/")
-                    ? branchName.Substring(branch.Remote.Name.Length + 1)
-                    : branchName;
+                var localBranchName = GenerateLocalBranchName(branch);
 
                 Console.WriteLine("\t create and checkout {0} from {1} ({2})", localBranchName, branch.Name, branch.CanonicalName);
 
@@ -137,6 +226,18 @@ namespace SourceDocs.Core.Generation
             return branch.Tip;
         }
 
+        private static string GenerateLocalBranchName(Branch branch)
+        {
+            return branch.Name.StartsWith(branch.Remote.Name + "/")
+                ? branch.Name.Substring(branch.Remote.Name.Length + 1)
+                : branch.Name;
+        }
+
+        private static DateTimeOffset GetDateUpdated(Branch branch)
+        {
+            return branch.Tip.Author.When;
+        }
+
         public Branch Checkout(string branchName)
         {
             Console.WriteLine("\t checkout : " + branchName);
@@ -171,12 +272,12 @@ namespace SourceDocs.Core.Generation
 
         private static void OnCheckoutProgress(string path, int steps, int totalSteps)
         {
-            Console.WriteLine("OnCheckoutProgress : [{0}/{1}] {2}", steps, totalSteps, path);
+            // Console.WriteLine("OnCheckoutProgress : [{0}/{1}] {2}", steps, totalSteps, path);
         }
 
         private static bool OnTransferProgress(TransferProgress progress)
         {
-            Console.WriteLine("OnTransferProgress : [{0}/{1}/{2}] {3}", progress.IndexedObjects, progress.ReceivedObjects, progress.TotalObjects, progress.ReceivedBytes);
+            // Console.WriteLine("OnTransferProgress : [{0}/{1}/{2}] {3}", progress.IndexedObjects, progress.ReceivedObjects, progress.TotalObjects, progress.ReceivedBytes);
             return true;
         }
 

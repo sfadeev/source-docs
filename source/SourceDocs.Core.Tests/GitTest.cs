@@ -24,7 +24,7 @@ namespace SourceDocs.Core.Tests
             var repoDir = GetWorkingDir("./repos/", repoUrl, "repo");
             var configFile = Path.Combine(GetWorkingDir("./repos/", repoUrl), "config.json");
 
-            using (var repo = new GitRepository(repoUrl, repoDir))
+            using (IRepository repo = new GitRepository(repoUrl, repoDir))
             {
                 var config = File.Exists(configFile)
                     ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
@@ -41,7 +41,7 @@ namespace SourceDocs.Core.Tests
                     File.WriteAllText(configFile, serializeObject);
                 };
 
-                Action<string> update = branchName =>
+                /*Action<string> update = branchName =>
                 {
                     var commit = repo.Update(branchName);
 
@@ -63,45 +63,50 @@ namespace SourceDocs.Core.Tests
                     if (configChanged) writeConfig();
 
                     Thread.Sleep(1000);
-                };
+                };*/
 
-                foreach (var branchName in repo.GetBranches())
+                /*foreach (var branchName in repo.GetBranches())
                 {
                     update(branchName);
-                }
+                }*/
 
                 while (true)
                 {
-                    foreach (var branchName in repo.GetBranches(changedOnly: true))
+                    /*foreach (var branchName in repo.GetBranches(changedOnly: true))
                     {
                         update(branchName);
-                    }
+                    }*/
 
-                    foreach (var branch in config.Nodes)
-                    {
-                        if (branch.Generated == null || branch.Generated < branch.Updated)
-                        {
-                            repo.Checkout(branch.Name);
+                    config.Nodes = repo.UpdateNodes(config.Nodes).ToList();
 
-                            var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");
-                            Console.WriteLine("Generating docs for {0} in {1}", branch.Name, tempDir);
-                            Empty(tempDir);
-                            CopyDirs(repoDir, tempDir); // generate
-
-                            var outDir = GetWorkingDir("./repos/", repoUrl, "docs", branch.Name);
-                            Console.WriteLine("Copying docs for {0} to {1}", branch.Name, outDir);
-                            Empty(outDir);
-                            CopyDirs(tempDir, outDir); // ready docs
-
-                            Empty(tempDir);
-
-                            branch.Generated = branch.Updated;
-
-                            writeConfig();
-                        }
-                    }
+                    writeConfig();
 
                     Thread.Sleep(1000);
+
+                    foreach (var node in config.Nodes.Where(node => node.Generated == null || node.Updated > node.Generated))
+                    {
+                        // repo.Checkout(node.Name);
+                        repo.UpdateNode(node);
+
+                        // generate docs
+                        var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");
+                        Console.WriteLine("Generating docs for {0} in {1}", node.Name, tempDir);
+                        Empty(tempDir);
+                        CopyDirs(repoDir, tempDir); // generate
+
+                        var outDir = GetWorkingDir("./repos/", repoUrl, "docs", node.Name);
+                        Console.WriteLine("Copying docs for {0} to {1}", node.Name, outDir);
+                        Empty(outDir);
+                        CopyDirs(tempDir, outDir); // ready docs
+
+                        Empty(tempDir);
+
+                        node.Generated = node.Updated;
+
+                        writeConfig();
+
+                        Thread.Sleep(1000);
+                    }
                 }
             }
         }

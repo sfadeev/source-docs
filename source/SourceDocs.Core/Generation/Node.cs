@@ -9,6 +9,8 @@ namespace SourceDocs.Core.Generation
     {
         public string Name { get; set; }
 
+        public string RemoteName { get; set; }
+
         public DateTimeOffset Updated { get; set; }
 
         public DateTimeOffset? Generated { get; set; }

@@ -41,42 +41,8 @@ namespace SourceDocs.Core.Tests
                     File.WriteAllText(configFile, serializeObject);
                 };
 
-                /*Action<string> update = branchName =>
-                {
-                    var commit = repo.Update(branchName);
-
-                    var node = config.Nodes.FirstOrDefault(x => x.Name == branchName);
-
-                    var configChanged = false;
-                    if (node == null)
-                    {
-                        config.Nodes.Add(node = new Node { Name = branchName });
-                        configChanged = true;
-                    }
-
-                    if (commit != null)
-                    {
-                        node.Updated = commit.Committer.When;
-                        configChanged = true;
-                    }
-
-                    if (configChanged) writeConfig();
-
-                    Thread.Sleep(1000);
-                };*/
-
-                /*foreach (var branchName in repo.GetBranches())
-                {
-                    update(branchName);
-                }*/
-
                 while (true)
                 {
-                    /*foreach (var branchName in repo.GetBranches(changedOnly: true))
-                    {
-                        update(branchName);
-                    }*/
-
                     config.Nodes = repo.UpdateNodes(config.Nodes).ToList();
 
                     writeConfig();
@@ -84,13 +50,9 @@ namespace SourceDocs.Core.Tests
                     Thread.Sleep(1000);
 
                     Node node;
-
                     while ((node = config.Nodes.FirstOrDefault(x => x.Generated == null || x.Updated > x.Generated)) != null)
                     {
-                        // repo.Checkout(node.Name);
-                        // Console.WriteLine("Generating docs for {0} (Updated: {1}, Generated: {2})", node.Name, node.Updated, node.Generated);
                         repo.UpdateNode(node);
-                        // Console.WriteLine("Generating docs for {0} (Updated: {1}, Generated: {2})", node.Name, node.Updated, node.Generated);
 
                         // generate docs
                         var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");

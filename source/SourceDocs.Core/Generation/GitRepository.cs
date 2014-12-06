@@ -97,7 +97,7 @@ namespace SourceDocs.Core.Generation
 
             if (localBranch != null && localBranch.TrackingDetails.BehindBy > 0)
             {
-                Checkout(localBranch.Name);
+                localBranch = Checkout(localBranch);
 
                 Console.WriteLine("Pull : " + localBranch);
 
@@ -155,94 +155,6 @@ namespace SourceDocs.Core.Generation
             }
         }
 
-        public string[] GetBranches(bool changedOnly = false)
-        {
-            Fetch();
-
-            var result = new List<string>();
-
-            foreach (var branch in _repo.Branches)
-            {
-                if (changedOnly)
-                {
-                    if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
-                    {
-                        Console.WriteLine("Changed local : {0}, {1} behind", branch, branch.TrackingDetails.BehindBy);
-
-                        result.Add(branch.Name);
-                    }
-                    else if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
-                    {
-                        Console.WriteLine("Not tracked remote : {0}", branch);
-
-                        result.Add(branch.Name);
-                    }
-                }
-                else
-                {
-                    // all local and remote not tracked
-                    if (branch.IsTracking || (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch)))
-                    {
-                        Console.WriteLine("Branch : {0}", branch);
-
-                        result.Add(branch.Name);
-                    }
-                }
-            }
-
-            return result.ToArray();
-        }
-
-        public Commit Update(string branchName)
-        {
-            var branch = _repo.Branches[branchName];
-
-            Console.WriteLine("\n\t updating : " + branch);
-
-            // remote not tracked
-            if (branch.IsRemote && _repo.Branches.All(x => x.TrackedBranch != branch))
-            {
-                var localBranchName = GenerateLocalBranchName(branch);
-
-                Console.WriteLine("\t create and checkout {0} from {1} ({2})", localBranchName, branch.Name, branch.CanonicalName);
-
-                var trackedBranch = branch;
-                var localBranch = _repo.CreateBranch(localBranchName, trackedBranch.Tip);
-
-                _repo.Branches.Update(localBranch, b => b.TrackedBranch = trackedBranch.CanonicalName);
-            }
-            else if (branch.IsTracking && branch.TrackingDetails != null && branch.TrackingDetails.BehindBy > 0)
-            {
-                Checkout(branchName);
-
-                Console.WriteLine("\t pull : " + branch);
-
-                var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
-                {
-                    MergeOptions = new MergeOptions
-                    {
-                        FastForwardStrategy = FastForwardStrategy.FastForwardOnly,
-                        OnCheckoutProgress = OnCheckoutProgress
-                    },
-                    FetchOptions = new FetchOptions
-                    {
-                        OnProgress = OnProgress, OnTransferProgress = OnTransferProgress
-                    }
-                });
-
-                Console.WriteLine("merge result : {0}, {1}", mergeResult.Status, mergeResult.Commit);
-            }
-
-            branch = _repo.Branches[branchName];
-
-            if (branch.Tip != null)
-            {
-                Console.WriteLine("\t tip @ {0} - {1} ", branch.Tip.Committer.When, branch.Tip.Message);
-            }
-
-            return branch.Tip;
-        }
-
         private static string GenerateLocalBranchName(Branch branch)
         {
             return branch.Name.StartsWith(branch.Remote.Name + "/")
@@ -255,11 +167,11 @@ namespace SourceDocs.Core.Generation
             return branch.Tip.Author.When;
         }
 
-        public Branch Checkout(string branchName)
+        private Branch Checkout(Branch branch)
         {
-            Console.WriteLine("Checkout : " + branchName);
+            Console.WriteLine("Checkout : " + branch);
             
-            return _repo.Checkout(branchName, new CheckoutOptions
+            return _repo.Checkout(branch, new CheckoutOptions
             {
                 OnCheckoutProgress = OnCheckoutProgress
             });

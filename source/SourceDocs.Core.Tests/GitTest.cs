@@ -14,10 +14,7 @@ namespace SourceDocs.Core.Tests
     public class GitTest
     {
         [TestCase("https://github.com/sfadeev/renocco.git")]
-        [TestCase("https://github.com/sfadeev/source-docs.git")]
-        [TestCase("git://github.com/progit/progit2.git")]
-        [TestCase("https://hg@bitbucket.org/tortoisehg/thg")]
-        [TestCase("http://repo.or.cz/sqlgg.git")]
+        [TestCase("git://github.com/sfadeev/source-docs.git")]
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
         public void WorkflowTest(string repoUrl)
         {
@@ -51,9 +48,8 @@ namespace SourceDocs.Core.Tests
                 {
                     config.Nodes = repo.UpdateNodes(config.Nodes).ToList();
 
+                    // todo: write config if something changed
                     writeConfig();
-
-                    Thread.Sleep(1000);
 
                     Console.Write("."); // for pretty test ;)
 
@@ -67,9 +63,9 @@ namespace SourceDocs.Core.Tests
                         Console.WriteLine("Generating docs for {0} in {1}", node.Name, tempDir);
                         EmptyDirectory(tempDir);
 
-                        TransformDirectory(repoDir, tempDir, new TransformOptions
+                        Transform(repoDir, tempDir, new TransformOptions
                         {
-                            ExcludeDirectories = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" },
+                            ExcludeDirectories = new[] { "docs", "bin", "obj", "packages", ".nuget", ".git", ".svn" },
                             FileTransformers = new Dictionary<string, IFileTransformer>
                             {
                                 { ".md", new MarkdownFileTransformer() }
@@ -86,9 +82,9 @@ namespace SourceDocs.Core.Tests
                         node.Generated = node.Updated;
 
                         writeConfig();
-
-                        Thread.Sleep(1000);
                     }
+
+                    Thread.Sleep(5000);
                 }
             }
         }
@@ -122,82 +118,45 @@ namespace SourceDocs.Core.Tests
                 dir.Delete(true);
             }
         }
-
-        public class TransformOptions
-        {
-            public string[] ExcludeDirectories { get; set; }
-
-            public IDictionary<string, IFileTransformer> FileTransformers { get; set; }
-        }
-
-        public interface IFileTransformer
-        {
-            string Transform(string input);
-        }
-
-        public class MarkdownFileTransformer : IFileTransformer
-        {
-            public string Transform(string input)
-            {
-                var md = new MarkdownDeep.Markdown
-                {
-                    ExtraMode = true,
-                    SafeMode = false
-                };
-
-                return md.Transform(input);
-            }
-        }
-
-        public static void TransformDirectory(string from, string to, TransformOptions transformOptions)
+        
+        public static void Transform(string from, string to, TransformOptions transformOptions)
         {
             if (transformOptions == null) throw new ArgumentNullException("transformOptions");
 
-            // var foldersToExclude = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" };
-
             var directoryInfo = new DirectoryInfo(from);
-            foreach (var fileSystemInfo in directoryInfo.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+
+            foreach (var fileInfo in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories))
             {
-                var relativePath = GetRelativePath(directoryInfo.FullName, fileSystemInfo.FullName);
-                if (transformOptions.ExcludeDirectories.Any(s => relativePath.Contains(s)))
+                var relativePath = GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
+
+                // todo: use more complex match with * instead of StartsWith
+                if (transformOptions.ExcludeDirectories.Any(relativePath.StartsWith)) continue;
+                
+                IFileTransformer transformer;
+                if (transformOptions.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
                 {
-                    continue;
-                }
+                    var destFileName = Path.Combine(to, relativePath);
+                    var destDirectoryName = Path.GetDirectoryName(destFileName);
 
-                var destFileName = Path.Combine(to, relativePath);
+                    if (Directory.Exists(destDirectoryName) == false)
+                        Directory.CreateDirectory(destDirectoryName);
 
-                if ((fileSystemInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
-                {
-                    Directory.CreateDirectory(destFileName);
-                }
-                else
-                {
-                    IFileTransformer transformer;
-                    if (transformOptions.FileTransformers.TryGetValue(fileSystemInfo.Extension, out transformer))
-                    {
-                        var input = File.ReadAllText(fileSystemInfo.FullName);
+                    var input = File.ReadAllText(fileInfo.FullName);
+                    var output = transformer.Transform(input);
 
-                        var output = transformer.Transform(input);
-
-                        File.WriteAllText(destFileName, output);
-
-                        // File.Copy(fileSystemInfo.FullName, destFileName);
-                    }
+                    File.WriteAllText(destFileName, output);
                 }
             }
         }
+
         public static void CopyDirectory(string from, string to)
         {
-            // var foldersToExclude = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" };
-
             var directoryInfo = new DirectoryInfo(from);
+
+            // todo: enumerate only files or merge with Transform method
             foreach (var fileSystemInfo in directoryInfo.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
             {
                 var relativePath = GetRelativePath(directoryInfo.FullName, fileSystemInfo.FullName);
-                /*if (foldersToExclude.Any(s => relativePath.Contains(s)))
-                {
-                    continue;
-                }*/
 
                 var destFileName = Path.Combine(to, relativePath);
 

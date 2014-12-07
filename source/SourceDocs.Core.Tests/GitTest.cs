@@ -6,7 +6,6 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
-using SourceDocs.Core.Generation;
 
 namespace SourceDocs.Core.Tests
 {
@@ -24,7 +23,13 @@ namespace SourceDocs.Core.Tests
             var repoDir = GetWorkingDir("./repos/", repoUrl, "repo");
             var configFile = Path.Combine(GetWorkingDir("./repos/", repoUrl), "config.json");
 
-            using (IRepository repo = new GitRepository(repoUrl, repoDir))
+            var settings = new GitRepository.Settings
+            {
+                Url = repoUrl,
+                WorkingDirectory = repoDir
+            };
+
+            using (IRepository repo = new GitRepository(settings))
             {
                 var config = File.Exists(configFile)
                     ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
@@ -48,6 +53,8 @@ namespace SourceDocs.Core.Tests
                     writeConfig();
 
                     Thread.Sleep(1000);
+
+                    Console.Write("."); // for pretty test ;)
 
                     Node node;
                     while ((node = config.Nodes.FirstOrDefault(x => x.Generated == null || x.Updated > x.Generated)) != null)

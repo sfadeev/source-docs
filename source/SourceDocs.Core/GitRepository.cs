@@ -1,30 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using LibGit2Sharp;
 
-namespace SourceDocs.Core.Generation
+namespace SourceDocs.Core
 {
-    public interface IRepository : IDisposable
-    {
-        IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes);
-
-        bool UpdateNode(Node node);
-    }
-
     public class GitRepository : IRepository
     {
-        private readonly Repository _repo;
+        public class Settings
+        {
+            /// <summary>
+            /// The URL of the remote Git repository.
+            /// </summary>
+            public string Url { get; set; }
+
+            /// <summary>
+            /// Working directory of .
+            /// </summary>
+            public string WorkingDirectory { get; set; }
+
+            /// <summary>
+            /// Patterns of branches to be monitored on changes in format +:* (to include branches) or -:*  (to exclude branches).
+            /// </summary>
+            [DefaultValue(new[] { "+:refs/heads/*" })]
+            public string[] Branches { get; set; }
+
+            public string Username { get; set; }
+
+            public string Password { get; set; }
+        }
+
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private readonly Settings _settings;
+
+        private readonly Repository _git;
 
         // todo: set specified timeout to delayed generate
-        public GitRepository(string repoUrl, string workingDir)
+        public GitRepository(Settings settings)
         {
-            Console.WriteLine("\nRepo : " + repoUrl);
+            if (settings == null) throw new ArgumentNullException("settings");
 
-            _repo = GetRepository(repoUrl, workingDir);
+            _settings = settings;
 
-            /*foreach (var branch in _repo.Branches)
+            _git = GetRepository();
+
+            /*foreach (var branch in _git.Branches)
             {
                 Console.WriteLine("\t[{0}] [{1}] {2} ({3}) {4} {5}",
                     branch.IsRemote ? "R" : " ", branch.IsTracking ? "T" : " ",
@@ -38,7 +61,7 @@ namespace SourceDocs.Core.Generation
         {
             Fetch();
 
-            var branches = _repo.Branches.ToList();
+            var branches = _git.Branches.ToList();
 
             // exclude local branches removed on remote
             var result = (nodes ?? Enumerable.Empty<Node>())
@@ -72,7 +95,7 @@ namespace SourceDocs.Core.Generation
         {
             if (node == null) throw new ArgumentNullException("node");
 
-            var branches = _repo.Branches.ToList();
+            var branches = _git.Branches.ToList();
 
             var remoteBranch = branches.FirstOrDefault(x => x.IsRemote && x.CanonicalName == node.RemoteName);
             var localBranch = branches.FirstOrDefault(x => x.IsTracking && x.TrackedBranch.CanonicalName == node.RemoteName);
@@ -83,11 +106,10 @@ namespace SourceDocs.Core.Generation
                 if (node.Name == null)
                     node.Name = GenerateLocalBranchName(remoteBranch);
 
-                Console.WriteLine("Create and checkout {0} from {1} ({2})", node.Name, remoteBranch.Name,
-                    remoteBranch.CanonicalName);
+                Console.WriteLine("Checkout {0} from {1} ({2})", node.Name, remoteBranch.Name, remoteBranch.CanonicalName);
 
-                localBranch = _repo.Branches.Update(
-                    _repo.CreateBranch(node.Name, remoteBranch.Tip),
+                localBranch = _git.Branches.Update(
+                    _git.CreateBranch(node.Name, remoteBranch.Tip),
                     b => b.TrackedBranch = remoteBranch.CanonicalName);
 
                 node.Updated = GetDateUpdated(localBranch);
@@ -101,7 +123,7 @@ namespace SourceDocs.Core.Generation
 
                 Console.WriteLine("Pull : " + localBranch);
 
-                var mergeResult = _repo.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
+                var mergeResult = _git.Network.Pull(new Signature("sd", "sd", DateTimeOffset.Now), new PullOptions
                 {
                     MergeOptions = new MergeOptions
                     {
@@ -132,11 +154,14 @@ namespace SourceDocs.Core.Generation
 
         private void Fetch()
         {
-            foreach (var remote in _repo.Network.Remotes)
+            foreach (var remote in _git.Network.Remotes)
             {
-                // Console.WriteLine("Fetching from : " + remote.Name);
-
-                // Removed on origin is not removed in local repo
+                if (Log.IsDebugEnabled)
+                {
+                    Log.DebugFormat("Fetching from {0}@{1}", remote.Name, _settings.Url);
+                }
+                
+                // todo: Branches removed on origin is not removed in local repository
                 // Remote prune #2700 - status is Open as of 12/07/2014
                 // https://github.com/libgit2/libgit2/pull/2700
 
@@ -144,14 +169,14 @@ namespace SourceDocs.Core.Generation
                 {
                     OnUpdateTips = (name, id, newId) =>
                     {
-                        Console.WriteLine("Fetch.OnUpdateTips : {0},  {1},  {2}", name, id, newId);
+                        Console.WriteLine("\nFetch.OnUpdateTips : {0},  {1},  {2}", name, id, newId);
                         return true;
                     },
                     OnProgress = OnProgress,
                     OnTransferProgress = OnTransferProgress
                 };
 
-                _repo.Network.Fetch(remote, fetchOptions);
+                _git.Network.Fetch(remote, fetchOptions);
             }
         }
 
@@ -171,26 +196,41 @@ namespace SourceDocs.Core.Generation
         {
             Console.WriteLine("Checkout : " + branch);
             
-            return _repo.Checkout(branch, new CheckoutOptions
+            return _git.Checkout(branch, new CheckoutOptions
             {
                 OnCheckoutProgress = OnCheckoutProgress
             });
         }
 
-        private static Repository GetRepository(string repoUrl, string workingDir)
+        private Repository GetRepository()
         {
-            if (Directory.EnumerateFileSystemEntries(workingDir).Any() == false)
+            if (Directory.EnumerateFileSystemEntries(_settings.WorkingDirectory).Any() == false)
             {
-                Repository.Clone(repoUrl, workingDir, new CloneOptions
+                if (Log.IsDebugEnabled)
                 {
-                    // Checkout = false,
-                    // IsBare = true,
+                    Log.DebugFormat("Cloning git repository {0} in {1}", _settings.Url, _settings.WorkingDirectory);
+                }
+
+                var cloneDirectory = Repository.Clone(_settings.Url, _settings.WorkingDirectory, new CloneOptions
+                {
                     OnCheckoutProgress = OnCheckoutProgress,
                     OnTransferProgress = OnTransferProgress
                 });
+
+                if (Log.IsDebugEnabled)
+                {
+                    Log.DebugFormat("Cloned git repository {0} in {1} ({2})", _settings.Url, _settings.WorkingDirectory, cloneDirectory);
+                }
             }
 
-            return new Repository(workingDir);
+            var repository = new Repository(_settings.WorkingDirectory);
+
+            if (Log.IsDebugEnabled)
+            {
+                Log.DebugFormat("Initialized git repository {0} in {1}", _settings.Url, _settings.WorkingDirectory);
+            }
+
+            return repository;
         }
 
         private static bool OnProgress(string serverProgressOutput)
@@ -212,7 +252,7 @@ namespace SourceDocs.Core.Generation
 
         public void Dispose()
         {
-            _repo.Dispose();
+            _git.Dispose();
         }
     }
 }

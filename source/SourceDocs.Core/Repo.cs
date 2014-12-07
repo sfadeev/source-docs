@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SourceDocs.Core.Generation
+namespace SourceDocs.Core
 {
     public class Repo
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -23,13 +24,13 @@ namespace SourceDocs.Core.Tests
             var repoDir = GetWorkingDir("./repos/", repoUrl, "repo");
             var configFile = Path.Combine(GetWorkingDir("./repos/", repoUrl), "config.json");
 
-            var settings = new GitRepository.Settings
+            var gitSettings = new GitRepository.Settings
             {
                 Url = repoUrl,
                 WorkingDirectory = repoDir
             };
 
-            using (IRepository repo = new GitRepository(settings))
+            using (IRepository repo = new GitRepository(gitSettings))
             {
                 var config = File.Exists(configFile)
                     ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
@@ -64,15 +65,23 @@ namespace SourceDocs.Core.Tests
                         // generate docs
                         var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");
                         Console.WriteLine("Generating docs for {0} in {1}", node.Name, tempDir);
-                        Empty(tempDir);
-                        CopyDirs(repoDir, tempDir); // generate
+                        EmptyDirectory(tempDir);
+
+                        TransformDirectory(repoDir, tempDir, new TransformOptions
+                        {
+                            ExcludeDirectories = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" },
+                            FileTransformers = new Dictionary<string, IFileTransformer>
+                            {
+                                { ".md", new MarkdownFileTransformer() }
+                            }
+                        });
 
                         var outDir = GetWorkingDir("./repos/", repoUrl, "docs", node.Name);
                         Console.WriteLine("Copying docs for {0} to {1}", node.Name, outDir);
-                        Empty(outDir);
-                        CopyDirs(tempDir, outDir); // ready docs
+                        EmptyDirectory(outDir);
+                        CopyDirectory(tempDir, outDir); // ready docs
 
-                        Empty(tempDir);
+                        EmptyDirectory(tempDir);
 
                         node.Generated = node.Updated;
 
@@ -99,7 +108,7 @@ namespace SourceDocs.Core.Tests
             return workingDir;
         }
 
-        public static void Empty(string directoryPath)
+        public static void EmptyDirectory(string directoryPath)
         {
             var directoryInfo = new DirectoryInfo(directoryPath);
 
@@ -114,18 +123,81 @@ namespace SourceDocs.Core.Tests
             }
         }
 
-        public static void CopyDirs(string from, string to)
+        public class TransformOptions
         {
-            var foldersToExclude = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" };
+            public string[] ExcludeDirectories { get; set; }
+
+            public IDictionary<string, IFileTransformer> FileTransformers { get; set; }
+        }
+
+        public interface IFileTransformer
+        {
+            string Transform(string input);
+        }
+
+        public class MarkdownFileTransformer : IFileTransformer
+        {
+            public string Transform(string input)
+            {
+                var md = new MarkdownDeep.Markdown
+                {
+                    ExtraMode = true,
+                    SafeMode = false
+                };
+
+                return md.Transform(input);
+            }
+        }
+
+        public static void TransformDirectory(string from, string to, TransformOptions transformOptions)
+        {
+            if (transformOptions == null) throw new ArgumentNullException("transformOptions");
+
+            // var foldersToExclude = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" };
 
             var directoryInfo = new DirectoryInfo(from);
             foreach (var fileSystemInfo in directoryInfo.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
             {
                 var relativePath = GetRelativePath(directoryInfo.FullName, fileSystemInfo.FullName);
-                if (foldersToExclude.Any(s => relativePath.Contains(s)))
+                if (transformOptions.ExcludeDirectories.Any(s => relativePath.Contains(s)))
                 {
                     continue;
                 }
+
+                var destFileName = Path.Combine(to, relativePath);
+
+                if ((fileSystemInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    Directory.CreateDirectory(destFileName);
+                }
+                else
+                {
+                    IFileTransformer transformer;
+                    if (transformOptions.FileTransformers.TryGetValue(fileSystemInfo.Extension, out transformer))
+                    {
+                        var input = File.ReadAllText(fileSystemInfo.FullName);
+
+                        var output = transformer.Transform(input);
+
+                        File.WriteAllText(destFileName, output);
+
+                        // File.Copy(fileSystemInfo.FullName, destFileName);
+                    }
+                }
+            }
+        }
+        public static void CopyDirectory(string from, string to)
+        {
+            // var foldersToExclude = new[] { "\\docs", "\\bin", "\\obj", "\\packages", "\\.nuget", ".git", "\\.svn" };
+
+            var directoryInfo = new DirectoryInfo(from);
+            foreach (var fileSystemInfo in directoryInfo.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+            {
+                var relativePath = GetRelativePath(directoryInfo.FullName, fileSystemInfo.FullName);
+                /*if (foldersToExclude.Any(s => relativePath.Contains(s)))
+                {
+                    continue;
+                }*/
 
                 var destFileName = Path.Combine(to, relativePath);
 

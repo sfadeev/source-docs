@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Globalization;
 
 namespace SourceDocs.Core
 {
@@ -20,11 +19,7 @@ namespace SourceDocs.Core
 
         private string DebuggerDisplay
         {
-            get
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "{0} ({1}), updated: {2}, generated: {3}", Name, RemoteName, Updated, Generated);
-            }
+            get { return string.Format("{0} ({1}), updated: {2}", Name, RemoteName, Updated); }
         }
     }
 }

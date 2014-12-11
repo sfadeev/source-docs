@@ -109,8 +109,22 @@
     <Content Include="Content\dashboard2.min.css">
       <DependentUpon>dashboard2.css</DependentUpon>
     </Content>
+    <Content Include="Scripts\app.js" />
+    <Content Include="Scripts\apps\files\files_app.js" />
+    <Content Include="Scripts\apps\files\list\list_controller.js" />
+    <Content Include="Scripts\apps\files\list\list_view.js" />
+    <Content Include="Scripts\backbone.marionette\backbone.babysitter.js" />
+    <Content Include="Scripts\backbone.marionette\backbone.js" />
+    <Content Include="Scripts\backbone.marionette\backbone.marionette.js" />
+    <Content Include="Scripts\backbone.marionette\backbone.marionette.min.js" />
+    <Content Include="Scripts\backbone.marionette\backbone.wreqr.js" />
+    <Content Include="Scripts\backbone.marionette\jquery.js" />
+    <Content Include="Scripts\backbone.marionette\json2.js" />
+    <Content Include="Scripts\backbone.marionette\underscore.js" />
+    <Content Include="Scripts\backbone.picky.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\entities\files.js" />
     <Content Include="Scripts\ie10-viewport-bug-workaround.js" />
     <Content Include="Content\source-docs.less" />
     <Content Include="Content\source-docs.css.map">
@@ -197,6 +211,7 @@
     <Content Include="Content\bootstrap\bootstrap.less" />
     <Content Include="Content\bootstrap\badges.less" />
     <Content Include="Content\bootstrap\alerts.less" />
+    <Content Include="Scripts\backbone.marionette\backbone.marionette.map" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
@@ -229,6 +244,7 @@
       <Name>SourceDocs.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

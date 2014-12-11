@@ -13,6 +13,7 @@ namespace SourceDocs.Core.Tests
     [TestFixture]
     public class GitTest
     {
+        [TestCase("https://github.com/davidsulc/marionette-gentle-introduction.git")]
         [TestCase("https://github.com/sfadeev/renocco.git")]
         [TestCase("git://github.com/sfadeev/source-docs.git")]
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]

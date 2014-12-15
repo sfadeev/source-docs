@@ -13,7 +13,7 @@ namespace SourceDocs.Core.Tests
     [TestFixture]
     public class GitTest
     {
-        [TestCase("https://github.com/davidsulc/marionette-gentle-introduction.git")]
+        // [TestCase("https://github.com/davidsulc/marionette-gentle-introduction.git")]
         [TestCase("https://github.com/sfadeev/renocco.git")]
         [TestCase("git://github.com/sfadeev/source-docs.git")]
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
@@ -34,15 +34,15 @@ namespace SourceDocs.Core.Tests
                     ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
                     : new Repo();
 
-                Action writeConfig = () =>
+                Action<string, object> serialize = (path, value) =>
                 {
-                    var serializeObject = JsonConvert.SerializeObject(config, Formatting.Indented,
+                    var serializeObject = JsonConvert.SerializeObject(value, Formatting.Indented,
                         new JsonSerializerSettings
                         {
                             ContractResolver = new CamelCasePropertyNamesContractResolver()
                         });
 
-                    File.WriteAllText(configFile, serializeObject);
+                    File.WriteAllText(path, serializeObject);
                 };
 
                 while (true)
@@ -50,7 +50,7 @@ namespace SourceDocs.Core.Tests
                     config.Nodes = repo.UpdateNodes(config.Nodes).ToList();
 
                     // todo: write config if something changed
-                    writeConfig();
+                    serialize(configFile, config);
 
                     Console.Write("."); // for pretty test ;)
 
@@ -60,11 +60,11 @@ namespace SourceDocs.Core.Tests
                         repo.UpdateNode(node);
 
                         // generate docs
-                        var tempDir = GetWorkingDir("./repos/", repoUrl, "temp");
+                        var tempDir = GetWorkingDir("./repos/", gitSettings.Url, "temp");
                         Console.WriteLine("Generating docs for {0} in {1}", node.Name, tempDir);
                         EmptyDirectory(tempDir);
 
-                        Transform(repoDir, tempDir, new TransformOptions
+                        var index = Transform(gitSettings.WorkingDirectory, tempDir, new TransformOptions
                         {
                             ExcludeDirectories = new[] { "docs", "bin", "obj", "packages", ".nuget", ".git", ".svn" },
                             FileTransformers = new Dictionary<string, IFileTransformer>
@@ -73,7 +73,9 @@ namespace SourceDocs.Core.Tests
                             }
                         });
 
-                        var outDir = GetWorkingDir("./repos/", repoUrl, "docs", node.Name);
+                        serialize(Path.Combine(tempDir, "index.json"), index);
+
+                        var outDir = GetWorkingDir("./repos/", gitSettings.Url, "docs", node.Name);
                         Console.WriteLine("Copying docs for {0} to {1}", node.Name, outDir);
                         EmptyDirectory(outDir);
                         CopyDirectory(tempDir, outDir); // ready docs
@@ -82,7 +84,7 @@ namespace SourceDocs.Core.Tests
 
                         node.Generated = node.Updated;
 
-                        writeConfig();
+                        serialize(configFile, config);
                     }
 
                     Thread.Sleep(5000);
@@ -119,10 +121,19 @@ namespace SourceDocs.Core.Tests
                 dir.Delete(true);
             }
         }
-        
-        public static void Transform(string from, string to, TransformOptions transformOptions)
+
+        public class FileItem
+        {
+            public string Name { get; set; }
+
+            public string Path { get; set; }
+        }
+
+        public static IList<FileItem> Transform(string from, string to, TransformOptions transformOptions)
         {
             if (transformOptions == null) throw new ArgumentNullException("transformOptions");
+
+            var index = new List<FileItem>();
 
             var directoryInfo = new DirectoryInfo(from);
 
@@ -136,6 +147,8 @@ namespace SourceDocs.Core.Tests
                 IFileTransformer transformer;
                 if (transformOptions.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
                 {
+                    index.Add(new FileItem { Name = Path.GetFileName(relativePath), Path = relativePath.Replace('\\', '/') });
+
                     var destFileName = Path.Combine(to, relativePath);
                     var destDirectoryName = Path.GetDirectoryName(destFileName);
 
@@ -148,6 +161,8 @@ namespace SourceDocs.Core.Tests
                     File.WriteAllText(destFileName, output);
                 }
             }
+
+            return index;
         }
 
         public static void CopyDirectory(string from, string to)

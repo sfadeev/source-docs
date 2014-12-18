@@ -22,7 +22,17 @@ Dokka.on("start", function() {
         Backbone.history.start();
 
         if (this.getCurrentRoute() === "") {
-            // Dokka.trigger("contacts:list");
+            Dokka.trigger("contacts:list");
         }
     }
+});
+
+// temp. from other apps
+Dokka.on("contacts:list", function () {
+    Dokka.navigate("contacts");
+    // API.listContacts();
+});
+Dokka.on("about:show", function () {
+    Dokka.navigate("about");
+    // API.listContacts();
 });

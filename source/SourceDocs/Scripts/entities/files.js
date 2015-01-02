@@ -7,6 +7,7 @@ Dokka.module("Entities", function (Entities, Dokka, Backbone, Marionette, $, _) 
     });
 
     Entities.FileCollection = Backbone.Collection.extend({
+        url: "files",
         model: Entities.File,
 
         initialize: function () {
@@ -15,19 +16,19 @@ Dokka.module("Entities", function (Entities, Dokka, Backbone, Marionette, $, _) 
         }
     });
 
-    var initializeFiles = function () {
-        Entities.files = new Entities.FileCollection([
-          { name: "Contacts", url: "contacts", navigationTrigger: "contacts:list" },
-          { name: "About", url: "about", navigationTrigger: "about:show" }
-        ]);
-    };
-
     var API = {
         getFiles: function () {
             if (Entities.files === undefined) {
-                initializeFiles();
+                Entities.files = new Entities.FileCollection();
             }
-            return Entities.files;
+
+            var defer = $.Deferred();
+            Entities.files.fetch({
+                success: function(data) {
+                    defer.resolve(data);
+                }
+            });
+            return defer.promise();
         }
     };
 

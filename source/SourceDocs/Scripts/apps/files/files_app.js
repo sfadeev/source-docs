@@ -10,6 +10,11 @@
         Dokka.FilesApp.List.Controller.setActiveFile(name);
     });
 
+    Dokka.on("contacts:list", function () {
+        Dokka.navigate("contacts");
+        API.listFiles();
+    });
+
     Files.on("start", function() {
         API.listFiles();
     });

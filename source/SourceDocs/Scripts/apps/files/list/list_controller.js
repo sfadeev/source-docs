@@ -14,7 +14,7 @@
                     Dokka.trigger(trigger);
                 });
 
-                Dokka.headerRegion.show(headers);
+                Dokka.filesRegion.show(headers);
             });
         },
 

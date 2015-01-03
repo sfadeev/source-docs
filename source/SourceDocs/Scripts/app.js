@@ -1,7 +1,7 @@
 ﻿var Dokka = new Backbone.Marionette.Application();
 
 Dokka.addRegions({
-    headerRegion: "#header-region",
+    filesRegion: "#files-region",
     mainRegion: "#main-region",
     /*dialogRegion: Marionette.Region.Dialog.extend({
         el: "#dialog-region"
@@ -28,10 +28,6 @@ Dokka.on("start", function() {
 });
 
 // temp. from other apps
-Dokka.on("contacts:list", function () {
-    Dokka.navigate("contacts");
-    // API.listContacts();
-});
 Dokka.on("about:show", function () {
     Dokka.navigate("about");
     // API.listContacts();

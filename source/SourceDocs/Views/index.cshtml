@@ -1,34 +1,62 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Source Docs</title>
-    <link rel="shortcut icon" href="~/favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="~/Content/source-docs.css" />
-    <link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css" />
+    <meta charset="utf-8"/>
+    <title>Docs</title>
+    <link rel="shortcut icon" href="~/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/source-docs.css"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css"/>
 </head>
 <body>
 
-    <div id="header-region"></div>
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
 
-    <div id="main-region" class="container">
-        <p>Here is static content in the web page. You'll notice that it gets replaced by our app as soon as we start it.</p>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#contacts">D</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                <ul class="nav navbar-nav" id="files-region">
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Test <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="./Dashboard1/">Dashboard 1</a></li>
+                            <li><a href="./Dashboard2/">Dashboard 2</a></li>
+                            <li><a href="./Dashboard3/">Dashboard 3</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+
+        </div>
+    </div>
+
+    <div id="main-region">
     </div>
 
     <div id="dialog-region"></div>
-    
-    <script type="text/template" id="header-template">
-        <div class="navbar-inner">
-            <div class="container">
-                <a class="brand" href="#contacts">[Contact manager]</a>
-                <div class="nav-collapse collapse1">
-                    <ul class="nav"></ul>
-                </div>
-            </div>
-        </div>
+
+    <script type="text/template" id="files-template">
+        <!-- li class="dropdown" -->
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Files <span class="caret"></span></a>
+        <ul class="dropdown-menu files" role="menu"></ul>
+        <!-- /li -->
     </script>
 
-    <script type="text/template" id="header-link">
+    <script type="text/template" id="files-link">
         <a href="#<%- url %>"><%- name %></a>
     </script>
 
@@ -44,7 +72,7 @@
 
     <script type="text/javascript" src="./Scripts/app.js"></script>
     <script type="text/javascript" src="./Scripts/entities/files.js"></script>
-    
+
     <script type="text/javascript" src="./Scripts/apps/files/files_app.js"></script>
     <script type="text/javascript" src="./Scripts/apps/files/list/list_view.js"></script>
     <script type="text/javascript" src="./Scripts/apps/files/list/list_controller.js"></script>
@@ -52,18 +80,6 @@
     <script type="text/javascript">
         Dokka.start();
     </script>
-
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <hr />
-    <ul>
-        <li><a href="~/Dashboard1/">Dashboard1</a></li>
-        <li><a href="~/Dashboard2/">Dashboard2</a></li>
-        <li><a href="~/Dashboard3/">Dashboard3</a></li>
-    </ul>
 
 </body>
 </html>

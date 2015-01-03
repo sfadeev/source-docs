@@ -1,6 +1,6 @@
 ﻿Dokka.module("FilesApp.List", function(List, Dokka, Backbone, Marionette, $, _) {
     List.Header = Marionette.ItemView.extend({
-        template: "#header-link",
+        template: "#files-link",
         tagName: "li",
 
         events: {
@@ -21,10 +21,11 @@
     });
 
     List.Headers = Marionette.CompositeView.extend({
-        template: "#header-template",
-        className: "navbar navbar-default navbar-fixed-top",
+        template: "#files-template",
+        tagName: "li",
+        className: "dropdown",
         childView: List.Header,
-        childViewContainer: "ul",
+        childViewContainer: "ul.files",
 
         events: {
             "click a.brand": "brandClicked"

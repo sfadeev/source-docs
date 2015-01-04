@@ -1,6 +1,6 @@
-﻿App.module("FilesApp.List", function(Module, App, Backbone, Marionette, $, _) {
-    Module.HeaderView = Marionette.ItemView.extend({
-        template: "#files-link",
+﻿App.module("Repos.List", function(Module, App, Backbone, Marionette, $, _) {
+    Module.RepoView = Marionette.ItemView.extend({
+        template: "#repos-link",
         tagName: "li",
 
         events: {
@@ -20,20 +20,20 @@
         }
     });
 
-    Module.HeaderListView = Marionette.CompositeView.extend({
-        template: "#files-template",
+    Module.RepoListView = Marionette.CompositeView.extend({
+        template: "#repos-template",
         tagName: "li",
         className: "dropdown",
-        childView: Module.HeaderView,
-        childViewContainer: "ul.files",
+        childView: Module.RepoView,
+        childViewContainer: "ul.repos",
 
-        events: {
+        /*events: {
             "click a.brand": "brandClicked"
         },
 
         brandClicked: function(e) {
             e.preventDefault();
             this.trigger("brand:clicked");
-        }
+        }*/
     });
 });

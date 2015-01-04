@@ -1,17 +1,17 @@
-﻿Dokka.module("FilesApp", function(Files, Dokka, Backbone, Marionette, $, _) {
+﻿App.module("FilesApp", function(Files, App, Backbone, Marionette, $, _) {
     var API = {
         listFiles: function() {
             Files.List.Controller.listFiles();
         }
     };
 
-    Dokka.commands.setHandler("set:active:file", function (name) {
+    App.commands.setHandler("set:active:file", function (name) {
         alert(name);
-        Dokka.FilesApp.List.Controller.setActiveFile(name);
+        App.FilesApp.List.Controller.setActiveFile(name);
     });
 
-    Dokka.on("contacts:list", function () {
-        Dokka.navigate("contacts");
+    App.on("contacts:list", function () {
+        App.navigate("contacts");
         API.listFiles();
     });
 

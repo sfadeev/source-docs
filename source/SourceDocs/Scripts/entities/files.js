@@ -1,4 +1,4 @@
-Dokka.module("Entities", function (Entities, Dokka, Backbone, Marionette, $, _) {
+App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
     Entities.File = Backbone.Model.extend({
         initialize: function () {
             var selectable = new Backbone.Picky.Selectable(this);
@@ -32,7 +32,7 @@ Dokka.module("Entities", function (Entities, Dokka, Backbone, Marionette, $, _) 
         }
     };
 
-    Dokka.reqres.setHandler("header:entities", function () {
+    App.reqres.setHandler("header:entities", function () {
         return API.getFiles();
     });
 });

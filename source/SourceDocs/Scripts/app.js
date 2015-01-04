@@ -1,6 +1,13 @@
-﻿var Dokka = new Backbone.Marionette.Application();
+﻿var App = new Backbone.Marionette.Application();
 
-Dokka.addRegions({
+App.config = {
+    api: {
+        url: "api/"
+    }
+};
+
+App.addRegions({
+    reposRegion: "#repos-region",
     filesRegion: "#files-region",
     mainRegion: "#main-region",
     /*dialogRegion: Marionette.Region.Dialog.extend({
@@ -8,27 +15,27 @@ Dokka.addRegions({
     })*/
 });
 
-Dokka.navigate = function (route, options) {
+App.navigate = function (route, options) {
     options || (options = {});
     Backbone.history.navigate(route, options);
 };
 
-Dokka.getCurrentRoute = function () {
+App.getCurrentRoute = function () {
     return Backbone.history.fragment;
 };
 
-Dokka.on("start", function() {
+App.on("start", function() {
     if (Backbone.history) {
         Backbone.history.start();
 
         if (this.getCurrentRoute() === "") {
-            Dokka.trigger("contacts:list");
+            App.trigger("contacts:list");
         }
     }
 });
 
 // temp. from other apps
-Dokka.on("about:show", function () {
-    Dokka.navigate("about");
+App.on("about:show", function () {
+    App.navigate("about");
     // API.listContacts();
 });

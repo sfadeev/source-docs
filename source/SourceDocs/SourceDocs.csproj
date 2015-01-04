@@ -116,6 +116,9 @@
     <Content Include="Scripts\apps\files\files_app.js" />
     <Content Include="Scripts\apps\files\list\list_controller.js" />
     <Content Include="Scripts\apps\files\list\list_view.js" />
+    <Content Include="Scripts\apps\repos\list\list_controller.js" />
+    <Content Include="Scripts\apps\repos\list\list_view.js" />
+    <Content Include="Scripts\apps\repos\repos_app.js" />
     <Content Include="Scripts\backbone.marionette\backbone.babysitter.js" />
     <Content Include="Scripts\backbone.marionette\backbone.js" />
     <Content Include="Scripts\backbone.marionette\backbone.marionette.js" />
@@ -127,6 +130,7 @@
     <Content Include="Scripts\backbone.picky.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\entities\repos.js" />
     <Content Include="Scripts\entities\files.js" />
     <Content Include="Scripts\ie10-viewport-bug-workaround.js" />
     <Content Include="Content\source-docs.less" />
@@ -223,6 +227,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiModule.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="IndexModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

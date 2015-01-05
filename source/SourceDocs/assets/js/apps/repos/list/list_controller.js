@@ -12,8 +12,6 @@
                 });*/
 
                 view.on("childview:navigate", function (childView, model) {
-                    // App.navigate(model.get("id"));
-
                     App.commands.execute("set:active:repo", model.get("id"));
 
                     /*var trigger = model.get("navigationTrigger");
@@ -27,16 +25,15 @@
 
         selectRepo: function (id) {
             if (Module.repos) {
-                var repoToSelect = Module.repos.find(function (repo) { return repo.get("id") === id; });
+                var repo = Module.repos.find(function (x) { return x.get("id") === id; });
 
-                if (repoToSelect === undefined && Module.repos.length > 0) {
-                    repoToSelect = Module.repos.at(0);
+                if (repo === undefined && Module.repos.length > 0) {
+                    repo = Module.repos.at(0);
                 }
 
-                if (repoToSelect) {
-                    repoToSelect.select(); 
-                    Module.selectedRepoId = repoToSelect.get("id");
-                    App.navigate(Module.selectedRepoId);
+                if (repo) {
+                    repo.select();
+                    App.navigate(repo.get("id"));
                     Module.repos.trigger("reset");
                 }
             }

@@ -14,6 +14,8 @@ namespace SourceDocs
             base.ConfigureConventions(conventions);
 
             conventions.StaticContentsConventions.Add(
+                StaticContentConventionBuilder.AddDirectory("assets"));
+            conventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("Scripts"));
         }
     }

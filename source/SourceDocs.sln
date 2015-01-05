@@ -16,6 +16,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceDocs.Core", "SourceDo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceDocs.Core.Tests", "SourceDocs.Core.Tests\SourceDocs.Core.Tests.csproj", "{28F8089B-05B7-477E-B291-1701C3191207}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".configs", ".configs", "{27B019F9-ABD6-4204-AB04-42B9772E7242}"
+	ProjectSection(SolutionItems) = preProject
+		bower.json = bower.json
+		gulpfile.js = gulpfile.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

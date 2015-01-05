@@ -1,8 +1,8 @@
 App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
     Entities.File = Backbone.Model.extend({
         initialize: function () {
-            var selectable = new Backbone.Picky.Selectable(this);
-            _.extend(this, selectable);
+           /* var selectable = new Backbone.Picky.Selectable(this);
+            _.extend(this, selectable);*/
         }
     });
 
@@ -11,8 +11,8 @@ App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
         model: Entities.File,
 
         initialize: function () {
-            var singleSelect = new Backbone.Picky.SingleSelect(this);
-            _.extend(this, singleSelect);
+            /*var singleSelect = new Backbone.Picky.SingleSelect(this);
+            _.extend(this, singleSelect);*/
         }
     });
 

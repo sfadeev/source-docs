@@ -3,7 +3,7 @@
 
 .logs/*
 source/SourceDocs/.repos/*
-source/SourceDocs/bower_components/*
+source/bower_components/*
 source/packages
 
 # User-specific files

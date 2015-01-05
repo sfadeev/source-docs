@@ -1,0 +1,20 @@
+{
+  "name": "SourceDocs",
+  "version": "0.0.0",
+  "homepage": "https://github.com/sfadeev/source-docs",
+  "authors": [
+    "Sergey Fadeev <fadeev@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "marionette": "~2.3.0",
+    "backbone.cycle": "~1.1.0"
+  }
+}

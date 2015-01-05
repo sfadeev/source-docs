@@ -2,8 +2,15 @@
     var API = {
         listRepos: function () {
             Module.List.Controller.listRepos();
+        },
+        selectRepo: function (id) {
+            Module.List.Controller.selectRepo(id);
         }
     };
+
+    App.commands.setHandler("set:active:repo", function (id) {
+        API.selectRepo(id);
+    });
 
     /*App.commands.setHandler("set:active:file", function (name) {
         alert(name);

@@ -20,19 +20,6 @@
                     App.trigger(trigger);*/
                 });
 
-                /*var repoToSelect;
-                if (this.selectedRepoId) {
-                    repoToSelect = repos.find(function (repo) { return repo.get("id") === this.selectedRepoId; });
-                }
-                if (repoToSelect === undefined && repos.length > 0) {
-                    repoToSelect = repos.at(0);
-                }
-
-                if (repoToSelect) {
-                    repoToSelect.selected = true;
-                    App.commands.execute("set:active:repo", repoToSelect.get("id"));
-                }*/
-
                 App.reposRegion.show(view);
                 App.commands.execute("set:active:repo");
             });
@@ -47,10 +34,7 @@
                 }
 
                 if (repoToSelect) {
-                    // todo: check why picky not extend model
-                    // Module.repos.select(repoToSelect);
-                    // repoToSelect.selected(); 
-                    repoToSelect.selected = true;
+                    repoToSelect.select(); 
                     Module.selectedRepoId = repoToSelect.get("id");
                     App.navigate(Module.selectedRepoId);
                     Module.repos.trigger("reset");

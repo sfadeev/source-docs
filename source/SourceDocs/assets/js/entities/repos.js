@@ -1,17 +1,15 @@
 App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
     Entities.Repo = Backbone.Model.extend({
         initialize: function () {
-            /*var selectable = new Backbone.Picky.Selectable(this);
-            _.extend(this, selectable);*/
+            Backbone.Cycle.SelectableModel.applyTo(this);
         }
     });
 
     Entities.RepoCollection = Backbone.Collection.extend({
         url: App.config.api.url + "repos",
         model: Entities.Repo,
-        initialize: function () {
-            /*var singleSelect = new Backbone.Picky.SingleSelect(this);
-            _.extend(this, singleSelect);*/
+        initialize: function ( models, options ) {
+            Backbone.Cycle.SelectableCollection.applyTo( this, models, options );
         }
     });
 

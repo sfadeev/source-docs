@@ -19,7 +19,7 @@
     "bootstrap": "~3.3.1",
     "json2": "*",
     "backbone": "~1.1.2",
-    "marionette": "~2.3.0",
     "backbone.cycle": "~1.1.0",
+    "marionette": "~2.3.0"
   }
 }

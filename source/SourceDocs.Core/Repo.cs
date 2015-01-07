@@ -4,6 +4,8 @@ namespace SourceDocs.Core
 {
     public class Repo
     {
+        public string Id { get; set; }
+
         public IList<Node> Nodes { get; set; }
     }
 }

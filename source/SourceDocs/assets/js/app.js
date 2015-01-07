@@ -21,8 +21,8 @@ App.config = {
 
 App.addRegions({
     reposRegion: "#repos-region",
-    filesRegion: "#files-region",
-    mainRegion: "#main-region",
+    nodesRegion: "#nodes-region",
+    mainRegion: "#main-region"
     /*dialogRegion: Marionette.Region.Dialog.extend({
         el: "#dialog-region"
     })*/

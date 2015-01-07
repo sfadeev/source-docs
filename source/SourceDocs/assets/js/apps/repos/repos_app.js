@@ -5,11 +5,20 @@
         },
         selectRepo: function (id) {
             Module.List.Controller.selectRepo(id);
+            Module.List.Controller.listNodes();
+        },
+        selectNode: function (name) {
+            Module.List.Controller.selectNode(name);
+            // Module.List.Controller.listIndex();
         }
     };
 
     App.commands.setHandler("set:active:repo", function (id) {
         API.selectRepo(id);
+    });
+
+    App.commands.setHandler("set:active:node", function (name) {
+        API.selectNode(name);
     });
 
     /*App.on("contacts:list", function () {

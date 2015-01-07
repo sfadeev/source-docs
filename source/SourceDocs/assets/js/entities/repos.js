@@ -1,15 +1,34 @@
-App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
+App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
+
+    Entities.Node = Backbone.Model.extend({
+        initialize: function() {
+            Backbone.Cycle.SelectableModel.applyTo(this);
+        }
+    });
+
+    Entities.NodeCollection = Backbone.Collection.extend({
+        model: Entities.Node,
+        initialize: function(models, options) {
+            Backbone.Cycle.SelectableCollection.applyTo(this, models, options);
+        }
+    });
 
     Entities.Repo = Backbone.Model.extend({
-        initialize: function () {
+        /*defaults: {
+            nodes: new Entities.NodeCollection()
+        },*/
+        initialize: function() {
             Backbone.Cycle.SelectableModel.applyTo(this);
+        },
+        parse: function(response, options) {
+            this.get("nodes").reset(response.nodes);
         }
     });
 
     Entities.RepoCollection = Backbone.Collection.extend({
         model: Entities.Repo,
-        initialize: function (models, options) {
-            Backbone.Cycle.SelectableCollection.applyTo( this, models, options );
+        initialize: function(models, options) {
+            Backbone.Cycle.SelectableCollection.applyTo(this, models, options);
         }
     });
 
@@ -18,8 +37,11 @@ App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
         defaults: {
             items: new Entities.RepoCollection()
         },
-        parse: function (response, options) {
+        parse: function(response, options) {
             this.get("items").reset(response.items);
+            this.get("items").each(function(repo) {
+                repo.set("nodes", new Entities.NodeCollection(repo.get("nodes")));
+            });
         }
     });
 
@@ -39,7 +61,7 @@ App.module("Entities", function (Entities, App, Backbone, Marionette, $, _) {
         }
     };
 
-    App.reqres.setHandler("header:repos", function () {
+    App.reqres.setHandler("header:repos", function() {
         return API.getRepos();
     });
 });

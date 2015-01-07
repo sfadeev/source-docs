@@ -1,20 +1,18 @@
 ﻿App.module("Repos.List", function(Module, App, Backbone, Marionette, $, _) {
+
     Module.RepoView = Marionette.ItemView.extend({
         template: "#repos-link",
         tagName: "li",
 
         events: {
-            "click a": "navigate"
-        },
-
-        navigate: function(e) {
-            e.preventDefault();
-            this.trigger("navigate", this.model);
+            "click a": function (e) {
+                e.preventDefault();
+                this.trigger("navigate", this.model);
+            }
         },
 
         onRender: function() {
             if (this.model.selected) {
-                // add class so Bootstrap will highlight the active entry in the navbar
                 this.$el.addClass("active");
             };
         }
@@ -27,13 +25,12 @@
         childView: Module.RepoView,
         childViewContainer: "ul.repos",
 
-        /*events: {
-            "click a.brand": "brandClicked"
+        modelEvents: {
+            "change": "render"
         },
 
-        brandClicked: function(e) {
-            e.preventDefault();
-            this.trigger("brand:clicked");
-        }*/
+        initialize: function() {
+            this.collection = this.model.get("items");
+        }
     });
 });

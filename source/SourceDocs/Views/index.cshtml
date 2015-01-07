@@ -54,7 +54,7 @@
 
     <script type="text/template" id="repos-template">
         <!-- li class="dropdown" -->
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Repo <span class="caret"></span></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{title}} <span class="caret"></span></a>
         <ul class="dropdown-menu repos" role="menu"></ul>
         <!-- /li -->
     </script>
@@ -63,30 +63,14 @@
         <a href="#{{ id }}">{{ id }}</a>
     </script>
 
-    <script type="text/template" id="files-template">
-        <!-- li class="dropdown" -->
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Files <span class="caret"></span></a>
-        <ul class="dropdown-menu files" role="menu"></ul>
-        <!-- /li -->
-    </script>
-
-    <script type="text/template" id="files-link">
-        <a href="#<%- url %>"><%- name %></a>
-    </script>
-
     <script type="text/javascript" src="./assets/js/libs.js"></script>
 
     <script type="text/javascript" src="./assets/js/app.js"></script>
     <script type="text/javascript" src="./assets/js/entities/repos.js"></script>
-    <script type="text/javascript" src="./assets/js/entities/files.js"></script>
 
     <script type="text/javascript" src="./assets/js/apps/repos/repos_app.js"></script>
     <script type="text/javascript" src="./assets/js/apps/repos/list/list_view.js"></script>
     <script type="text/javascript" src="./assets/js/apps/repos/list/list_controller.js"></script>
-
-    @*<script type="text/javascript" src="./assets/js/apps/files/files_app.js"></script>
-    <script type="text/javascript" src="./assets/js/apps/files/list/list_view.js"></script>
-    <script type="text/javascript" src="./assets/js/apps/files/list/list_controller.js"></script>*@
 
     <script type="text/javascript">
         App.start();

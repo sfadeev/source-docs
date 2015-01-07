@@ -1,11 +1,12 @@
 ﻿App.module("Repos.List", function (Module, App, Backbone, Marionette, $, _) {
+
     Module.Controller = {
         listRepos: function () {
             App.request("header:repos").done(function (repos) {
 
                 Module.repos = repos;
 
-                var view = new Module.RepoListView({ collection: repos });
+                var view = new Module.RepoListView({ model: repos });
 
                 /*view.on("brand:clicked", function() {
                     App.trigger("contacts:list");
@@ -25,16 +26,23 @@
 
         selectRepo: function (id) {
             if (Module.repos) {
-                var repo = Module.repos.find(function (x) { return x.get("id") === id; });
 
-                if (repo === undefined && Module.repos.length > 0) {
-                    repo = Module.repos.at(0);
+                var items = Module.repos.get("items");
+
+                var repo = items.find(function (x) { return x.get("id") === id; });
+
+                if (repo === undefined && items.length > 0) {
+                    repo = items.at(0);
                 }
 
                 if (repo) {
                     repo.select();
                     App.navigate(repo.get("id"));
-                    Module.repos.trigger("reset");
+
+                    Module.repos.set("title", repo.get("id"));
+
+                    // Module.model.trigger("change");
+                    // Module.repos.trigger("reset");
                 }
             }
         }

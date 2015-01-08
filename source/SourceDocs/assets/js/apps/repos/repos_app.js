@@ -21,6 +21,11 @@
         API.selectNode(name);
     });
 
+    App.commands.setHandler("list:index", function (repoId, nodeName) {
+        console.log("list:index : " + repoId + "/" + nodeName);
+        App.navigate("repo/" + repoId + "/" + nodeName);
+    });
+
     /*App.on("contacts:list", function () {
         App.navigate("contacts");
         API.listFiles();

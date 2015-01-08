@@ -8,24 +8,19 @@
 
                 var view = new Module.RepoListView({ model: repos });
 
-                /*view.on("brand:clicked", function() {
-                    App.trigger("contacts:list");
-                });*/
-
                 view.on("childview:navigate", function(childView, model) {
                     App.commands.execute("set:active:repo", model.get("id"));
-
-                    /*var trigger = model.get("navigationTrigger");
-                    App.trigger(trigger);*/
                 });
 
                 App.reposRegion.show(view);
-
-                App.commands.execute("set:active:repo");
+                App.commands.execute("set:active:repo", Module.selectedRpoId);
             });
         },
 
         selectRepo: function(id) {
+
+            Module.selectedRpoId = id;
+
             if (Module.repos) {
 
                 var items = Module.repos.get("items");
@@ -38,18 +33,13 @@
 
                 if (repo) {
                     repo.select();
-
                     Module.repos.set("title", repo.get("id"));
-
-                    App.commands.execute("set:active:node");
-
-                    // Module.model.trigger("change");
-                    // Module.repos.trigger("reset");
                 }
             }
         },
 
-        listNodes: function() {
+        listNodes: function () {
+
             if (Module.repos) {
 
                 var items = Module.repos.get("items");
@@ -63,28 +53,32 @@
                     });
 
                     App.nodesRegion.show(view);
+                    App.commands.execute("set:active:node", Module.selectedNodeName);
                 }
             }
         },
 
         selectNode: function(name) {
 
-            var items = Module.repos.get("items");
+            Module.selectedNodeName = name;
 
-            var nodes = items.selected.get("nodes");
+            if (Module.repos) {
+                var repo = Module.repos.get("items").selected;
 
-            var node = nodes.find(function (x) { return x.get("name") === name; });
+                var nodes = repo.get("nodes");
 
-            if (node === undefined && nodes.length > 0) {
-                node = nodes.at(0);
-            }
+                var node = nodes.find(function (x) { return x.get("name") === name; });
 
-            if (node) {
-                node.select();
+                if (node === undefined && nodes.length > 0) {
+                    node = nodes.at(0);
+                }
 
-                items.selected.set("title", node.get("name"));
+                if (node) {
+                    node.select();
+                    repo.set("title", node.get("name"));
 
-                App.navigate("repo/" + items.selected.get("id") + "/" + node.get("name"));
+                    App.commands.execute("list:index", repo.get("id"), node.get("name"));
+                }
             }
         }
 

@@ -37,18 +37,33 @@ App.getCurrentRoute = function () {
     return Backbone.history.fragment;
 };
 
-App.on("start", function() {
-    if (Backbone.history) {
-        Backbone.history.start();
+App.Router = Backbone.Router.extend({
+    routes: {
+        "home": "home",
+        "repo/:repoId(/:nodeName)": "repo"
+    },
 
-        if (this.getCurrentRoute() === "") {
-            App.trigger("contacts:list");
-        }
+    home: function () {
+        console.log("#home");
+    },
+
+    repo: function(repoId, nodeName) {
+        console.log("#repo/" + repoId + "/" + nodeName);
+
+        if (repoId) App.commands.execute("set:active:repo", repoId);
+        if (nodeName) App.commands.execute("set:active:node", nodeName);
     }
+
 });
 
-// temp. from other apps
-App.on("about:show", function () {
-    App.navigate("about");
-    // API.listContacts();
+App.router = new App.Router();
+
+App.on("start", function() {
+    if (Backbone.history) {
+        Backbone.history.start(/*{ pushState: true }*/);
+
+        /*if (this.getCurrentRoute() === "") {
+            App.trigger("contacts:list");
+        }*/
+    }
 });

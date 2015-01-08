@@ -13,7 +13,7 @@ namespace SourceDocs.Core.Tests
     [TestFixture]
     public class GitTest
     {
-        // [TestCase("https://github.com/davidsulc/marionette-gentle-introduction.git")]
+        [TestCase("https://github.com/libgit2/libgit2sharp.git")]
         [TestCase("https://github.com/sfadeev/renocco.git")]
         [TestCase("git://github.com/sfadeev/source-docs.git")]
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
@@ -69,7 +69,8 @@ namespace SourceDocs.Core.Tests
                             ExcludeDirectories = new[] { "docs", "bin", "obj", "packages", ".nuget", ".git", ".svn" },
                             FileTransformers = new Dictionary<string, IFileTransformer>
                             {
-                                { ".md", new MarkdownFileTransformer() }
+                                { ".md", new MarkdownFileTransformer() },
+                                { ".cs", new SourceFileTransformer() }
                             }
                         });
 

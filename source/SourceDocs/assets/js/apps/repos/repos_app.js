@@ -24,6 +24,10 @@
     App.commands.setHandler("list:index", function (repoId, nodeName) {
         console.log("list:index : " + repoId + "/" + nodeName);
         App.navigate("repo/" + repoId + "/" + nodeName);
+
+        App.request("header:repo:index", repoId, nodeName).done(function (index) {
+            console.log("index : " + index);
+        });
     });
 
     /*App.on("contacts:list", function () {

@@ -7,7 +7,20 @@ namespace SourceDocs
     {
         public ApiModule() : base("/api")
         {
-            Get["/repos"] = parameters => new
+            Get["/repos"] = parameters =>
+            {
+                return GetTestRepos();
+            };
+
+            Get["/repos/{id}/{node}/index"] = x =>
+            {
+                return Response.AsFile(".repos/index.json");
+            };
+        }
+
+        public static object GetTestRepos()
+        {
+            return new
             {
                 Items = new[]
                 {

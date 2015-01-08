@@ -45,6 +45,15 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
         }
     });
 
+    Entities.RepoIndexCollection = Backbone.Collection.extend({
+        initialize: function (models, options) {
+            this.options = options;
+        },
+        url: function () {
+            return App.config.api.url + "repos/" + this.options.repoId + "/" + this.options.nodeName + "/index";
+        }
+    });
+
     var API = {
         getRepos: function() {
             if (Entities.repos === undefined) {
@@ -58,10 +67,29 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
                 }
             });
             return dfd.promise();
+        },
+        getRepoIndex: function (repoId, nodeName) {
+
+            var result = new Entities.RepoIndexCollection(
+                [], { repoId: repoId, nodeName: nodeName });
+
+            var dfd = $.Deferred();
+            result.fetch({
+                // type: "POST",
+                cache: false,
+                success: function(data) {
+                    dfd.resolve(data);
+                }
+            });
+            return dfd.promise();
         }
     };
 
     App.reqres.setHandler("header:repos", function() {
         return API.getRepos();
+    });
+
+    App.reqres.setHandler("header:repo:index", function(repoId, nodeName) {
+        return API.getRepoIndex(repoId, nodeName);
     });
 });

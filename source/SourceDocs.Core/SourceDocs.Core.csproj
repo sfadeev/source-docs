@@ -59,6 +59,7 @@
     <Compile Include="Node.cs" />
     <Compile Include="Repo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceFileTransformer.cs" />
     <Compile Include="TransformOptions.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="GitRepository.cs" />
     <Compile Include="IFileTransformer.cs" />
+    <Compile Include="IndexItem.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="MarkdownFileTransformer.cs" />
     <Compile Include="Node.cs" />

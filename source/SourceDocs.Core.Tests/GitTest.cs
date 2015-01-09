@@ -88,6 +88,7 @@ namespace SourceDocs.Core.Tests
                         serialize(configFile, config);
                     }
 
+                    Console.Out.Flush();
                     Thread.Sleep(5000);
                 }
             }
@@ -123,18 +124,11 @@ namespace SourceDocs.Core.Tests
             }
         }
 
-        public class FileItem
-        {
-            public string Name { get; set; }
-
-            public string Path { get; set; }
-        }
-
-        public static IList<FileItem> Transform(string from, string to, TransformOptions transformOptions)
+        public static IList<IndexItem> Transform(string from, string to, TransformOptions transformOptions)
         {
             if (transformOptions == null) throw new ArgumentNullException("transformOptions");
 
-            var index = new List<FileItem>();
+            var index = new List<IndexItem>();
 
             var directoryInfo = new DirectoryInfo(from);
 
@@ -148,7 +142,7 @@ namespace SourceDocs.Core.Tests
                 IFileTransformer transformer;
                 if (transformOptions.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
                 {
-                    index.Add(new FileItem { Name = Path.GetFileName(relativePath), Path = relativePath.Replace('\\', '/') });
+                    index.Add(new IndexItem { Name = Path.GetFileName(relativePath), Path = relativePath.Replace('\\', '/') });
 
                     var destFileName = Path.Combine(to, relativePath);
                     var destDirectoryName = Path.GetDirectoryName(destFileName);

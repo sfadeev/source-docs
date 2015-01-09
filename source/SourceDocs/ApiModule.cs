@@ -1,4 +1,5 @@
-﻿using Nancy;
+﻿using System.Collections.Generic;
+using Nancy;
 using SourceDocs.Core;
 
 namespace SourceDocs
@@ -12,9 +13,11 @@ namespace SourceDocs
                 return GetTestRepos();
             };
 
-            Get["/repos/{id}/{node}/index"] = x =>
+            Get["/repos/{repoId}/{nodeName}/index"] = x =>
             {
-                return Response.AsFile(".repos/index.json");
+                return GetTestRepoIndex((string) x.repoId, (string) x.nodeName);
+
+                // return Response.AsFile(".repos/index.json");
             };
         }
 
@@ -59,6 +62,48 @@ namespace SourceDocs
                     new Repo { Id = "Twitter.Bootstrap.Less" }
                 }
             };
+        }
+
+        public static dynamic GetTestRepoIndex(string repoId, string nodeName)
+        {
+            var result = new List<IndexItem>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var item0 = new IndexItem
+                {
+                    Path = "item/" + i,
+                    Name = repoId + "/" + nodeName + " Item " + i,
+                    Children = new List<IndexItem>()
+                };
+
+                for (var j = 0; j < 5; j++)
+                {
+                    var item1 = new IndexItem
+                    {
+                        Path = item0.Path + "/" + j,
+                        Name = item0.Name + "." + j,
+                        Children = new List<IndexItem>()
+                    };
+
+                    for (var k = 0; k < 3; k++)
+                    {
+                        var item2 = new IndexItem
+                        {
+                            Path = item1.Path + "/" + k,
+                            Name = item1.Name + "." + k
+                        };
+
+                        item1.Children.Add(item2);
+                    }
+
+                    item0.Children.Add(item1);
+                }
+
+                result.Add(item0);
+            }
+
+            return result;
         }
     }
 }

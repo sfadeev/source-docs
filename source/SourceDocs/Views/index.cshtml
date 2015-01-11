@@ -4,7 +4,8 @@
     <meta charset="utf-8"/>
     <title>Docs</title>
     <link rel="shortcut icon" href="~/favicon.ico"/>
-    <link rel="stylesheet" type="text/css" href="~/Content/source-docs.css"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/source-docs.css" />
+    <link rel="stylesheet" type="text/css" href="~/assets/css/nprogress.css" />
     @*<link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css"/>*@
     @*<link rel="stylesheet" type="text/css" href="~/Content/lib/font-awesome-4.1.0/css/font-awesome.min.css">*@
 </head>
@@ -137,7 +138,29 @@
     <script type="text/javascript" src="./assets/js/apps/repos/list/list_controller.js"></script>
 
     <script type="text/javascript">
+
         App.start();
+
+        // http://blog.pagebakers.nl/2013/11/23/using-nprogress-with-backbone-js/
+        // Keep track of the pending promises,
+        // this way the indicator is only stopped when all pending promises are done.
+        var promises = 0;
+        App.reqres.setHandler('progress', function (promise) {
+            promises++;
+            NProgress.start();
+
+            // Return the promise to keep chaining support.
+            return promise
+              // Increase the progress indicator when we receive a progress notification.
+              .progress(function () {
+                  NProgress.inc();
+              })
+              // Use always here so it doesn't matter if the promise is resolved or rejected.
+              .always(function () {
+                  promises--;
+                  !promises && NProgress.done(); // No more pending promises, we're done.
+              });
+        });
     </script>
 
 </body>

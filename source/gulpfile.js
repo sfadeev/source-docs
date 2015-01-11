@@ -11,7 +11,8 @@ gulp.task('lib_scripts', function() {
             './bower_components/backbone.select/dist/backbone.select.js',
             './bower_components/backbone.cycle/dist/backbone.cycle.js',
             './bower_components/marionette/lib/backbone.marionette.js',
-            './bower_components/mustache/mustache.js'
+            './bower_components/mustache/mustache.js',
+            './bower_components/nprogress/nprogress.js'
         ])
         .pipe(concat('libs.js'))
         .pipe(gulp.dest('./SourceDocs/assets/js/'));

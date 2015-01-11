@@ -57,6 +57,8 @@ App.Router = Backbone.Router.extend({
 
 });
 
+App.router = new App.Router();
+
 /*(function() {
     var trigger = Backbone.Events.trigger;
     var wrapper = function() {
@@ -68,7 +70,11 @@ App.Router = Backbone.Router.extend({
     Backbone.View.prototype.trigger = wrapper;
 })();*/
 
-App.router = new App.Router();
+// See http://backbonejs.org/#Sync-ajax
+Backbone.ajax = function () {
+    // Wrap all ajax requests in our progress handler.
+    return App.request('progress', Backbone.$.ajax.apply(Backbone.$, arguments));
+};
 
 App.on("start", function() {
     if (Backbone.history) {

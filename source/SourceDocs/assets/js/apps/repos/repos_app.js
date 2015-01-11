@@ -9,7 +9,10 @@
         },
         selectNode: function (name) {
             Module.List.Controller.selectNode(name);
-            // Module.List.Controller.listIndex();
+        },
+        showRepoIndex: function (repoId, nodeName) {
+            App.navigate("repo/" + repoId + "/" + nodeName);
+            Module.List.Controller.showRepoIndex(repoId, nodeName);
         }
     };
 
@@ -21,13 +24,9 @@
         API.selectNode(name);
     });
 
-    App.commands.setHandler("list:index", function (repoId, nodeName) {
-        console.log("list:index : " + repoId + "/" + nodeName);
-        App.navigate("repo/" + repoId + "/" + nodeName);
+    App.commands.setHandler("Repos:showRepoIndex", function (repoId, nodeName) {
+        API.showRepoIndex(repoId, nodeName);
 
-        App.request("header:repo:index", repoId, nodeName).done(function (index) {
-            console.log("index : " + index);
-        });
     });
 
     /*App.on("contacts:list", function () {

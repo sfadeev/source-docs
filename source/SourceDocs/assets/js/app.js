@@ -22,6 +22,7 @@ App.config = {
 App.addRegions({
     reposRegion: "#repos-region",
     nodesRegion: "#nodes-region",
+    repoIndexRegion: "#repo-index-region",
     mainRegion: "#main-region"
     /*dialogRegion: Marionette.Region.Dialog.extend({
         el: "#dialog-region"
@@ -55,6 +56,17 @@ App.Router = Backbone.Router.extend({
     }
 
 });
+
+/*(function() {
+    var trigger = Backbone.Events.trigger;
+    var wrapper = function() {
+        console.log("Event Triggered: " + arguments[0]);
+        trigger.apply(this, arguments);
+    };
+    Backbone.Model.prototype.trigger = wrapper;
+    Backbone.Collection.prototype.trigger = wrapper;
+    Backbone.View.prototype.trigger = wrapper;
+})();*/
 
 App.router = new App.Router();
 

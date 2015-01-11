@@ -14,14 +14,8 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
     });
 
     Entities.Repo = Backbone.Model.extend({
-        /*defaults: {
-            nodes: new Entities.NodeCollection()
-        },*/
         initialize: function() {
             Backbone.Cycle.SelectableModel.applyTo(this);
-        },
-        parse: function(response, options) {
-            this.get("nodes").reset(response.nodes);
         }
     });
 
@@ -45,17 +39,37 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
         }
     });
 
-    Entities.RepoIndexCollection = Backbone.Collection.extend({
+    Entities.RepoIndexItemModel = Backbone.Model.extend({
+        initialize: function () {
+            Backbone.Cycle.SelectableModel.applyTo(this);
+        }
+    });
+
+    Entities.RepoIndexItemCollection = Backbone.Collection.extend({
+        model: Entities.RepoIndexItemModel,
         initialize: function (models, options) {
+            Backbone.Cycle.SelectableCollection.applyTo(this, models, options);
+        }
+    });
+
+    Entities.RepoIndexModel = Backbone.Model.extend({
+        defaults: {
+            // children: new Entities.RepoIndexItemCollection()
+        },
+        initialize: function (options) {
             this.options = options;
         },
         url: function () {
             return App.config.api.url + "repos/" + this.options.repoId + "/" + this.options.nodeName + "/index";
-        }
+        },
+        /*parse: function (response, options) {
+            this.get("children").reset(response.children);
+        }*/
     });
 
     var API = {
-        getRepos: function() {
+
+        loadRepos: function () {
             if (Entities.repos === undefined) {
                 Entities.repos = new Entities.Repos();
             }
@@ -68,10 +82,10 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             });
             return dfd.promise();
         },
-        getRepoIndex: function (repoId, nodeName) {
 
-            var result = new Entities.RepoIndexCollection(
-                [], { repoId: repoId, nodeName: nodeName });
+        loadRepoIndex: function (repoId, nodeName) {
+
+            var result = new Entities.RepoIndexModel({ repoId: repoId, nodeName: nodeName });
 
             var dfd = $.Deferred();
             result.fetch({
@@ -83,13 +97,14 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             });
             return dfd.promise();
         }
+
     };
 
-    App.reqres.setHandler("header:repos", function() {
-        return API.getRepos();
+    App.reqres.setHandler("Entities:loadRepos", function () {
+        return API.loadRepos();
     });
 
-    App.reqres.setHandler("header:repo:index", function(repoId, nodeName) {
-        return API.getRepoIndex(repoId, nodeName);
+    App.reqres.setHandler("Entities:loadRepoIndex", function (repoId, nodeName) {
+        return API.loadRepoIndex(repoId, nodeName);
     });
 });

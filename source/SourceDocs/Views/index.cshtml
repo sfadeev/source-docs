@@ -6,6 +6,7 @@
     <link rel="shortcut icon" href="~/favicon.ico"/>
     <link rel="stylesheet" type="text/css" href="~/Content/source-docs.css"/>
     <link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css"/>
+    <link rel="stylesheet" type="text/css" href="~/Content/lib/font-awesome-4.1.0/css/font-awesome.min.css">
 </head>
 <body>
 
@@ -47,9 +48,19 @@
         </div>
     </div>
 
-    <div id="main-region">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <ul id="repo-index-region"></ul>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="main-region"></div>
+            </div>
+        </div>
     </div>
-
+    
     <div id="dialog-region"></div>
 
     <script type="text/x-handlebars-template" id="repos-template">
@@ -74,11 +85,23 @@
         <a href="#{{ name }}">{{ name }}</a>
     </script>
 
-<script type="text/javascript" src="./assets/js/libs.js"></script>
+    <script type="text/x-handlebars-template" id="repo-index-template">
+        <!-- li -->
+        <a href="#{{ path }}">{{ name }}</a>
+        <ul class="nav"></ul>
+        <!-- /li -->
+    </script>
 
+    <script type="text/x-handlebars-template" id="repo-index-link">
+        <!-- li -->
+        <a href="#{{ path }}">{{ name }}</a>
+        <ul class="nav"></ul>
+        <!-- /li -->
+    </script>
+
+    <script type="text/javascript" src="./assets/js/libs.js"></script>
     <script type="text/javascript" src="./assets/js/app.js"></script>
     <script type="text/javascript" src="./assets/js/entities/repos.js"></script>
-
     <script type="text/javascript" src="./assets/js/apps/repos/repos_app.js"></script>
     <script type="text/javascript" src="./assets/js/apps/repos/list/list_view.js"></script>
     <script type="text/javascript" src="./assets/js/apps/repos/list/list_controller.js"></script>

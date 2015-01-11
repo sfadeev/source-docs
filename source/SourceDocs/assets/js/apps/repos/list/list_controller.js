@@ -2,7 +2,7 @@
 
     Module.Controller = {
         listRepos: function() {
-            App.request("header:repos").done(function(repos) {
+            App.request("Entities:loadRepos").done(function (repos) {
 
                 Module.repos = repos;
 
@@ -77,9 +77,26 @@
                     node.select();
                     repo.set("title", node.get("name"));
 
-                    App.commands.execute("list:index", repo.get("id"), node.get("name"));
+                    App.commands.execute("Repos:showRepoIndex", repo.get("id"), node.get("name"));
                 }
             }
+        },
+
+        showRepoIndex: function (repoId, nodeName) {
+            App.request("Entities:loadRepoIndex", repoId, nodeName).done(function (index) {
+
+                Module.index = index;
+
+                var view = new Module.RepoIndexListView({ model: index });
+
+                /*view.on("childview:navigate", function (childView, model) {
+                    App.commands.execute("set:active:repo", model.get("id"));
+                });*/
+
+                App.repoIndexRegion.show(view);
+
+                // App.commands.execute("set:active:repo", Module.selectedRpoId);
+            });
         }
 
     };

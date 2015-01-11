@@ -84,13 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\js\app.js" />
-    <Content Include="assets\js\apps\files\files_app.js" />
-    <Content Include="assets\js\apps\files\list\list_controller.js" />
-    <Content Include="assets\js\apps\files\list\list_view.js" />
     <Content Include="assets\js\apps\repos\list\list_controller.js" />
     <Content Include="assets\js\apps\repos\list\list_view.js" />
     <Content Include="assets\js\apps\repos\repos_app.js" />
-    <Content Include="assets\js\entities\files.js" />
     <Content Include="assets\js\entities\repos.js" />
     <Content Include="assets\js\ie10-viewport-bug-workaround.js" />
     <Content Include="assets\js\libs.js" />

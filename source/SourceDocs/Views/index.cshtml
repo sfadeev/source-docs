@@ -161,6 +161,12 @@
                   !promises && NProgress.done(); // No more pending promises, we're done.
               });
         });
+
+        // See http://backbonejs.org/#Sync-ajax
+        Backbone.ajax = function () {
+            // Wrap all ajax requests in our progress handler.
+            return App.request('progress', Backbone.$.ajax.apply(Backbone.$, arguments));
+        };
     </script>
 
 </body>

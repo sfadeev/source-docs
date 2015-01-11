@@ -70,12 +70,6 @@ App.router = new App.Router();
     Backbone.View.prototype.trigger = wrapper;
 })();*/
 
-// See http://backbonejs.org/#Sync-ajax
-Backbone.ajax = function () {
-    // Wrap all ajax requests in our progress handler.
-    return App.request('progress', Backbone.$.ajax.apply(Backbone.$, arguments));
-};
-
 App.on("start", function() {
     if (Backbone.history) {
         Backbone.history.start(/*{ pushState: true }*/);

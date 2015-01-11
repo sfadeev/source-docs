@@ -47,24 +47,26 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
 
     Entities.RepoIndexItemCollection = Backbone.Collection.extend({
         model: Entities.RepoIndexItemModel,
+
         initialize: function (models, options) {
+
+            /*var children = this.get("children");
+            if (children) {
+                this.children = new RepoIndexItemCollection(children);
+                this.unset("children");
+            }*/
+
             Backbone.Cycle.SelectableCollection.applyTo(this, models, options);
         }
     });
 
     Entities.RepoIndexModel = Backbone.Model.extend({
-        defaults: {
-            // children: new Entities.RepoIndexItemCollection()
-        },
         initialize: function (options) {
             this.options = options;
         },
         url: function () {
             return App.config.api.url + "repos/" + this.options.repoId + "/" + this.options.nodeName + "/index";
-        },
-        /*parse: function (response, options) {
-            this.get("children").reset(response.children);
-        }*/
+        }
     });
 
     var API = {

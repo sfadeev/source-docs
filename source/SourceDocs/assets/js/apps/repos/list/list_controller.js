@@ -86,8 +86,9 @@
             App.request("Entities:loadRepoIndex", repoId, nodeName).done(function (index) {
 
                 Module.index = index;
+                Module.index.isRoot = true;
 
-                var view = new Module.RepoIndexListView({ model: index });
+                var view = new Module.RepoIndexView({ model: index, tagName: "div" });
 
                 /*view.on("childview:navigate", function (childView, model) {
                     App.commands.execute("set:active:repo", model.get("id"));

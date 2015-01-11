@@ -6285,4 +6285,20 @@ button.close {
     display: none !important;
   }
 }
+body {
+  padding-top: 50px;
+}
+.sidebar {
+  /*position: fixed;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;*/
+}
+@media (min-width: 992px) {
+  .sidebar {
+    border-right: 1px solid #e7e7e7;
+  }
+}
 /*# sourceMappingURL=source-docs.css.map */

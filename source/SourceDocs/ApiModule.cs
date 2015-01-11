@@ -65,7 +65,14 @@ namespace SourceDocs
                 new Repo { Id = "Nancy" },
                 new Repo { Id = "Nancy.Hosting.Aspnet" },
                 new Repo { Id = "Nancy.Viewengines.Razor" },
-                new Repo { Id = "Twitter.Bootstrap.Less" }
+                new Repo
+                {
+                    Id = "Twitter.Bootstrap.Less",
+                    Nodes = new[]
+                    {
+                        new Node { Name = "v1.0" }
+                    }
+                }
             };
         }
 
@@ -87,7 +94,7 @@ namespace SourceDocs
                     var item1 = new IndexItem
                     {
                         Path = item0.Path + "/" + j,
-                        Name = item0.Name + "." + j,
+                        Name = item0.Name + " Subitem " + j,
                         Children = new List<IndexItem>()
                     };
 
@@ -96,7 +103,7 @@ namespace SourceDocs
                         var item2 = new IndexItem
                         {
                             Path = item1.Path + "/" + k,
-                            Name = item1.Name + "." + k
+                            Name = item1.Name + " Subitem " + k
                         };
 
                         item1.Children.Add(item2);

@@ -5,8 +5,8 @@
     <title>Docs</title>
     <link rel="shortcut icon" href="~/favicon.ico"/>
     <link rel="stylesheet" type="text/css" href="~/Content/source-docs.css"/>
-    <link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css"/>
-    <link rel="stylesheet" type="text/css" href="~/Content/lib/font-awesome-4.1.0/css/font-awesome.min.css">
+    @*<link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css"/>*@
+    @*<link rel="stylesheet" type="text/css" href="~/Content/lib/font-awesome-4.1.0/css/font-awesome.min.css">*@
 </head>
 <body>
 
@@ -51,12 +51,33 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3">
-                <div class="sidebar">
-                    <ul id="repo-index-region"></ul>
-                </div>
+                <div class="sidebar" id="repo-index-region"></div>
             </div>
             <div class="col-md-9">
+
+                <br/>
+
+                <nav>
+                    <ol class="breadcrumb">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Library</a></li>
+                        <li class="active">Data</li>
+                    </ol>
+                </nav>
+
+                <div class="page-header">
+                    <h1>Example documentation heading <small><span class="label label-success">New</span></small></h1>
+                </div>
+                
                 <div id="main-region"></div>
+
+                <nav>
+                    <ul class="pager">
+                        <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Logging something interesting ...</a></li>
+                        <li class="next"><a href="#">Configuring everything usefull ... <span aria-hidden="true">&rarr;</span></a></li>
+                    </ul>
+                </nav>
+
             </div>
         </div>
     </div>
@@ -86,17 +107,26 @@
     </script>
 
     <script type="text/x-handlebars-template" id="repo-index-template">
-        <!-- li -->
-        <a href="#{{ path }}">{{ name }}</a>
-        <ul class="nav"></ul>
-        <!-- /li -->
+        <div class="panel index-search">
+            <br />
+            <form class="form-inline" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                </div><!-- /input-group -->
+            </form>
+            <br />
+        </div>
+        <div class="index-tree">
+            <ul></ul>
+        </div>
     </script>
 
     <script type="text/x-handlebars-template" id="repo-index-link">
-        <!-- li -->
         <a href="#{{ path }}">{{ name }}</a>
-        <ul class="nav"></ul>
-        <!-- /li -->
+        <ul></ul>
     </script>
 
     <script type="text/javascript" src="./assets/js/libs.js"></script>

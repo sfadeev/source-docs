@@ -1,2 +1,22 @@
 ﻿@import "bootstrap/bootstrap.less";
 
+body {
+    padding-top: @navbar-height;
+}
+
+.sidebar {
+    /*position: fixed;
+    z-index: 1000;
+    display: block;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;*/
+}
+
+@media (min-width: @screen-md-min) {
+
+.sidebar {
+    border-right: 1px solid @navbar-default-border;
+}
+
+}

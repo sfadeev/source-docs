@@ -78,7 +78,7 @@
         childView: Module.RepoIndexTreeView,
         childViewContainer: "ul",
         getTemplate: function() {
-            return this.model.isRoot ? "#repo-index-template" : "#repo-index-link";
+            return (this.model.get("level") === 0) ? "#repo-index-template" : "#repo-index-link";
         },
 
         events: {
@@ -98,6 +98,12 @@
         initialize: function() {
             var children = this.model.get("children");
             if (children) {
+
+                var level = this.model.get("level");
+                children.forEach(function (item) {
+                    item.level = level + 1;
+                });
+
                 this.collection = new App.Entities.RepoIndexItemCollection(children);
             }
         },
@@ -106,7 +112,9 @@
             cv.$("ul:first").append(iv.el);
         },*/
 
-        onRender: function() {
+        onRender: function () {
+            this.$el.addClass("nav-level-" + this.model.get("level"));
+
             if (this.model.selected) {
                 this.$el.addClass("active");
             } else {

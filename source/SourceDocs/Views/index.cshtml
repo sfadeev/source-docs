@@ -51,8 +51,8 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-3">
-                <div class="sidebar" id="repo-index-region"></div>
+            <div class="col-md-3 sidebar navbar-default" role="navigation">
+                <div class="" id="repo-index-region"></div>
             </div>
             <div class="col-md-9">
 
@@ -108,8 +108,7 @@
     </script>
 
     <script type="text/x-handlebars-template" id="repo-index-template">
-        <div class="panel index-search">
-            <br />
+        <div class="navbar-form sidebar-search">
             <form class="form-inline" role="search">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search for...">
@@ -118,16 +117,15 @@
                     </span>
                 </div><!-- /input-group -->
             </form>
-            <br />
         </div>
-        <div class="index-tree">
-            <ul></ul>
+       <div class="index-tree">
+            <ul class="nav"></ul>
         </div>
     </script>
 
     <script type="text/x-handlebars-template" id="repo-index-link">
         <a href="#{{ path }}">{{ name }}</a>
-        <ul></ul>
+        <ul class="nav"></ul>
     </script>
 
     <script type="text/javascript" src="./assets/js/libs.js"></script>

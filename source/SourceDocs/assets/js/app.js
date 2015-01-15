@@ -1,4 +1,5 @@
 ﻿// http://stackoverflow.com/questions/11084021/how-to-use-backbone-marionette-itemview-with-mustache
+// todo: check for type="text/x-handlebars-template"
 Marionette.TemplateCache.prototype.compileTemplate = function (rawTemplate) {
 
     // Mustache.parse will not return anything useful (returns an array)

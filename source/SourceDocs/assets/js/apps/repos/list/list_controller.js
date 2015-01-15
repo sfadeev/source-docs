@@ -86,7 +86,7 @@
             App.request("Entities:loadRepoIndex", repoId, nodeName).done(function(index) {
 
                 Module.index = index;
-                Module.index.isRoot = true;
+                Module.index.set("level", 0);
 
                 var view = new Module.RepoIndexView({ model: index, tagName: "div" });
 
@@ -97,7 +97,7 @@
     };
 
     Module.on("Repos.List:selectIndexItem", function(model) {
-        
+
         if (Module.selectedIndexItem) {
             Module.selectedIndexItem.deselect();
         }

@@ -62,7 +62,7 @@ App.router = new App.Router();
 /*(function() {
     var trigger = Backbone.Events.trigger;
     var wrapper = function() {
-        console.log("Event Triggered: " + arguments[0]);
+        // console.log("Event Triggered: " + arguments[0]);
         trigger.apply(this, arguments);
     };
     Backbone.Model.prototype.trigger = wrapper;

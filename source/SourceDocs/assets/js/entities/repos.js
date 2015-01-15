@@ -63,6 +63,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
     Entities.RepoIndexModel = Backbone.Model.extend({
         initialize: function (options) {
             this.options = options;
+            Backbone.Cycle.SelectableModel.applyTo(this);
         },
         url: function () {
             return App.config.api.url + "repos/" + this.options.repoId + "/" + this.options.nodeName + "/index";

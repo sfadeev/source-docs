@@ -6296,6 +6296,9 @@ body {
     overflow-x: hidden;
     overflow-y: auto;*/
 }
+.sidebar .active > a {
+  color: red;
+}
 @media (min-width: 992px) {
   .sidebar {
     border-right: 1px solid #e7e7e7;

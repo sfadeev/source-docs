@@ -1,8 +1,8 @@
-﻿App.module("Repos.List", function (Module, App, Backbone, Marionette, $, _) {
+﻿App.module("Repos.List", function(Module, App, Backbone, Marionette, $, _) {
 
     Module.Controller = {
         listRepos: function() {
-            App.request("Entities:loadRepos").done(function (repos) {
+            App.request("Entities:loadRepos").done(function(repos) {
 
                 Module.repos = repos;
 
@@ -38,7 +38,7 @@
             }
         },
 
-        listNodes: function () {
+        listNodes: function() {
 
             if (Module.repos) {
 
@@ -67,7 +67,7 @@
 
                 var nodes = repo.get("nodes");
 
-                var node = nodes.find(function (x) { return x.get("name") === name; });
+                var node = nodes.find(function(x) { return x.get("name") === name; });
 
                 if (node === undefined && nodes.length > 0) {
                     node = nodes.at(0);
@@ -82,23 +82,27 @@
             }
         },
 
-        showRepoIndex: function (repoId, nodeName) {
-            App.request("Entities:loadRepoIndex", repoId, nodeName).done(function (index) {
+        showRepoIndex: function(repoId, nodeName) {
+            App.request("Entities:loadRepoIndex", repoId, nodeName).done(function(index) {
 
                 Module.index = index;
                 Module.index.isRoot = true;
 
                 var view = new Module.RepoIndexView({ model: index, tagName: "div" });
 
-                /*view.on("childview:navigate", function (childView, model) {
-                    App.commands.execute("set:active:repo", model.get("id"));
-                });*/
-
                 App.repoIndexRegion.show(view);
-
-                // App.commands.execute("set:active:repo", Module.selectedRpoId);
             });
         }
 
     };
+
+    Module.on("Repos.List:selectIndexItem", function(model) {
+        
+        if (Module.selectedIndexItem) {
+            Module.selectedIndexItem.deselect();
+        }
+
+        Module.selectedIndexItem = model;
+        Module.selectedIndexItem.select();
+    });
 });

@@ -7,6 +7,28 @@ body {
 .sidebar {
     padding-left: 0;
     padding-right: 0;
+
+    .generate-levels(10);
+
+    .generate-levels(@n, @i: 1) when (@i =< @n) {
+
+        .nav-level-@{i} a {
+            /* color: @navbar-default-link-color; */
+            padding: 5px; 
+            padding-left: @navbar-padding-horizontal * @i;
+        }
+
+        .generate-levels(@n, (@i + 1));
+    }
+
+    .active > a {
+        color: @navbar-default-link-active-color;
+        background-color: @navbar-default-link-active-bg;
+    }
+
+    @media (min-width: @screen-md-min) {
+        border-right: 1px solid @navbar-default-border;
+    }
 }
 
 .sidebar_ {
@@ -16,23 +38,4 @@ body {
     padding: 20px;
     overflow-x: hidden;
     overflow-y: auto;
-}
-
-.sidebar .nav-level-1 a { padding: 5px 5px 5px 15px; }
-.sidebar .nav-level-2 a { padding: 5px 5px 5px 30px; }
-.sidebar .nav-level-3 a { padding: 5px 5px 5px 45px; }
-.sidebar .nav-level-4 a { padding: 5px 5px 5px 60px; }
-.sidebar .nav-level-5 a { padding: 5px 5px 5px 75px; }
-
-.sidebar .active>a {
-    color: @navbar-default-link-active-color;
-    background-color: @navbar-default-link-active-bg;
-}
-
-@media (min-width: @screen-md-min) {
-
-    .sidebar {
-        border-right: 1px solid @navbar-default-border;
-    }
-
 }

@@ -6,6 +6,8 @@
 
                 Module.repos = repos;
 
+                console.log("rendering repos");
+
                 var view = new Module.RepoListView({ model: repos });
 
                 view.on("childview:navigate", function(childView, model) {
@@ -13,13 +15,13 @@
                 });
 
                 App.reposRegion.show(view);
-                App.commands.execute("set:active:repo", Module.selectedRpoId);
+                App.commands.execute("set:active:repo", Module.selectedRepoId);
             });
         },
 
         selectRepo: function(id) {
 
-            Module.selectedRpoId = id;
+            Module.selectedRepoId = id;
 
             if (Module.repos) {
 
@@ -45,6 +47,8 @@
                 var items = Module.repos.get("items");
 
                 if (items.selected) {
+
+                    console.log("rendering nodes of " + Module.selectedRepoId);
 
                     var view = new Module.NodeListView({ model: items.selected });
 
@@ -88,21 +92,36 @@
                 Module.index = index;
                 Module.index.set("level", 0);
 
+                console.log("rendering index of " + repoId + "/" + nodeName);
+
                 var view = new Module.RepoIndexView({ model: index, tagName: "div" });
 
                 App.repoIndexRegion.show(view);
+            });
+        },
+
+        selectIndexItem: function(model) {
+
+            if (Module.selectedIndexItem) {
+                Module.selectedIndexItem.deselect();
+            }
+
+            Module.selectedIndexItem = model;
+
+            model.select();
+
+            App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + model.get("path"));
+
+            App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function (doc) {
+                console.log("rendering doc ", doc);
+
+                var view = new Module.RepoDocView({ model: doc });
+                App.mainRegion.show(view);
+
             });
         }
 
     };
 
-    Module.on("Repos.List:selectIndexItem", function(model) {
-
-        if (Module.selectedIndexItem) {
-            Module.selectedIndexItem.deselect();
-        }
-
-        Module.selectedIndexItem = model;
-        Module.selectedIndexItem.select();
-    });
+    Module.on("Repos.List:selectIndexItem", Module.Controller.selectIndexItem);
 });

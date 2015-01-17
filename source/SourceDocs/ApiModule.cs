@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using Nancy;
 using SourceDocs.Core;
 
@@ -26,6 +28,13 @@ namespace SourceDocs
                 };
 
                 // return Response.AsFile(".repos/index.json");
+            };
+            Get["/repos/{repoId}/{nodeName}/doc/{path*}"] = x =>
+            {
+                return new
+                {
+                    Content = File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README." + new Random().Next(1, 4) + ".md"))
+                };
             };
         }
 

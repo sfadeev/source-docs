@@ -70,6 +70,15 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
         }
     });
 
+    Entities.RepoDoc = Backbone.Model.extend({
+        initialize: function (options) {
+            this.options = options;
+        },
+        url: function () {
+            return App.config.api.url + "repos/" + this.options.repoId + "/" + this.options.nodeName + "/doc/" + this.options.path;
+        }
+    });
+
     var API = {
 
         loadRepos: function () {
@@ -93,7 +102,20 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             var dfd = $.Deferred();
             result.fetch({
                 // type: "POST",
-                cache: false,
+                // cache: false,
+                success: function(data) {
+                    dfd.resolve(data);
+                }
+            });
+            return dfd.promise();
+        },
+
+        loadRepoDoc: function (repoId, nodeName, path) {
+
+            var result = new Entities.RepoDoc({ repoId: repoId, nodeName: nodeName, path: path });
+
+            var dfd = $.Deferred();
+            result.fetch({
                 success: function(data) {
                     dfd.resolve(data);
                 }
@@ -109,5 +131,9 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
 
     App.reqres.setHandler("Entities:loadRepoIndex", function (repoId, nodeName) {
         return API.loadRepoIndex(repoId, nodeName);
+    });
+
+    App.reqres.setHandler("Entities:loadRepoDoc", function (repoId, nodeName, path) {
+        return API.loadRepoDoc(repoId, nodeName, path);
     });
 });

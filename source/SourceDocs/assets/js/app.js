@@ -73,7 +73,7 @@ App.router = new App.Router();
 
 App.on("start", function() {
     if (Backbone.history) {
-        Backbone.history.start(/*{ pushState: true }*/);
+        Backbone.history.start({ pushState: false, root: "/SourceDocs/" });
 
         /*if (this.getCurrentRoute() === "") {
             App.trigger("contacts:list");

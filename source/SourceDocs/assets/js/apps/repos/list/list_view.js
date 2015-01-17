@@ -129,4 +129,8 @@
 
     Module.RepoIndexView = Module.RepoIndexListView.extend({
     });
+
+    Module.RepoDocView = Marionette.ItemView.extend({
+        template: "#repo-doc-template"
+    });
 });

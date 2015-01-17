@@ -66,9 +66,9 @@
                     </ol>
                 </nav>
 
-                <div class="page-header">
+                @*<div class="page-header">
                     <h1>Example documentation heading <small><span class="label label-success">New</span></small></h1>
-                </div>
+                </div>*@
                 
                 <div id="main-region"></div>
 
@@ -118,7 +118,7 @@
                 </div><!-- /input-group -->
             </form>
         </div>
-       <div class="index-tree">
+        <div class="index-tree">
             <ul class="nav"></ul>
         </div>
     </script>
@@ -126,6 +126,10 @@
     <script type="text/x-handlebars-template" id="repo-index-link">
         <a href="#{{ path }}">{{ name }}</a>
         <ul class="nav"></ul>
+    </script>
+
+    <script type="text/x-handlebars-template" id="repo-doc-template">
+        {{{ content }}}
     </script>
 
     <script type="text/javascript" src="./assets/js/libs.js"></script>

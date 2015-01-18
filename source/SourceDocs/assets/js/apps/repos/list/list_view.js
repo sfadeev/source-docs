@@ -99,9 +99,10 @@
             var children = this.model.get("children");
             if (children) {
 
+                // todo: move to buildListRecursive
                 var level = this.model.get("level");
                 children.forEach(function (item) {
-                    item.level = level + 1;
+                    item.set("level", level + 1);
                 });
 
                 this.collection = new App.Entities.RepoIndexItemCollection(children);

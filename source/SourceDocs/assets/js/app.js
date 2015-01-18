@@ -58,8 +58,9 @@ App.Router = Backbone.Router.extend({
     repo: function(repoId, nodeName, path) {
         console.log("routing", { history: Backbone.history, repoId: repoId, nodeName: nodeName, path: path });
 
-        if (repoId) App.commands.execute("set:active:repo", repoId);
-        if (nodeName) App.commands.execute("set:active:node", nodeName);
+        if (repoId) App.commands.execute("Repos:selectRepo", repoId);
+        if (nodeName) App.commands.execute("Repos:selectNode", nodeName);
+        if (path) App.commands.execute("Repos:selectPath", path);
     }
 
 });

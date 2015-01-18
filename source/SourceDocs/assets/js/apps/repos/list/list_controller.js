@@ -11,11 +11,11 @@
                 var view = new Module.RepoListView({ model: repos });
 
                 view.on("childview:navigate", function(childView, model) {
-                    App.commands.execute("set:active:repo", model.get("id"));
+                    App.commands.execute("Repos:selectRepo", model.get("id"));
                 });
 
                 App.reposRegion.show(view);
-                App.commands.execute("set:active:repo", Module.selectedRepoId);
+                App.commands.execute("Repos:selectRepo", Module.selectedRepoId);
             });
         },
 
@@ -54,11 +54,11 @@
                     var view = new Module.NodeListView({ model: items.selected });
 
                     view.on("childview:navigate", function(childView, model) {
-                        App.commands.execute("set:active:node", model.get("name"));
+                        App.commands.execute("Repos:selectNode", model.get("name"));
                     });
 
                     App.nodesRegion.show(view);
-                    App.commands.execute("set:active:node", Module.selectedNodeName);
+                    App.commands.execute("Repos:selectNode", Module.selectedNodeName);
                 }
             }
         },
@@ -94,6 +94,32 @@
                 Module.index = index;
                 Module.index.set("level", 0);
 
+                var childrenList = new App.Entities.RepoIndexItemCollection();
+                var buildListRecursive = function(children) {
+                    if (children) {
+                        _.each(children, function (child, index, list) {
+                            list[index] = childrenList.add(child);
+                            buildListRecursive(child.children);
+                        });
+                    }
+                };
+
+                buildListRecursive(index.get("children"));
+
+                Module.index.set("childrenList", childrenList);
+
+                var selectedModel;
+                if (Module.selectedPath) {
+                    selectedModel = childrenList.find(function (x) { return x.get("path") === Module.selectedPath; });
+                    // Module.selectedPath = null;
+                }
+                if (selectedModel === undefined && childrenList.length > 0) {
+                    selectedModel = childrenList.at(0);
+                }
+                if (selectedModel) {
+                    Module.Controller.selectIndexItem(selectedModel);
+                }
+
                 console.log("rendering index of " + repoId + "/" + nodeName);
 
                 var view = new Module.RepoIndexView({ model: index, tagName: "div" });
@@ -109,18 +135,23 @@
             }
 
             Module.selectedIndexItem = model;
+            Module.selectedPath = model.get("path");
 
             model.select();
 
-            App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + model.get("path"));
+            App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + Module.selectedPath);
 
-            App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function (doc) {
+            App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
                 console.log("rendering", doc);
 
                 var view = new Module.RepoDocView({ model: doc });
                 App.mainRegion.show(view);
 
             });
+        },
+
+        selectPath: function(path) {
+            Module.selectedPath = path;
         }
 
     };

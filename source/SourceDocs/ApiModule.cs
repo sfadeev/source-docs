@@ -89,7 +89,7 @@ namespace SourceDocs
         {
             var result = new List<IndexItem>();
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 5; i++)
             {
                 var item0 = new IndexItem
                 {
@@ -98,7 +98,7 @@ namespace SourceDocs
                     Children = new List<IndexItem>()
                 };
 
-                for (var j = 0; j < 5; j++)
+                for (var j = 0; j < 2; j++)
                 {
                     var item1 = new IndexItem
                     {

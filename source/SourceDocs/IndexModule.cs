@@ -6,7 +6,12 @@ namespace SourceDocs
     {
         public IndexModule()
         {
-            Get["/"] = parameters =>
+            Get[""] = parameters =>
+            {
+                return View["index"];
+            };
+            
+            Get["{path*}"] = parameters =>
             {
                 return View["index"];
             };

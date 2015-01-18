@@ -1,5 +1,7 @@
 ﻿// http://stackoverflow.com/questions/11084021/how-to-use-backbone-marionette-itemview-with-mustache
 // todo: check for type="text/x-handlebars-template"
+// todo: compare with Handlebar and check dynamic loading like in BBCloneMail
+// https://github.com/wycats/handlebars.js#differences-between-handlebarsjs-and-mustache
 Marionette.TemplateCache.prototype.compileTemplate = function (rawTemplate) {
 
     // Mustache.parse will not return anything useful (returns an array)
@@ -18,6 +20,10 @@ App.config = {
     api: {
         url: "api/"
     }
+};
+
+App.getApiUrl = function(path) {
+    return Backbone.history.root + App.config.api.url + path;
 };
 
 App.addRegions({
@@ -42,15 +48,15 @@ App.getCurrentRoute = function () {
 App.Router = Backbone.Router.extend({
     routes: {
         "home": "home",
-        "repo/:repoId(/:nodeName)": "repo"
+        "repo/:repoId(/:nodeName)(/*path)": "repo"
     },
 
     home: function () {
         console.log("#home");
     },
 
-    repo: function(repoId, nodeName) {
-        console.log("#repo/" + repoId + "/" + nodeName);
+    repo: function(repoId, nodeName, path) {
+        console.log("routing", { history: Backbone.history, repoId: repoId, nodeName: nodeName, path: path });
 
         if (repoId) App.commands.execute("set:active:repo", repoId);
         if (nodeName) App.commands.execute("set:active:node", nodeName);
@@ -71,9 +77,11 @@ App.router = new App.Router();
     Backbone.View.prototype.trigger = wrapper;
 })();*/
 
-App.on("start", function() {
+App.on("start", function(options) {
     if (Backbone.history) {
-        Backbone.history.start({ pushState: false, root: "/SourceDocs/" });
+        Backbone.history.start({ pushState: true, root: options.root });
+
+        App.commands.execute("Repos:listRepos");
 
         /*if (this.getCurrentRoute() === "") {
             App.trigger("contacts:list");

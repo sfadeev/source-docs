@@ -8,6 +8,14 @@
     <link rel="stylesheet" type="text/css" href="~/assets/css/nprogress.css" />
     @*<link rel="stylesheet" type="text/css" href="~/Content/dashboard1.min.css"/>*@
     @*<link rel="stylesheet" type="text/css" href="~/Content/lib/font-awesome-4.1.0/css/font-awesome.min.css">*@
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
 </head>
 <body>
 
@@ -23,7 +31,7 @@
                     <span class="icon-bar"></span>
                 </button>
 
-                <a class="navbar-brand" href="#home"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+                <a class="navbar-brand" href="@Url.Content("~/")"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
             </div>
 
             <div class="collapse navbar-collapse">
@@ -132,16 +140,16 @@
         {{{ content }}}
     </script>
 
-    <script type="text/javascript" src="./assets/js/libs.js"></script>
-    <script type="text/javascript" src="./assets/js/app.js"></script>
-    <script type="text/javascript" src="./assets/js/entities/repos.js"></script>
-    <script type="text/javascript" src="./assets/js/apps/repos/repos_app.js"></script>
-    <script type="text/javascript" src="./assets/js/apps/repos/list/list_view.js"></script>
-    <script type="text/javascript" src="./assets/js/apps/repos/list/list_controller.js"></script>
+    <script type="text/javascript" src="~/assets/js/libs.js"></script>
+    <script type="text/javascript" src="~/assets/js/app.js"></script>
+    <script type="text/javascript" src="~/assets/js/entities/repos.js"></script>
+    <script type="text/javascript" src="~/assets/js/apps/repos/repos_app.js"></script>
+    <script type="text/javascript" src="~/assets/js/apps/repos/list/list_view.js"></script>
+    <script type="text/javascript" src="~/assets/js/apps/repos/list/list_controller.js"></script>
 
     <script type="text/javascript">
 
-        App.start();
+        App.start({ root: "@Url.Content("~/")" });
 
         // http://blog.pagebakers.nl/2013/11/23/using-nprogress-with-backbone-js/
         // Keep track of the pending promises,

@@ -16,6 +16,10 @@
         }
     };
 
+    App.commands.setHandler("Repos:listRepos", function () {
+        API.listRepos();
+    });
+
     App.commands.setHandler("set:active:repo", function (id) {
         API.selectRepo(id);
     });
@@ -26,7 +30,6 @@
 
     App.commands.setHandler("Repos:showRepoIndex", function (repoId, nodeName) {
         API.showRepoIndex(repoId, nodeName);
-
     });
 
     /*App.on("contacts:list", function () {
@@ -35,6 +38,6 @@
     });*/
 
     Module.on("start", function() {
-        API.listRepos();
+        // API.listRepos();
     });
 });

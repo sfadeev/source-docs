@@ -108,6 +108,7 @@
             }
         },
 
+        // http://jsfiddle.net/hoffmanc/NH9J6/
         /*appendHtml: function(cv, iv) {
             cv.$("ul:first").append(iv.el);
         },*/

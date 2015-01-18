@@ -6,7 +6,7 @@
 
                 Module.repos = repos;
 
-                console.log("rendering repos");
+                console.log("rendering", repos);
 
                 var view = new Module.RepoListView({ model: repos });
 
@@ -31,6 +31,7 @@
 
                 if (repo === undefined && items.length > 0) {
                     repo = items.at(0);
+                    Module.selectedRepoId = repo.get("id");
                 }
 
                 if (repo) {
@@ -75,6 +76,7 @@
 
                 if (node === undefined && nodes.length > 0) {
                     node = nodes.at(0);
+                    Module.selectedNodeName = node.get("name");
                 }
 
                 if (node) {
@@ -113,7 +115,7 @@
             App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + model.get("path"));
 
             App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function (doc) {
-                console.log("rendering doc ", doc);
+                console.log("rendering", doc);
 
                 var view = new Module.RepoDocView({ model: doc });
                 App.mainRegion.show(view);

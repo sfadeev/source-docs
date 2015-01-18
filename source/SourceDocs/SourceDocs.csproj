@@ -103,10 +103,10 @@
       <DependentUpon>dashboard1.css</DependentUpon>
     </Content>
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="Content\source-docs.css">
+    <Content Include="assets\css\source-docs.css">
       <DependentUpon>source-docs.less</DependentUpon>
     </Content>
-    <Content Include="Content\source-docs.min.css">
+    <Content Include="assets\css\source-docs.min.css">
       <DependentUpon>source-docs.css</DependentUpon>
     </Content>
     <Content Include="Content\dashboard2.css">
@@ -119,8 +119,8 @@
     <Content Include="Content\dashboard2.min.css">
       <DependentUpon>dashboard2.css</DependentUpon>
     </Content>
-    <Content Include="Content\source-docs.less" />
-    <Content Include="Content\source-docs.css.map">
+    <Content Include="assets\css\source-docs.less" />
+    <Content Include="assets\css\source-docs.css.map">
       <DependentUpon>source-docs.css</DependentUpon>
     </Content>
     <Content Include="Content\dashboard1.less" />

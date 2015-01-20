@@ -64,33 +64,18 @@
             </div>
             <div class="col-md-9">
 
-                <br/>
+                <br />
 
-                <nav>
-                    <ol class="breadcrumb">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Library</a></li>
-                        <li class="active">Data</li>
-                    </ol>
-                </nav>
+                <div id="breadcrumb-region"></div>
 
-                @*<div class="page-header">
-                    <h1>Example documentation heading <small><span class="label label-success">New</span></small></h1>
-                </div>*@
-                
                 <div id="main-region"></div>
 
-                <nav>
-                    <ul class="pager">
-                        <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Logging something interesting ...</a></li>
-                        <li class="next"><a href="#">Configuring everything usefull ... <span aria-hidden="true">&rarr;</span></a></li>
-                    </ul>
-                </nav>
+                <div id="pager-region"></div>
 
             </div>
         </div>
     </div>
-    
+
     <div id="dialog-region"></div>
 
     <script type="text/x-handlebars-template" id="repos-template">
@@ -138,6 +123,21 @@
 
     <script type="text/x-handlebars-template" id="repo-doc-template">
         {{{ content }}}
+    </script>
+
+    <script type="text/x-handlebars-template" id="repo-doc-breadcrumb-template">
+        <ol class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Library</a></li>
+            <li class="active">{{ name }}</li>
+        </ol>
+    </script>
+
+    <script type="text/x-handlebars-template" id="repo-doc-pager-template">
+        <ul class="pager">
+            <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> {{ name }}</a></li>
+            <li class="next"><a href="#">{{ name }} <span aria-hidden="true">&rarr;</span></a></li>
+        </ul>
     </script>
 
     <script type="text/javascript" src="~/assets/js/libs.js"></script>

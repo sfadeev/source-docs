@@ -30,7 +30,9 @@ App.addRegions({
     reposRegion: "#repos-region",
     nodesRegion: "#nodes-region",
     repoIndexRegion: "#repo-index-region",
-    mainRegion: "#main-region"
+    breadcrumbRegion: "#breadcrumb-region",
+    mainRegion: "#main-region",
+    pagerRegion: "#pager-region"
     /*dialogRegion: Marionette.Region.Dialog.extend({
         el: "#dialog-region"
     })*/

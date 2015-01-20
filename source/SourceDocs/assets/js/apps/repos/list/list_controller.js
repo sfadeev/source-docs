@@ -15,11 +15,17 @@
                 });
 
                 App.reposRegion.show(view);
+
                 App.commands.execute("Repos:selectRepo", Module.selectedRepoId);
             });
         },
 
         selectRepo: function(id) {
+
+            App.repoIndexRegion.empty();
+            App.breadcrumbRegion.empty();
+            App.mainRegion.empty();
+            App.pagerRegion.empty();
 
             Module.selectedRepoId = id;
 
@@ -58,12 +64,18 @@
                     });
 
                     App.nodesRegion.show(view);
+
                     App.commands.execute("Repos:selectNode", Module.selectedNodeName);
                 }
             }
         },
 
         selectNode: function(name) {
+
+            App.repoIndexRegion.empty();
+            App.breadcrumbRegion.empty();
+            App.mainRegion.empty();
+            App.pagerRegion.empty();
 
             Module.selectedNodeName = name;
 
@@ -95,16 +107,18 @@
                 Module.index.set("level", 0);
 
                 var childrenList = new App.Entities.RepoIndexItemCollection();
-                var buildListRecursive = function(children) {
+                var buildListRecursive = function(level, children) {
                     if (children) {
-                        _.each(children, function (child, index, list) {
-                            list[index] = childrenList.add(child);
-                            buildListRecursive(child.children);
-                        });
+                        for (var i = 0; i < children.length; i++) {
+                            var child = children[i];
+                            children[i] = childrenList.add(child);
+                            children[i].set("level", level);
+                            buildListRecursive(level + 1, child.children);
+                        }
                     }
                 };
 
-                buildListRecursive(index.get("children"));
+                buildListRecursive(1, index.get("children"));
 
                 Module.index.set("childrenList", childrenList);
 
@@ -140,6 +154,18 @@
             model.select();
 
             App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + Module.selectedPath);
+
+            App.breadcrumbRegion.show(new Marionette.ItemView({
+                template: "#repo-doc-breadcrumb-template",
+                tagName: "nav",
+                model: model
+            }));
+
+            App.pagerRegion.show(new Marionette.ItemView({
+                template: "#repo-doc-pager-template",
+                tagName: "nav",
+                model: model
+            }));
 
             App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
                 console.log("rendering", doc);

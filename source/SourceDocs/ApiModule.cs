@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Nancy;
 using SourceDocs.Core;
@@ -33,7 +32,9 @@ namespace SourceDocs
             {
                 return new
                 {
-                    Content = File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README." + new Random().Next(1, 4) + ".md"))
+                    Content =
+                        "<h1>Documentation for " + x.repoId + " v. " + x.nodeName + " - " + x.path + "</h1>"
+                        + File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README.3.md"))
                 };
             };
         }

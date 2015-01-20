@@ -221,6 +221,7 @@
     <Content Include="Views\Dashboard2.cshtml" />
     <Content Include="Views\Dashboard1.cshtml" />
     <Content Include="Views\Dashboard3.cshtml" />
+    <Content Include="assets\js\marionette.handlebars.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

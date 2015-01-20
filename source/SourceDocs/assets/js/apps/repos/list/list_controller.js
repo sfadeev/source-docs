@@ -22,10 +22,7 @@
 
         selectRepo: function(id) {
 
-            App.repoIndexRegion.empty();
-            App.breadcrumbRegion.empty();
-            App.mainRegion.empty();
-            App.pagerRegion.empty();
+            Module.Controller.emptyNodeRegions();
 
             Module.selectedRepoId = id;
 
@@ -70,12 +67,18 @@
             }
         },
 
-        selectNode: function(name) {
+        // todo: do not empty region till sure it should be empty to prevent flickering
+        emptyNodeRegions: function () {
 
             App.repoIndexRegion.empty();
             App.breadcrumbRegion.empty();
             App.mainRegion.empty();
             App.pagerRegion.empty();
+        },
+
+        selectNode: function(name) {
+
+            Module.Controller.emptyNodeRegions();
 
             Module.selectedNodeName = name;
 
@@ -106,13 +109,26 @@
                 Module.index = index;
                 Module.index.set("level", 0);
 
+                var prevChild;
                 var childrenList = new App.Entities.RepoIndexItemCollection();
                 var buildListRecursive = function(level, children) {
                     if (children) {
                         for (var i = 0; i < children.length; i++) {
+
                             var child = children[i];
-                            children[i] = childrenList.add(child);
-                            children[i].set("level", level);
+
+                            if (prevChild) {
+                                child.prev = prevChild;
+                                prevChild.next = child;
+                            }
+
+                            prevChild = child;
+
+                            var childModel = childrenList.add(child); // convert object to model
+
+                            children[i] = childModel;
+                            childModel.set("level", level);
+
                             buildListRecursive(level + 1, child.children);
                         }
                     }

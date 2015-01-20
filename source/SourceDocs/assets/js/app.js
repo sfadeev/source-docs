@@ -2,7 +2,7 @@
 // todo: check for type="text/x-handlebars-template"
 // todo: compare with Handlebar and check dynamic loading like in BBCloneMail
 // https://github.com/wycats/handlebars.js#differences-between-handlebarsjs-and-mustache
-Marionette.TemplateCache.prototype.compileTemplate = function (rawTemplate) {
+/*Marionette.TemplateCache.prototype.compileTemplate = function (rawTemplate) {
 
     // Mustache.parse will not return anything useful (returns an array)
     // The render function from Marionette.Renderer.render expects a function
@@ -12,7 +12,7 @@ Marionette.TemplateCache.prototype.compileTemplate = function (rawTemplate) {
     // Additionally Mustache.compile no longer exists so we must use parse.
     Mustache.parse(rawTemplate);
     return _.partial(Mustache.render, rawTemplate);
-};
+};*/
 
 var App = new Backbone.Marionette.Application();
 

@@ -135,12 +135,13 @@
 
     <script type="text/x-handlebars-template" id="repo-doc-pager-template">
         <ul class="pager">
-            <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> {{ name }}</a></li>
-            <li class="next"><a href="#">{{ name }} <span aria-hidden="true">&rarr;</span></a></li>
+            {{#prev}}<li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> {{ name }}</a></li>{{/prev}}
+            {{#next}}<li class="next"><a href="#">{{ name }} <span aria-hidden="true">&rarr;</span></a></li>{{/next}}
         </ul>
     </script>
 
     <script type="text/javascript" src="~/assets/js/libs.js"></script>
+    <script type="text/javascript" src="~/assets/js/marionette.handlebars.js"></script>
     <script type="text/javascript" src="~/assets/js/app.js"></script>
     <script type="text/javascript" src="~/assets/js/entities/repos.js"></script>
     <script type="text/javascript" src="~/assets/js/apps/repos/repos_app.js"></script>

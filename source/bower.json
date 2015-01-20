@@ -22,6 +22,7 @@
     "backbone.cycle": "~1.1.0",
     "marionette": "~2.3.0",
     "mustache": "~0.8.2",
-    "nprogress": "~0.1.6"
+    "nprogress": "~0.1.6",
+    "handlebars": "~2.0.0"
   }
 }

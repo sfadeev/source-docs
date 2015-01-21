@@ -109,7 +109,7 @@
                 Module.index = index;
                 Module.index.set("level", 0);
 
-                var prevChild;
+                var prevChildModel;
                 var childrenList = new App.Entities.RepoIndexItemCollection();
                 var buildListRecursive = function(level, children) {
                     if (children) {
@@ -117,17 +117,16 @@
 
                             var child = children[i];
 
-                            if (prevChild) {
-                                child.prev = prevChild;
-                                prevChild.next = child;
-                            }
-
-                            prevChild = child;
-
                             var childModel = childrenList.add(child); // convert object to model
 
                             children[i] = childModel;
                             childModel.set("level", level);
+
+                            if (prevChildModel) {
+                                childModel.set("prev", prevChildModel);
+                                prevChildModel.set("next", childModel);
+                            }
+                            prevChildModel = childModel;
 
                             buildListRecursive(level + 1, child.children);
                         }

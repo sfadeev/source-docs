@@ -11,7 +11,7 @@
             Module.List.Controller.selectNode(name);
         },
         showRepoIndex: function(repoId, nodeName) {
-            App.navigate("repo/" + repoId + "/" + nodeName);
+            // App.navigate("repo/" + repoId + "/" + nodeName);
             Module.List.Controller.showRepoIndex(repoId, nodeName);
         },
         selectPath: function(path) {

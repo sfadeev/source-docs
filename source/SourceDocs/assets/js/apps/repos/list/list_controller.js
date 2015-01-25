@@ -123,8 +123,8 @@
                             childModel.set("level", level);
 
                             if (prevChildModel) {
-                                childModel.set("prev", prevChildModel);
-                                prevChildModel.set("next", childModel);
+                                childModel.set("sibling:prev", prevChildModel);
+                                prevChildModel.set("sibling:next", childModel);
                             }
                             prevChildModel = childModel;
 
@@ -183,11 +183,20 @@
             });
         },
 
+        selectSiblingIndexItem: function (direction) {
+            if (Module.selectedIndexItem) {
+                var sibling = Module.selectedIndexItem.get("sibling:" + direction);
+                if (sibling) Module.Controller.selectIndexItem(sibling);
+            }
+        },
+
         selectPath: function(path) {
             Module.selectedPath = path;
         }
 
     };
 
+    // todo: should be in repos app?
     Module.on("Repos.List:selectIndexItem", Module.Controller.selectIndexItem);
+    Module.on("Repos.List:selectSiblingIndexItem", Module.Controller.selectSiblingIndexItem);
 });

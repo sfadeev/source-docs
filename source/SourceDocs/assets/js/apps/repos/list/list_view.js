@@ -78,7 +78,10 @@
         childView: Module.RepoIndexTreeView,
         childViewContainer: "ul",
         getTemplate: function() {
-            return (this.model.get("level") === 0) ? "#repo-index-template" : "#repo-index-link";
+            if (this.model.get("level") === 0)
+                return "#repo-index-template";
+            else
+                return "#repo-index-link";
         },
 
         events: {
@@ -137,19 +140,35 @@
         template: "#repo-doc-pager-template",
         tagName: "nav",
 
+        onAttach: function () {
+            // console.log("binding hotkeys for pager");
+
+            $(document).bind("keydown", "left", this.navigatePrev);
+            $(document).bind("keydown", "right", this.navigateNext);
+        },
+
+        onDestroy: function () {
+            // console.log("unbinding hotkeys for pager");
+
+            $(document).unbind("keydown", this.navigatePrev);
+            $(document).unbind("keydown", this.navigateNext);
+        },
+
         events: {
             "click li.previous a": "navigatePrev",
             "click li.next a": "navigateNext"
         },
 
-        navigatePrev: function (e) {
+        navigatePrev: function(e) {
             e.preventDefault();
-            Module.trigger("Repos.List:selectIndexItem", this.model.get("prev"));
+            Module.trigger("Repos.List:selectSiblingIndexItem", "prev");
+            // Module.trigger("Repos.List:selectIndexItem", this.model.get("sibling:prev"));
         },
 
-        navigateNext: function (e) {
+        navigateNext: function(e) {
             e.preventDefault();
-            Module.trigger("Repos.List:selectIndexItem", this.model.get("next"));
+            Module.trigger("Repos.List:selectSiblingIndexItem", "next");
+            // Module.trigger("Repos.List:selectIndexItem", this.model.get("sibling:next"));
         }
     });
 });

@@ -140,35 +140,15 @@
         template: "#repo-doc-pager-template",
         tagName: "nav",
 
-        onAttach: function () {
-            // console.log("binding hotkeys for pager");
-
-            $(document).bind("keydown", "left", this.navigatePrev);
-            $(document).bind("keydown", "right", this.navigateNext);
+        ui: {
+            "previous": "li.previous a",
+            "next": "li.next a"
         },
 
-        onDestroy: function () {
-            // console.log("unbinding hotkeys for pager");
-
-            $(document).unbind("keydown", this.navigatePrev);
-            $(document).unbind("keydown", this.navigateNext);
-        },
-
-        events: {
-            "click li.previous a": "navigatePrev",
-            "click li.next a": "navigateNext"
-        },
-
-        navigatePrev: function(e) {
-            e.preventDefault();
-            Module.trigger("Repos.List:selectSiblingIndexItem", "prev");
-            // Module.trigger("Repos.List:selectIndexItem", this.model.get("sibling:prev"));
-        },
-
-        navigateNext: function(e) {
-            e.preventDefault();
-            Module.trigger("Repos.List:selectSiblingIndexItem", "next");
-            // Module.trigger("Repos.List:selectIndexItem", this.model.get("sibling:next"));
+        triggers: {
+            "click @ui.previous": "navigate:previous",
+            "click @ui.next": "navigate:next"
         }
+
     });
 });

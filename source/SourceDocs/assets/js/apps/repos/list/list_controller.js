@@ -123,7 +123,7 @@
                             childModel.set("level", level);
 
                             if (prevChildModel) {
-                                childModel.set("sibling:prev", prevChildModel);
+                                childModel.set("sibling:previous", prevChildModel);
                                 prevChildModel.set("sibling:next", childModel);
                             }
                             prevChildModel = childModel;
@@ -172,7 +172,13 @@
 
             App.breadcrumbRegion.show(new Module.RepoBreadcrumbView({ model: model }));
 
-            App.pagerRegion.show(new Module.RepoPagerView({ model: model }));
+            App.pagerRegion.show(
+                new Module.RepoPagerView({ model: model })
+                .on({
+                    "navigate:previous": function() { Module.Controller.selectSiblingIndexItem("previous"); },
+                    "navigate:next": function() { Module.Controller.selectSiblingIndexItem("next"); }
+                })
+            );
 
             App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
                 console.log("rendering", doc);
@@ -199,4 +205,7 @@
     // todo: should be in repos app?
     Module.on("Repos.List:selectIndexItem", Module.Controller.selectIndexItem);
     Module.on("Repos.List:selectSiblingIndexItem", Module.Controller.selectSiblingIndexItem);
+
+    $(document).bind("keydown", "left", function () { Module.Controller.selectSiblingIndexItem("previous"); });
+    $(document).bind("keydown", "right", function () { Module.Controller.selectSiblingIndexItem("next"); });
 });

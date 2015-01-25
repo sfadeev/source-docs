@@ -170,17 +170,9 @@
 
             App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + Module.selectedPath);
 
-            App.breadcrumbRegion.show(new Marionette.ItemView({
-                template: "#repo-doc-breadcrumb-template",
-                tagName: "nav",
-                model: model
-            }));
+            App.breadcrumbRegion.show(new Module.RepoBreadcrumbView({ model: model }));
 
-            App.pagerRegion.show(new Marionette.ItemView({
-                template: "#repo-doc-pager-template",
-                tagName: "nav",
-                model: model
-            }));
+            App.pagerRegion.show(new Module.RepoPagerView({ model: model }));
 
             App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
                 console.log("rendering", doc);

@@ -19,12 +19,16 @@ namespace SourceDocs
 
             Get["/repos/{repoId}/{nodeName}/index"] = x =>
             {
-                return new
+                var result = new IndexItem
                 {
-                    RepoId = (string)x.repoId,
-                    NodeName = (string)x.nodeName,
-                    Children = GetTestRepoIndex((string)x.repoId, (string)x.nodeName)
+                    Path = "item",
+                    Name = x.repoId + "/" + x.nodeName,
+                    Children = new List<IndexItem>()
                 };
+
+                BuildRepoIndex(result, 5);
+
+                return result;
 
                 // return Response.AsFile(".repos/index.json");
             };
@@ -86,46 +90,25 @@ namespace SourceDocs
             };
         }
 
-        public static IList<IndexItem> GetTestRepoIndex(string repoId, string nodeName)
+        public static void BuildRepoIndex(IndexItem parent, int level)
         {
-            var result = new List<IndexItem>();
-
-            for (var i = 0; i < 5; i++)
+            for (var i = 1; i < level; i++)
             {
-                var item0 = new IndexItem
+                var item = new IndexItem
                 {
-                    Path = "item/" + i,
-                    Name = repoId + "/" + nodeName + " Item " + i,
-                    Children = new List<IndexItem>()
+                    Path = parent.Path + "/" + i,
+                    Name = parent.Name + " Item " + i
                 };
 
-                for (var j = 0; j < 2; j++)
+                parent.Children.Add(item);
+
+                if (level > 0)
                 {
-                    var item1 = new IndexItem
-                    {
-                        Path = item0.Path + "/" + j,
-                        Name = item0.Name + " Subitem " + j,
-                        Children = new List<IndexItem>()
-                    };
+                    item.Children = new List<IndexItem>();
 
-                    for (var k = 0; k < 3; k++)
-                    {
-                        var item2 = new IndexItem
-                        {
-                            Path = item1.Path + "/" + k,
-                            Name = item1.Name + " Subitem " + k
-                        };
-
-                        item1.Children.Add(item2);
-                    }
-
-                    item0.Children.Add(item1);
+                    BuildRepoIndex(item, level - 1);
                 }
-
-                result.Add(item0);
             }
-
-            return result;
         }
     }
 }

@@ -87,7 +87,6 @@
 
         navigate: function (e) {
             e.preventDefault();
-
             Module.trigger("Repos.List:selectIndexItem", this.model);
         },
 
@@ -127,5 +126,30 @@
 
     Module.RepoDocView = Marionette.ItemView.extend({
         template: "#repo-doc-template"
+    });
+
+    Module.RepoBreadcrumbView = Marionette.ItemView.extend({
+        template: "#repo-doc-breadcrumb-template",
+        tagName: "nav"
+    });
+
+    Module.RepoPagerView = Marionette.ItemView.extend({
+        template: "#repo-doc-pager-template",
+        tagName: "nav",
+
+        events: {
+            "click li.previous a": "navigatePrev",
+            "click li.next a": "navigateNext"
+        },
+
+        navigatePrev: function (e) {
+            e.preventDefault();
+            Module.trigger("Repos.List:selectIndexItem", this.model.get("prev"));
+        },
+
+        navigateNext: function (e) {
+            e.preventDefault();
+            Module.trigger("Repos.List:selectIndexItem", this.model.get("next"));
+        }
     });
 });

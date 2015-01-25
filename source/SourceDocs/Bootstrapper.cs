@@ -1,5 +1,6 @@
 ﻿using Nancy;
 using Nancy.Conventions;
+using Nancy.Json;
 
 namespace SourceDocs
 {
@@ -12,6 +13,8 @@ namespace SourceDocs
         protected override void ConfigureConventions(NancyConventions conventions)
         {
             base.ConfigureConventions(conventions);
+
+            JsonSettings.MaxJsonLength = int.MaxValue;
 
             conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("assets"));
         }

@@ -74,15 +74,10 @@
 
 
     Module.RepoIndexListView = Marionette.CompositeView.extend({
+        template: "#repo-index-link",
         tagName: "li",
-        childView: Module.RepoIndexTreeView,
+        // childView: Module.RepoIndexListView,
         childViewContainer: "ul",
-        getTemplate: function() {
-            if (this.model.get("level") === 0)
-                return "#repo-index-template";
-            else
-                return "#repo-index-link";
-        },
 
         events: {
             "click a": "navigate"
@@ -124,7 +119,42 @@
         }
     });
 
-    Module.RepoIndexView = Module.RepoIndexListView.extend({
+    Module.RepoIndexView = Marionette.CompositeView.extend({
+        template: "#repo-index-template",
+        tagName: "div",
+        childViewContainer: "ul",
+        childView: Module.RepoIndexListView,
+
+        initialize: function () {
+            var children = this.model.get("children");
+            if (children) {
+                this.collection = new App.Entities.RepoIndexItemCollection(children);
+            }
+        },
+
+        onAttach: function () {
+            console.log("binding hotkeys for index view");
+
+            $(document).bind("keydown", "left", this.navigatePrevious);
+            $(document).bind("keydown", "right", this.navigateNext);
+        },
+
+        onDestroy: function () {
+            console.log("unbinding hotkeys for index view");
+
+            $(document).unbind("keydown", this.navigatePrevious);
+            $(document).unbind("keydown", this.navigateNext);
+        },
+
+        navigatePrevious: function (e) {
+            e.preventDefault();
+            Module.trigger("Repos.List:selectSiblingIndexItem", "previous");
+        },
+
+        navigateNext: function (e) {
+            e.preventDefault();
+            Module.trigger("Repos.List:selectSiblingIndexItem", "next");
+        }
     });
 
     Module.RepoDocView = Marionette.ItemView.extend({
@@ -149,6 +179,5 @@
             "click @ui.previous": "navigate:previous",
             "click @ui.next": "navigate:next"
         }
-
     });
 });

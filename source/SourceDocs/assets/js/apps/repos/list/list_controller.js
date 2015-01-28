@@ -6,7 +6,7 @@
 
                 Module.repos = repos;
 
-                console.log("rendering", repos);
+                console.log("rendering repos list", repos);
 
                 var view = new Module.RepoListView({ model: repos });
 
@@ -52,7 +52,7 @@
 
                 if (items.selected) {
 
-                    console.log("rendering nodes of " + Module.selectedRepoId);
+                    console.log("rendering nodes of repo", Module.selectedRepoId);
 
                     var view = new Module.NodeListView({ model: items.selected });
 
@@ -151,9 +151,7 @@
 
                 console.log("rendering index of " + repoId + "/" + nodeName);
 
-                var view = new Module.RepoIndexView({ model: index, tagName: "div" });
-
-                App.repoIndexRegion.show(view);
+                App.repoIndexRegion.show(new Module.RepoIndexView({ model: index }));
             });
         },
 
@@ -181,10 +179,9 @@
             );
 
             App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
-                console.log("rendering", doc);
+                console.log("rendering document", doc);
 
-                var view = new Module.RepoDocView({ model: doc });
-                App.mainRegion.show(view);
+                App.mainRegion.show(new Module.RepoDocView({ model: doc }));
 
             });
         },
@@ -206,6 +203,4 @@
     Module.on("Repos.List:selectIndexItem", Module.Controller.selectIndexItem);
     Module.on("Repos.List:selectSiblingIndexItem", Module.Controller.selectSiblingIndexItem);
 
-    $(document).bind("keydown", "left", function () { Module.Controller.selectSiblingIndexItem("previous"); });
-    $(document).bind("keydown", "right", function () { Module.Controller.selectSiblingIndexItem("next"); });
 });

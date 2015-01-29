@@ -161,9 +161,21 @@
         template: "#repo-doc-template"
     });
 
+
     Module.RepoBreadcrumbView = Marionette.ItemView.extend({
+        template: "#repo-doc-breadcrumb-link",
+        tagName: "li",
+
+        triggers: {
+            "click a": "navigate"
+        }
+    });
+
+    Module.RepoBreadcrumbListView = Marionette.CompositeView.extend({
         template: "#repo-doc-breadcrumb-template",
-        tagName: "nav"
+        tagName: "nav",
+        childViewContainer: "ol",
+        childView: Module.RepoBreadcrumbView
     });
 
     Module.RepoPagerView = Marionette.ItemView.extend({

@@ -127,10 +127,14 @@
 
     <script type="text/x-handlebars-template" id="repo-doc-breadcrumb-template">
         <ol class="breadcrumb">
-            <li><a href="#">Home</a></li>
+            @*<li><a href="#">Home</a></li>
             <li><a href="#">Library</a></li>
-            <li class="active">{{ name }}</li>
+            <li class="active">{{ name }}</li>*@
         </ol>
+    </script>
+
+    <script type="text/x-handlebars-template" id="repo-doc-breadcrumb-link">
+        <a href="#{{ path }}" class="active">{{ name }}</a>
     </script>
 
     <script type="text/x-handlebars-template" id="repo-doc-pager-template">

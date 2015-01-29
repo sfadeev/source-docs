@@ -111,7 +111,7 @@
 
                 var prevChildModel;
                 var childrenList = new App.Entities.RepoIndexItemCollection();
-                var buildListRecursive = function(level, children) {
+                var buildListRecursive = function(level, parentModel, children) {
                     if (children) {
                         for (var i = 0; i < children.length; i++) {
 
@@ -121,6 +121,7 @@
 
                             children[i] = childModel;
                             childModel.set("level", level);
+                            childModel.set("sibling:parent", parentModel);
 
                             if (prevChildModel) {
                                 childModel.set("sibling:previous", prevChildModel);
@@ -128,12 +129,12 @@
                             }
                             prevChildModel = childModel;
 
-                            buildListRecursive(level + 1, child.children);
+                            buildListRecursive(level + 1, childModel, child.children);
                         }
                     }
                 };
 
-                buildListRecursive(1, index.get("children"));
+                buildListRecursive(1, index, index.get("children"));
 
                 Module.index.set("childrenList", childrenList);
 
@@ -168,8 +169,24 @@
 
             App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + Module.selectedPath);
 
-            App.breadcrumbRegion.show(new Module.RepoBreadcrumbView({ model: model }));
+            // build and show breadcrumb
+            var breadcrumbList = new App.Entities.RepoIndexItemCollection();
+            var breadcrumbItem = model;
+            do {
+                breadcrumbList.add(breadcrumbItem, { at: 0 });
+                breadcrumbItem = breadcrumbItem.get("sibling:parent");
 
+            } while (breadcrumbItem)
+
+            App.breadcrumbRegion.show(
+                new Module.RepoBreadcrumbListView({ model: model, collection: breadcrumbList })
+                .on("childview:navigate", function(e) {
+                    console.log("breadcrumb navigate", e);
+                    Module.Controller.selectIndexItem(e.model);
+                })
+            );
+
+            // build and show pager
             App.pagerRegion.show(
                 new Module.RepoPagerView({ model: model })
                 .on({
@@ -178,6 +195,7 @@
                 })
             );
 
+            // load and show doc
             App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
                 console.log("rendering document", doc);
 

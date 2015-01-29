@@ -9205,8 +9205,8 @@ return jQuery;
 }));
 
 /*!
- * Bootstrap v3.3.1 (http://getbootstrap.com)
- * Copyright 2011-2014 Twitter, Inc.
+ * Bootstrap v3.3.2 (http://getbootstrap.com)
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
@@ -9215,6 +9215,7 @@ if (typeof jQuery === 'undefined') {
 }
 
 +function ($) {
+  'use strict';
   var version = $.fn.jquery.split(' ')[0].split('.')
   if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1)) {
     throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher')
@@ -9222,10 +9223,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: transition.js v3.3.1
+ * Bootstrap: transition.js v3.3.2
  * http://getbootstrap.com/javascript/#transitions
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -9282,10 +9283,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: alert.js v3.3.1
+ * Bootstrap: alert.js v3.3.2
  * http://getbootstrap.com/javascript/#alerts
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -9301,7 +9302,7 @@ if (typeof jQuery === 'undefined') {
     $(el).on('click', dismiss, this.close)
   }
 
-  Alert.VERSION = '3.3.1'
+  Alert.VERSION = '3.3.2'
 
   Alert.TRANSITION_DURATION = 150
 
@@ -9377,10 +9378,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: button.js v3.3.1
+ * Bootstrap: button.js v3.3.2
  * http://getbootstrap.com/javascript/#buttons
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -9397,7 +9398,7 @@ if (typeof jQuery === 'undefined') {
     this.isLoading = false
   }
 
-  Button.VERSION  = '3.3.1'
+  Button.VERSION  = '3.3.2'
 
   Button.DEFAULTS = {
     loadingText: 'loading...'
@@ -9494,10 +9495,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: carousel.js v3.3.1
+ * Bootstrap: carousel.js v3.3.2
  * http://getbootstrap.com/javascript/#carousel
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -9525,7 +9526,7 @@ if (typeof jQuery === 'undefined') {
       .on('mouseleave.bs.carousel', $.proxy(this.cycle, this))
   }
 
-  Carousel.VERSION  = '3.3.1'
+  Carousel.VERSION  = '3.3.2'
 
   Carousel.TRANSITION_DURATION = 600
 
@@ -9565,8 +9566,11 @@ if (typeof jQuery === 'undefined') {
   }
 
   Carousel.prototype.getItemForDirection = function (direction, active) {
-    var delta = direction == 'prev' ? -1 : 1
     var activeIndex = this.getItemIndex(active)
+    var willWrap = (direction == 'prev' && activeIndex === 0)
+                || (direction == 'next' && activeIndex == (this.$items.length - 1))
+    if (willWrap && !this.options.wrap) return active
+    var delta = direction == 'prev' ? -1 : 1
     var itemIndex = (activeIndex + delta) % this.$items.length
     return this.$items.eq(itemIndex)
   }
@@ -9611,13 +9615,7 @@ if (typeof jQuery === 'undefined') {
     var $next     = next || this.getItemForDirection(type, $active)
     var isCycling = this.interval
     var direction = type == 'next' ? 'left' : 'right'
-    var fallback  = type == 'next' ? 'first' : 'last'
     var that      = this
-
-    if (!$next.length) {
-      if (!this.options.wrap) return
-      $next = this.$element.find('.item')[fallback]()
-    }
 
     if ($next.hasClass('active')) return (this.sliding = false)
 
@@ -9735,10 +9733,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: collapse.js v3.3.1
+ * Bootstrap: collapse.js v3.3.2
  * http://getbootstrap.com/javascript/#collapse
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -9764,7 +9762,7 @@ if (typeof jQuery === 'undefined') {
     if (this.options.toggle) this.toggle()
   }
 
-  Collapse.VERSION  = '3.3.1'
+  Collapse.VERSION  = '3.3.2'
 
   Collapse.TRANSITION_DURATION = 350
 
@@ -9782,7 +9780,7 @@ if (typeof jQuery === 'undefined') {
     if (this.transitioning || this.$element.hasClass('in')) return
 
     var activesData
-    var actives = this.$parent && this.$parent.find('> .panel').children('.in, .collapsing')
+    var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
 
     if (actives && actives.length) {
       activesData = actives.data('bs.collapse')
@@ -9947,10 +9945,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: dropdown.js v3.3.1
+ * Bootstrap: dropdown.js v3.3.2
  * http://getbootstrap.com/javascript/#dropdowns
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -9967,7 +9965,7 @@ if (typeof jQuery === 'undefined') {
     $(element).on('click.bs.dropdown', this.toggle)
   }
 
-  Dropdown.VERSION = '3.3.1'
+  Dropdown.VERSION = '3.3.2'
 
   Dropdown.prototype.toggle = function (e) {
     var $this = $(this)
@@ -10109,10 +10107,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: modal.js v3.3.1
+ * Bootstrap: modal.js v3.3.2
  * http://getbootstrap.com/javascript/#modals
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -10140,7 +10138,7 @@ if (typeof jQuery === 'undefined') {
     }
   }
 
-  Modal.VERSION  = '3.3.1'
+  Modal.VERSION  = '3.3.2'
 
   Modal.TRANSITION_DURATION = 300
   Modal.BACKDROP_TRANSITION_DURATION = 150
@@ -10434,11 +10432,11 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: tooltip.js v3.3.1
+ * Bootstrap: tooltip.js v3.3.2
  * http://getbootstrap.com/javascript/#tooltip
  * Inspired by the original jQuery.tipsy by Jason Frame
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -10460,7 +10458,7 @@ if (typeof jQuery === 'undefined') {
     this.init('tooltip', element, options)
   }
 
-  Tooltip.VERSION  = '3.3.1'
+  Tooltip.VERSION  = '3.3.2'
 
   Tooltip.TRANSITION_DURATION = 150
 
@@ -10781,10 +10779,10 @@ if (typeof jQuery === 'undefined') {
   }
 
   Tooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
-    return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2  } :
-           placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2  } :
+    return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2 } :
+           placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2 } :
            placement == 'left'   ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
-        /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width   }
+        /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width }
 
   }
 
@@ -10880,18 +10878,12 @@ if (typeof jQuery === 'undefined') {
 
   function Plugin(option) {
     return this.each(function () {
-      var $this    = $(this)
-      var data     = $this.data('bs.tooltip')
-      var options  = typeof option == 'object' && option
-      var selector = options && options.selector
+      var $this   = $(this)
+      var data    = $this.data('bs.tooltip')
+      var options = typeof option == 'object' && option
 
       if (!data && option == 'destroy') return
-      if (selector) {
-        if (!data) $this.data('bs.tooltip', (data = {}))
-        if (!data[selector]) data[selector] = new Tooltip(this, options)
-      } else {
-        if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
-      }
+      if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
       if (typeof option == 'string') data[option]()
     })
   }
@@ -10913,10 +10905,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: popover.js v3.3.1
+ * Bootstrap: popover.js v3.3.2
  * http://getbootstrap.com/javascript/#popovers
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -10933,7 +10925,7 @@ if (typeof jQuery === 'undefined') {
 
   if (!$.fn.tooltip) throw new Error('Popover requires tooltip.js')
 
-  Popover.VERSION  = '3.3.1'
+  Popover.VERSION  = '3.3.2'
 
   Popover.DEFAULTS = $.extend({}, $.fn.tooltip.Constructor.DEFAULTS, {
     placement: 'right',
@@ -11000,18 +10992,12 @@ if (typeof jQuery === 'undefined') {
 
   function Plugin(option) {
     return this.each(function () {
-      var $this    = $(this)
-      var data     = $this.data('bs.popover')
-      var options  = typeof option == 'object' && option
-      var selector = options && options.selector
+      var $this   = $(this)
+      var data    = $this.data('bs.popover')
+      var options = typeof option == 'object' && option
 
       if (!data && option == 'destroy') return
-      if (selector) {
-        if (!data) $this.data('bs.popover', (data = {}))
-        if (!data[selector]) data[selector] = new Popover(this, options)
-      } else {
-        if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
-      }
+      if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
       if (typeof option == 'string') data[option]()
     })
   }
@@ -11033,10 +11019,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: scrollspy.js v3.3.1
+ * Bootstrap: scrollspy.js v3.3.2
  * http://getbootstrap.com/javascript/#scrollspy
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -11064,7 +11050,7 @@ if (typeof jQuery === 'undefined') {
     this.process()
   }
 
-  ScrollSpy.VERSION  = '3.3.1'
+  ScrollSpy.VERSION  = '3.3.2'
 
   ScrollSpy.DEFAULTS = {
     offset: 10
@@ -11209,10 +11195,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: tab.js v3.3.1
+ * Bootstrap: tab.js v3.3.2
  * http://getbootstrap.com/javascript/#tabs
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -11227,7 +11213,7 @@ if (typeof jQuery === 'undefined') {
     this.element = $(element)
   }
 
-  Tab.VERSION = '3.3.1'
+  Tab.VERSION = '3.3.2'
 
   Tab.TRANSITION_DURATION = 150
 
@@ -11363,10 +11349,10 @@ if (typeof jQuery === 'undefined') {
 }(jQuery);
 
 /* ========================================================================
- * Bootstrap: affix.js v3.3.1
+ * Bootstrap: affix.js v3.3.2
  * http://getbootstrap.com/javascript/#affix
  * ========================================================================
- * Copyright 2011-2014 Twitter, Inc.
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * ======================================================================== */
 
@@ -11392,7 +11378,7 @@ if (typeof jQuery === 'undefined') {
     this.checkPosition()
   }
 
-  Affix.VERSION  = '3.3.1'
+  Affix.VERSION  = '3.3.2'
 
   Affix.RESET    = 'affix affix-top affix-bottom'
 
@@ -11417,7 +11403,7 @@ if (typeof jQuery === 'undefined') {
     var colliderTop    = initializing ? scrollTop : position.top
     var colliderHeight = initializing ? targetHeight : height
 
-    if (offsetTop != null && colliderTop <= offsetTop) return 'top'
+    if (offsetTop != null && scrollTop <= offsetTop) return 'top'
     if (offsetBottom != null && (colliderTop + colliderHeight >= scrollHeight - offsetBottom)) return 'bottom'
 
     return false
@@ -16010,9 +15996,9 @@ if (typeof JSON !== 'object') {
 }( Backbone, _ ));
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
-// v2.3.0
+// v2.3.1
 //
-// Copyright (c)2014 Derick Bailey, Muted Solutions, LLC.
+// Copyright (c)2015 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
 //
 // http://marionettejs.com
@@ -16048,7 +16034,7 @@ if (typeof JSON !== 'object') {
   /* istanbul ignore next */
   // Backbone.BabySitter
   // -------------------
-  // v0.1.4
+  // v0.1.5
   //
   // Copyright (c)2014 Derick Bailey, Muted Solutions, LLC.
   // Distributed under MIT license
@@ -16177,7 +16163,7 @@ if (typeof JSON !== 'object') {
       // return the public API
       return Container;
     }(Backbone, _);
-    Backbone.ChildViewContainer.VERSION = "0.1.4";
+    Backbone.ChildViewContainer.VERSION = "0.1.5";
     Backbone.ChildViewContainer.noConflict = function() {
       Backbone.ChildViewContainer = previousChildViewContainer;
       return this;
@@ -16503,7 +16489,7 @@ if (typeof JSON !== 'object') {
 
   var Marionette = Backbone.Marionette = {};
 
-  Marionette.VERSION = '2.3.0';
+  Marionette.VERSION = '2.3.1';
 
   Marionette.noConflict = function() {
     root.Marionette = previousMarionette;
@@ -16552,6 +16538,17 @@ if (typeof JSON !== 'object') {
   // Proxy `Marionette.getOption`
   Marionette.proxyGetOption = function(optionName) {
     return Marionette.getOption(this, optionName);
+  };
+  
+  // Similar to `_.result`, this is a simple helper
+  // If a function is provided we call it with context
+  // otherwise just return the value. If the value is
+  // undefined return a default value
+  Marionette._getValue = function(value, context, params) {
+    if (_.isFunction(value)) {
+      value = value.apply(context, params);
+    }
+    return value;
   };
   
   // Marionette.normalizeMethods
@@ -16812,7 +16809,7 @@ if (typeof JSON !== 'object') {
       if (!entity || !bindings) { return; }
   
       // type-check bindings
-      if (!_.isFunction(bindings) && !_.isObject(bindings)) {
+      if (!_.isObject(bindings)) {
         throw new Marionette.Error({
           message: 'Bindings must be an object or function.',
           url: 'marionette.functions.html#marionettebindentityevents'
@@ -16820,9 +16817,7 @@ if (typeof JSON !== 'object') {
       }
   
       // allow the bindings to be a function
-      if (_.isFunction(bindings)) {
-        bindings = bindings.call(target);
-      }
+      bindings = Marionette._getValue(bindings, target);
   
       // iterate the bindings and bind them
       _.each(bindings, function(methods, evt) {
@@ -17216,24 +17211,18 @@ if (typeof JSON !== 'object') {
       }
     },
   
-    // Override this method to change how the region finds the
-    // DOM element that it manages. Return a jQuery selector object.
+    // Override this method to change how the region finds the DOM
+    // element that it manages. Return a jQuery selector object scoped
+    // to a provided parent el or the document if none exists.
     getEl: function(el) {
-      return Backbone.$(el);
+      return Backbone.$(el, Marionette._getValue(this.options.parentEl, this));
     },
   
     // Override this method to change how the new view is
     // appended to the `$el` that the region is managing
     attachHtml: function(view) {
-      // empty the node and append new view
-      // We can not use `.innerHTML` due to the fact that IE
-      // will not let us clear the html of tables and selects.
-      // We also do not want to use the more declarative `empty` method
-      // that jquery exposes since `.empty` loops over all of the children DOM
-      // nodes and unsets the listeners on each node. While this seems like
-      // a desirable thing, it comes at quite a high perf cost. For that reason
-      // we are simply clearing the html contents of the node.
-      this.$el.html('');
+      this.$el.contents().detach();
+  
       this.el.appendChild(view.el);
     },
   
@@ -17359,28 +17348,7 @@ if (typeof JSON !== 'object') {
         options.el = regionConfig.selector;
       }
   
-      var region = new RegionClass(options);
-  
-      // override the `getEl` function if we have a parentEl
-      // this must be overridden to ensure the selector is found
-      // on the first use of the region. if we try to assign the
-      // region's `el` to `parentEl.find(selector)` in the object
-      // literal to build the region, the element will not be
-      // guaranteed to be in the DOM already, and will cause problems
-      if (regionConfig.parentEl) {
-        region.getEl = function(el) {
-          if (_.isObject(el)) {
-            return Backbone.$(el);
-          }
-          var parentEl = regionConfig.parentEl;
-          if (_.isFunction(parentEl)) {
-            parentEl = parentEl();
-          }
-          return parentEl.find(el);
-        };
-      }
-  
-      return region;
+      return new RegionClass(options);
     },
   
     // Build the region directly from a given `RegionClass`
@@ -17407,26 +17375,19 @@ if (typeof JSON !== 'object') {
     // each key becomes the region name, and each value is
     // the region definition.
     addRegions: function(regionDefinitions, defaults) {
-      if (_.isFunction(regionDefinitions)) {
-        regionDefinitions = regionDefinitions.apply(this, arguments);
-      }
+      regionDefinitions = Marionette._getValue(regionDefinitions, this, arguments);
   
-      var regions = {};
-  
-      _.each(regionDefinitions, function(definition, name) {
+      return _.reduce(regionDefinitions, function(regions, definition, name) {
         if (_.isString(definition)) {
           definition = {selector: definition};
         }
-  
         if (definition.selector) {
           definition = _.defaults({}, definition, defaults);
         }
   
-        var region = this.addRegion(name, definition);
-        regions[name] = region;
-      }, this);
-  
-      return regions;
+        regions[name] = this.addRegion(name, definition);
+        return regions;
+      }, {}, this);
     },
   
     // Add an individual region to the region manager,
@@ -17637,12 +17598,7 @@ if (typeof JSON !== 'object') {
         });
       }
   
-      var templateFunc;
-      if (typeof template === 'function') {
-        templateFunc = template;
-      } else {
-        templateFunc = Marionette.TemplateCache.get(template);
-      }
+      var templateFunc = _.isFunction(template) ? template : Marionette.TemplateCache.get(template);
   
       return templateFunc(data);
     }
@@ -17655,11 +17611,12 @@ if (typeof JSON !== 'object') {
   
   // The core view class that other Marionette views extend from.
   Marionette.View = Backbone.View.extend({
+    isDestroyed: false,
   
     constructor: function(options) {
       _.bindAll(this, 'render');
   
-      options = _.isFunction(options) ? options.call(this) : options;
+      options = Marionette._getValue(options, this);
   
       // this exposes view options to the view initializer
       // this is a backfill since backbone removed the assignment
@@ -17697,9 +17654,7 @@ if (typeof JSON !== 'object') {
     mixinTemplateHelpers: function(target) {
       target = target || {};
       var templateHelpers = this.getOption('templateHelpers');
-      if (_.isFunction(templateHelpers)) {
-        templateHelpers = templateHelpers.call(this);
-      }
+      templateHelpers = Marionette._getValue(templateHelpers, this);
       return _.extend(target, templateHelpers);
     },
   
@@ -17751,8 +17706,7 @@ if (typeof JSON !== 'object') {
   
     // internal method to delegate DOM events and triggers
     _delegateDOMEvents: function(eventsArg) {
-      var events = eventsArg || this.events;
-      if (_.isFunction(events)) { events = events.call(this); }
+      var events = Marionette._getValue(eventsArg || this.events, this);
   
       // normalize ui keys
       events = this.normalizeUIKeys(events);
@@ -17855,8 +17809,7 @@ if (typeof JSON !== 'object') {
       this.ui = {};
   
       // bind each of the selectors
-      _.each(_.keys(bindings), function(key) {
-        var selector = bindings[key];
+      _.each(bindings, function(selector, key) {
         this.ui[key] = this.$(selector);
       }, this);
     },
@@ -18352,9 +18305,7 @@ if (typeof JSON !== 'object') {
     // in order to keep the children in sync with the collection.
     addChild: function(child, ChildView, index) {
       var childViewOptions = this.getOption('childViewOptions');
-      if (_.isFunction(childViewOptions)) {
-        childViewOptions = childViewOptions.call(this, child, index);
-      }
+      childViewOptions = Marionette._getValue(childViewOptions, this, [child, index]);
   
       var view = this.buildChildView(child, ChildView, childViewOptions);
   
@@ -18378,22 +18329,14 @@ if (typeof JSON !== 'object') {
       if (increment) {
         // assign the index to the view
         view._index = index;
+      }
   
-        // increment the index of views after this one
-        this.children.each(function (laterView) {
-          if (laterView._index >= view._index) {
-            laterView._index++;
-          }
-        });
-      }
-      else {
-        // decrement the index of views after this one
-        this.children.each(function (laterView) {
-          if (laterView._index >= view._index) {
-            laterView._index--;
-          }
-        });
-      }
+      // update the indexes of views after this one
+      this.children.each(function (laterView) {
+        if (laterView._index >= view._index) {
+          laterView._index += increment ? 1 : -1;
+        }
+      });
     },
   
   
@@ -18717,7 +18660,7 @@ if (typeof JSON !== 'object') {
       var childViewContainer = Marionette.getOption(containerView, 'childViewContainer');
       if (childViewContainer) {
   
-        var selector = _.isFunction(childViewContainer) ? childViewContainer.call(containerView) : childViewContainer;
+        var selector = Marionette._getValue(childViewContainer, containerView);
   
         if (selector.charAt(0) === '@' && containerView.ui) {
           container = containerView.ui[selector.substr(4)];
@@ -18834,7 +18777,7 @@ if (typeof JSON !== 'object') {
     _buildRegions: function(regions) {
       var defaults = {
         regionClass: this.getOption('regionClass'),
-        parentEl: _.partial(_.result, this, '$el')
+        parentEl: _.partial(_.result, this, 'el')
       };
   
       return this.regionManager.addRegions(regions, defaults);
@@ -18846,19 +18789,13 @@ if (typeof JSON !== 'object') {
       var regions;
       this._initRegionManager();
   
-      if (_.isFunction(this.regions)) {
-        regions = this.regions(options);
-      } else {
-        regions = this.regions || {};
-      }
+      regions = Marionette._getValue(this.regions, this, [options]) || {};
   
       // Enable users to define `regions` as instance options.
       var regionOptions = this.getOption.call(options, 'regions');
   
       // enable region options to be a function
-      if (_.isFunction(regionOptions)) {
-        regionOptions = regionOptions.call(this, options);
-      }
+      regionOptions = Marionette._getValue(regionOptions, this, [options]);
   
       _.extend(regions, regionOptions);
   
@@ -18967,6 +18904,8 @@ if (typeof JSON !== 'object') {
   // method for things to work properly.
   
   Marionette.Behaviors = (function(Marionette, _) {
+    // Borrow event splitter from Backbone
+    var delegateEventSplitter = /^(\S+)\s*(.*)$/;
   
     function Behaviors(view, behaviors) {
   
@@ -18993,12 +18932,12 @@ if (typeof JSON !== 'object') {
   
       behaviorEvents: function(behaviorEvents, behaviors) {
         var _behaviorsEvents = {};
-        var viewUI = _.result(this, 'ui');
+        var viewUI = this._uiBindings || _.result(this, 'ui');
   
         _.each(behaviors, function(b, i) {
           var _events = {};
           var behaviorEvents = _.clone(_.result(b, 'events')) || {};
-          var behaviorUI = _.result(b, 'ui');
+          var behaviorUI = b._uiBindings || _.result(b, 'ui');
   
           // Construct an internal UI hash first using
           // the views UI hash and then the behaviors UI hash.
@@ -19011,21 +18950,25 @@ if (typeof JSON !== 'object') {
           // a user to use the @ui. syntax.
           behaviorEvents = Marionette.normalizeUIKeys(behaviorEvents, ui);
   
-          _.each(_.keys(behaviorEvents), function(key) {
-            // Append white-space at the end of each key to prevent behavior key collisions.
-            // This is relying on the fact that backbone events considers "click .foo" the same as
-            // "click .foo ".
+          var j = 0;
+          _.each(behaviorEvents, function(behaviour, key) {
+            var match     = key.match(delegateEventSplitter);
   
-            // +2 is used because new Array(1) or 0 is "" and not " "
-            var whitespace = (new Array(i + 2)).join(' ');
-            var eventKey   = key + whitespace;
-            var handler    = _.isFunction(behaviorEvents[key]) ? behaviorEvents[key] : b[behaviorEvents[key]];
+            // Set event name to be namespaced using the view cid,
+            // the behavior index, and the behavior event index
+            // to generate a non colliding event namespace
+            // http://api.jquery.com/event.namespace/
+            var eventName = match[1] + '.' + [this.cid, i, j++, ' '].join(''),
+                selector  = match[2];
+  
+            var eventKey  = eventName + selector;
+            var handler   = _.isFunction(behaviour) ? behaviour : b[behaviour];
   
             _events[eventKey] = _.bind(handler, b);
-          });
+          }, this);
   
           _behaviorsEvents = _.extend(_behaviorsEvents, _events);
-        });
+        }, this);
   
         return _behaviorsEvents;
       }
@@ -19060,7 +19003,7 @@ if (typeof JSON !== 'object') {
         }
   
         // Get behavior class can be either a flat object or a method
-        return _.isFunction(Behaviors.behaviorsLookup) ? Behaviors.behaviorsLookup.apply(this, arguments)[key] : Behaviors.behaviorsLookup[key];
+        return Marionette._getValue(Behaviors.behaviorsLookup, this, [options, key])[key];
       },
   
       // Iterate over the behaviors object, for each behavior
@@ -19111,7 +19054,7 @@ if (typeof JSON !== 'object') {
   
         triggersHash = Marionette.normalizeUIKeys(triggersHash, ui);
   
-        _.each(triggersHash, _.partial(this._setHandlerForBehavior, behavior, i), this);
+        _.each(triggersHash, _.bind(this._setHandlerForBehavior, this, behavior, i));
       },
   
       // Internal method to create and assign the trigger handler for a given

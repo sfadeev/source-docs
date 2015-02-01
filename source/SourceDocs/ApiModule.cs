@@ -11,10 +11,10 @@ namespace SourceDocs
         {
             Get["/repos"] = parameters =>
             {
-                return new
-                {
-                    Items = GetTestRepos()
-                };
+                IRepositoryCatalog repositoryCatalog = 
+                    new DefaultRepositoryCatalog(Path.Combine(Response.RootPath, ".repos/"));
+
+                return repositoryCatalog.GetRepos();
             };
 
             Get["/repos/{repoId}/{nodeName}/index"] = x =>
@@ -38,55 +38,8 @@ namespace SourceDocs
                 {
                     Content =
                         "<h1>Documentation for " + x.repoId + " v. " + x.nodeName + " - " + x.path + "</h1>"
-                        + File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README.3.md"))
+                        + File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README.1.md"))
                 };
-            };
-        }
-
-        public static Repo[] GetTestRepos()
-        {
-            return new[]
-            {
-                new Repo
-                {
-                    Id = "jQuery",
-                    Nodes = new[]
-                    {
-                        new Node { Name = "2.1.3" },
-                        new Node { Name = "2.1.1" },
-                        new Node { Name = "2.1.0" },
-                        new Node { Name = "2.0.3" },
-                        new Node { Name = "2.0.2" },
-                        new Node { Name = "2.0.1" },
-                        new Node { Name = "2.0.0" },
-                        new Node { Name = "1.11.2" },
-                        new Node { Name = "1.11.1" },
-                        new Node { Name = "1.11.0" }
-                    }
-                },
-                new Repo { Id = "LibGit2Sharp" },
-                new Repo
-                {
-                    Id = "log4net",
-                    Nodes = new[]
-                    {
-                        new Node { Name = "1.2.13" },
-                        new Node { Name = "1.2.12" },
-                        new Node { Name = "1.2.11" },
-                        new Node { Name = "1.2.10" }
-                    }
-                },
-                new Repo { Id = "Nancy" },
-                new Repo { Id = "Nancy.Hosting.Aspnet" },
-                new Repo { Id = "Nancy.Viewengines.Razor" },
-                new Repo
-                {
-                    Id = "Twitter.Bootstrap.Less",
-                    Nodes = new[]
-                    {
-                        new Node { Name = "v1.0" }
-                    }
-                }
             };
         }
 

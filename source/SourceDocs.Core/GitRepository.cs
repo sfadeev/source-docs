@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using LibGit2Sharp;
+using SourceDocs.Core.Models;
 
 namespace SourceDocs.Core
 {

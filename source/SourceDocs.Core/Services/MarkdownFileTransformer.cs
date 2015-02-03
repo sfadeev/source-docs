@@ -1,4 +1,4 @@
-namespace SourceDocs.Core
+namespace SourceDocs.Core.Services
 {
     public class MarkdownFileTransformer : IFileTransformer
     {

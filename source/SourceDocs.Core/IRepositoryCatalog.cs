@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
+using SourceDocs.Core.Models;
+using SourceDocs.Core.Services;
 
 namespace SourceDocs.Core
 {
@@ -10,17 +12,17 @@ namespace SourceDocs.Core
 
     public class DefaultRepositoryCatalog : IRepositoryCatalog
     {
-        private readonly string _workingRoot;
+        private readonly IContextProvider _contextProvider;
 
-        public DefaultRepositoryCatalog(string workingRoot)
+        public DefaultRepositoryCatalog(IContextProvider contextProvider)
         {
-            _workingRoot = workingRoot;
+            _contextProvider = contextProvider;
         }
 
         public Repos GetRepos()
         {
-            var reposConfig = Path.Combine(_workingRoot, "repos.json");
-            var reposStream = File.ReadAllText(reposConfig);
+            var reposConfigPath = _contextProvider.MapPath("repos.json");
+            var reposStream = File.ReadAllText(reposConfigPath);
             var result = JsonConvert.DeserializeObject<Repos>(reposStream);
 
             foreach (var item in result.Items)

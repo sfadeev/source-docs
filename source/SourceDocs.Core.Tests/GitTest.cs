@@ -7,6 +7,8 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
+using SourceDocs.Core.Models;
+using SourceDocs.Core.Services;
 
 namespace SourceDocs.Core.Tests
 {

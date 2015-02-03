@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SourceDocs.Core
+namespace SourceDocs.Core.Models
 {
     public class Repos
     {

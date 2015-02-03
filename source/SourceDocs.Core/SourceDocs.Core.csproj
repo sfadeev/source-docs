@@ -57,15 +57,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GitRepository.cs" />
-    <Compile Include="IFileTransformer.cs" />
-    <Compile Include="IndexItem.cs" />
+    <Compile Include="Services\IFileTransformer.cs" />
+    <Compile Include="Models\IndexItem.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IRepositoryCatalog.cs" />
-    <Compile Include="MarkdownFileTransformer.cs" />
-    <Compile Include="Node.cs" />
-    <Compile Include="Repo.cs" />
+    <Compile Include="Services\MarkdownFileTransformer.cs" />
+    <Compile Include="Models\Node.cs" />
+    <Compile Include="Models\Repo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SourceFileTransformer.cs" />
+    <Compile Include="Services\IContextProvider.cs" />
+    <Compile Include="Services\SourceFileTransformer.cs" />
     <Compile Include="TransformOptions.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,18 +2,16 @@
 using System.IO;
 using Nancy;
 using SourceDocs.Core;
+using SourceDocs.Core.Models;
 
 namespace SourceDocs
 {
     public class ApiModule : NancyModule
     {
-        public ApiModule() : base("/api")
+        public ApiModule(IRepositoryCatalog repositoryCatalog) : base("/api")
         {
             Get["/repos"] = parameters =>
             {
-                IRepositoryCatalog repositoryCatalog = 
-                    new DefaultRepositoryCatalog(Path.Combine(Response.RootPath, ".repos/"));
-
                 return repositoryCatalog.GetRepos();
             };
 

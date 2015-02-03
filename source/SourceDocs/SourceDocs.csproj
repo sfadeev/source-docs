@@ -216,6 +216,7 @@
     <Compile Include="IndexModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorConfig.cs" />
+    <Compile Include="Services\NancyContextProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-namespace SourceDocs.Core
+namespace SourceDocs.Core.Models
 {
     /// <summary>
     /// Info about documentation node (repository branch)

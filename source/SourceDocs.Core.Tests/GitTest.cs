@@ -7,6 +7,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
+using SourceDocs.Core.Helpers;
 using SourceDocs.Core.Models;
 using SourceDocs.Core.Services;
 
@@ -21,8 +22,8 @@ namespace SourceDocs.Core.Tests
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
         public void WorkflowTest(string repoUrl)
         {
-            var repoDir = GetWorkingDir("./repos/", repoUrl, "repo");
-            var configFile = Path.Combine(GetWorkingDir("./repos/", repoUrl), "config.json");
+            var repoDir = FileHelper.GetWorkingDir("./repos/", repoUrl, "repo");
+            var configFile = Path.Combine(FileHelper.GetWorkingDir("./repos/", repoUrl), "config.json");
 
             var gitSettings = new GitRepository.Settings
             {
@@ -62,7 +63,7 @@ namespace SourceDocs.Core.Tests
                         repo.UpdateNode(node);
 
                         // generate docs
-                        var tempDir = GetWorkingDir("./repos/", gitSettings.Url, "temp");
+                        var tempDir = FileHelper.GetWorkingDir("./repos/", gitSettings.Url, "temp");
                         Console.WriteLine("Generating docs for {0} in {1}", node.Name, tempDir);
                         EmptyDirectory(tempDir);
 
@@ -78,7 +79,7 @@ namespace SourceDocs.Core.Tests
 
                         serialize(Path.Combine(tempDir, "index.json"), index);
 
-                        var outDir = GetWorkingDir("./repos/", gitSettings.Url, "docs", node.Name);
+                        var outDir = FileHelper.GetWorkingDir("./repos/", gitSettings.Url, "docs", node.Name);
                         Console.WriteLine("Copying docs for {0} to {1}", node.Name, outDir);
                         EmptyDirectory(outDir);
                         CopyDirectory(tempDir, outDir); // ready docs
@@ -94,21 +95,6 @@ namespace SourceDocs.Core.Tests
                     Thread.Sleep(5000);
                 }
             }
-        }
-
-        public static string GetWorkingDir(string workingRoot, string repoUrl, params string[] repoPaths)
-        {
-            Func<string, string> fixDirName = dirName =>
-                Path.GetInvalidFileNameChars().Aggregate(dirName, (current, c) => current.Replace(c, '_'));
-
-            var workingDir = Path.Combine(new[] { workingRoot, fixDirName(repoUrl) }.Concat(repoPaths.Select(fixDirName)).ToArray());
-
-            if (Directory.Exists(workingDir) == false)
-            {
-                Directory.CreateDirectory(workingDir);
-            }
-
-            return workingDir;
         }
 
         public static void EmptyDirectory(string directoryPath)

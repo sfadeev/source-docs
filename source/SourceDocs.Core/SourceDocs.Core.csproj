@@ -56,13 +56,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\TaskAdded.cs" />
+    <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Services\IEventAggregator.cs" />
     <Compile Include="GitRepository.cs" />
     <Compile Include="Services\IFileTransformer.cs" />
     <Compile Include="Models\IndexItem.cs" />
     <Compile Include="IRepository.cs" />
-    <Compile Include="IRepositoryCatalog.cs" />
+    <Compile Include="Services\IJavaScriptSerializer.cs" />
+    <Compile Include="Services\IRepositoryCatalog.cs" />
     <Compile Include="Services\IRepositoryTask.cs" />
+    <Compile Include="Services\IStartable.cs" />
+    <Compile Include="Services\ITaskManager.cs" />
     <Compile Include="Services\MarkdownFileTransformer.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\Repo.cs" />

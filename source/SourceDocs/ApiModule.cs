@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Nancy;
-using SourceDocs.Core;
 using SourceDocs.Core.Models;
+using SourceDocs.Core.Services;
 
 namespace SourceDocs
 {
@@ -30,6 +30,7 @@ namespace SourceDocs
 
                 // return Response.AsFile(".repos/index.json");
             };
+
             Get["/repos/{repoId}/{nodeName}/doc/{path*}"] = x =>
             {
                 return new

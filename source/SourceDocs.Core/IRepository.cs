@@ -6,7 +6,7 @@ namespace SourceDocs.Core
 {
     public interface IRepository : IDisposable
     {
-        IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes);
+        IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes = null);
 
         bool UpdateNode(Node node);
     }

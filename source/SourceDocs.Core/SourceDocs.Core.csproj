@@ -56,11 +56,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\IEventAggregator.cs" />
     <Compile Include="GitRepository.cs" />
     <Compile Include="Services\IFileTransformer.cs" />
     <Compile Include="Models\IndexItem.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IRepositoryCatalog.cs" />
+    <Compile Include="Services\IRepositoryTask.cs" />
     <Compile Include="Services\MarkdownFileTransformer.cs" />
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\Repo.cs" />

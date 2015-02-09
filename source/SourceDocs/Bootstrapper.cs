@@ -26,6 +26,7 @@ namespace SourceDocs
             JsonSettings.MaxJsonLength = int.MaxValue;
 
             conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("assets"));
+            conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("Scripts"));
         }
 
         protected override void ConfigureApplicationContainer(TinyIoCContainer container)

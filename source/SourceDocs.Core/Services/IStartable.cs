@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading;
-using log4net;
 
 namespace SourceDocs.Core.Services
 {
@@ -12,30 +10,32 @@ namespace SourceDocs.Core.Services
 
     public class RepositoryUpdater : IStartable, IDisposable
     {
-        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly IRepositoryCatalog _repositoryCatalog;
+        private readonly INotificationService _notificationService;
 
         private Timer _timer;
 
-        public RepositoryUpdater(IRepositoryCatalog repositoryCatalog)
+        public RepositoryUpdater(IRepositoryCatalog repositoryCatalog, INotificationService notificationService)
         {
             _repositoryCatalog = repositoryCatalog;
+            _notificationService = notificationService;
         }
 
         public void Start()
         {
-            _timer = new Timer(state => { UpdateRepositories(); }, null, 0, 30 * 1000);
+            _timer = new Timer(state => { UpdateRepositories(); }, null, 0, 15 * 1000);
         }
 
         public void UpdateRepositories()
         {
-            if (Log.IsDebugEnabled) Log.Debug("Checking for updates in repositories.");
+            _notificationService.Notify("Checking for updates in repositories.");
 
             var repositories = _repositoryCatalog.GetRepositories();
 
             foreach (var repository in repositories)
             {
+                _notificationService.Notify("Updating repository " + repository.Url);
+
                 repository.UpdateNodes();
             }
         }

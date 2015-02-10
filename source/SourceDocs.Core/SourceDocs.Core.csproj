@@ -64,6 +64,7 @@
     <Compile Include="Models\IndexItem.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Services\IJavaScriptSerializer.cs" />
+    <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IRepositoryCatalog.cs" />
     <Compile Include="Services\IRepositoryTask.cs" />
     <Compile Include="Services\IStartable.cs" />

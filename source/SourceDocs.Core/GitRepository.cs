@@ -58,6 +58,11 @@ namespace SourceDocs.Core
             }*/
         }
 
+        public string Url
+        {
+            get { return _settings.Url; }
+        }
+
         public IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes)
         {
             Fetch();

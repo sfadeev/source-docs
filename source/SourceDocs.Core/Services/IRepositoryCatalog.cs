@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json.Serialization;
 using SourceDocs.Core.Helpers;
 using SourceDocs.Core.Models;
 

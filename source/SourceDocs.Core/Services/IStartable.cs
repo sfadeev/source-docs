@@ -23,7 +23,7 @@ namespace SourceDocs.Core.Services
 
         public void Start()
         {
-            _timer = new Timer(state => { UpdateRepositories(); }, null, 0, 15 * 1000);
+            _timer = new Timer(state => { UpdateRepositories(); }, null, 0, 60 * 1000);
         }
 
         public void UpdateRepositories()

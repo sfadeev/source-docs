@@ -10,7 +10,7 @@ namespace SourceDocs
             {
                 return View["index"];
             };
-            
+
             Get["/test"] = x =>
             {
                 return View["test"];
@@ -25,7 +25,6 @@ namespace SourceDocs
             {
                 return View["index"];
             };
-
         }
     }
 }

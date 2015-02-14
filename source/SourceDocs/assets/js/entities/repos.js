@@ -28,7 +28,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
 
     Entities.Repos = Backbone.Model.extend({
         url: function () {
-            return App.getApiUrl("repos");
+            return App.getApiUrl("repositories");
         },
         defaults: {
             items: new Entities.RepoCollection()
@@ -68,7 +68,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             Backbone.Cycle.SelectableModel.applyTo(this);
         },
         url: function () {
-            return App.getApiUrl("repos/" + this.options.repoId + "/@/" + this.options.nodeName + "/index");
+            return App.getApiUrl("repositories/" + this.options.repoId + "/" + this.options.nodeName + "/index");
         }
     });
 
@@ -77,7 +77,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             this.options = options;
         },
         url: function () {
-            return App.getApiUrl("repos/" + this.options.repoId + "/@/" + this.options.nodeName + "/~/" + this.options.path);
+            return App.getApiUrl("repositories/" + this.options.repoId + "/" + this.options.nodeName + "/document/" + this.options.path);
         }
     });
 

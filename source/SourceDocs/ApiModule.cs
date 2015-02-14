@@ -10,12 +10,12 @@ namespace SourceDocs
     {
         public ApiModule(IRepositoryCatalog repositoryCatalog) : base("/api")
         {
-            Get["/repos"] = parameters =>
+            Get["/repositories"] = parameters =>
             {
                 return repositoryCatalog.GetRepos();
             };
 
-            Get["/repos/{repoId}/@/{nodeName*}/index"] = x =>
+            Get["/repositories/{repoId}/{nodeName*}/index"] = x =>
             {
                 var result = new IndexItem
                 {
@@ -31,12 +31,12 @@ namespace SourceDocs
                 // return Response.AsFile(".repos/index.json");
             };
 
-            Get["/repos/{repoId}/@/{nodeName*}/~/{path*}"] = x =>
+            Get["/repositories/{repoId}/{nodeName*}/document/{path*}"] = x =>
             {
                 return new
                 {
                     Content =
-                        "<h1>Documentation for " + x.repoId + " v. " + x.nodeName + " - " + x.path + "</h1>"
+                        "<h1>" + x.repoId + "/" + x.nodeName + "/" + x.path + "</h1>"
                         + File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README.1.md"))
                 };
             };

@@ -3,6 +3,7 @@ using log4net;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
+using Nancy.Diagnostics;
 using Nancy.Json;
 using Nancy.TinyIoc;
 using SourceDocs.Core.Services;
@@ -39,6 +40,13 @@ namespace SourceDocs
             container.Register<IEventAggregator, EventAggregator>().AsSingleton();
             container.Register<IRepositoryCatalog, RepositoryCatalog>().AsSingleton();
             container.Register<ITaskManager, DefaultTaskManager>().AsSingleton();
+        }
+
+        protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
+        {
+            base.ApplicationStartup(container, pipelines);
+
+            DiagnosticsHook.Disable(pipelines);
         }
 
         /*protected override DiagnosticsConfiguration DiagnosticsConfiguration

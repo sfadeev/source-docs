@@ -22,19 +22,17 @@ namespace SourceDocs.Core.Tests
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
         public void WorkflowTest(string repoUrl)
         {
-            var repoDir = FileHelper.GetWorkingDir("./repos/", repoUrl, "repo");
-            var configFile = Path.Combine(FileHelper.GetWorkingDir("./repos/", repoUrl), "config.json");
-
             var gitSettings = new GitRepository.Settings
             {
                 Url = repoUrl,
-                WorkingDirectory = repoDir
+                ConfigFile = Path.Combine(FileHelper.GetWorkingDir("./repos/", repoUrl), "config.json"),
+                WorkingDirectory = FileHelper.GetWorkingDir("./repos/", repoUrl, "repo")
             };
 
             using (var repo = new GitRepository(gitSettings))
             {
-                var config = File.Exists(configFile)
-                    ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
+                var config = File.Exists(gitSettings.ConfigFile)
+                    ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(gitSettings.ConfigFile))
                     : new Repo();
 
                 Action<string, object> serialize = (path, value) =>
@@ -53,7 +51,7 @@ namespace SourceDocs.Core.Tests
                     config.Nodes = repo.UpdateNodes(config.Nodes);
 
                     // todo: write config if something changed
-                    serialize(configFile, config);
+                    serialize(gitSettings.ConfigFile, config);
 
                     Console.Write("."); // for pretty test ;)
 
@@ -88,7 +86,7 @@ namespace SourceDocs.Core.Tests
 
                         node.Generated = node.Updated;
 
-                        serialize(configFile, config);
+                        serialize(gitSettings.ConfigFile, config);
                     }
 
                     Console.Out.Flush();

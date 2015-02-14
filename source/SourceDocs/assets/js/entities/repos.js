@@ -34,7 +34,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             items: new Entities.RepoCollection()
         },
         parse: function(response, options) {
-            this.get("items").reset(response.items);
+            this.get("items").reset(response);
             this.get("items").each(function(repo) {
                 repo.set("nodes", new Entities.NodeCollection(repo.get("nodes")));
             });

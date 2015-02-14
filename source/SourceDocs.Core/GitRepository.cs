@@ -18,7 +18,12 @@ namespace SourceDocs.Core
             public string Url { get; set; }
 
             /// <summary>
-            /// Working directory of .
+            /// Repository configuration file path.
+            /// </summary>
+            public string ConfigFile { get; set; }
+
+            /// <summary>
+            /// Working directory of repository.
             /// </summary>
             public string WorkingDirectory { get; set; }
 

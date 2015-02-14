@@ -6369,11 +6369,11 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-#notifications {
+.panel-notifications {
   background-color: #333333;
   color: #ffffff;
+}
+.panel-notifications ul {
   font-family: Consolas;
-  padding: 20px 40px;
-  list-style: outside disc;
 }
 /*# sourceMappingURL=app.css.map */

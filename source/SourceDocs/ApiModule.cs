@@ -15,7 +15,7 @@ namespace SourceDocs
                 return repositoryCatalog.GetRepos();
             };
 
-            Get["/repos/{repoId}/{nodeName}/index"] = x =>
+            Get["/repos/{repoId}/@/{nodeName*}/index"] = x =>
             {
                 var result = new IndexItem
                 {
@@ -31,7 +31,7 @@ namespace SourceDocs
                 // return Response.AsFile(".repos/index.json");
             };
 
-            Get["/repos/{repoId}/{nodeName}/doc/{path*}"] = x =>
+            Get["/repos/{repoId}/@/{nodeName*}/~/{path*}"] = x =>
             {
                 return new
                 {

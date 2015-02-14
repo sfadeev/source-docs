@@ -6373,7 +6373,7 @@ body {
   background-color: #333333;
   color: #ffffff;
   font-family: Consolas;
-  padding: 20px;
-  list-style: none;
+  padding: 20px 40px;
+  list-style: outside disc;
 }
-/*# sourceMappingURL=source-docs.css.map */
+/*# sourceMappingURL=app.css.map */

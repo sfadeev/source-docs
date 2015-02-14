@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SourceDocs.Core.Helpers;
 using SourceDocs.Core.Models;
 
@@ -10,18 +11,22 @@ namespace SourceDocs.Core.Services
         IRepository[] GetRepositories();
 
         Repos GetRepos();
+
+        void UpdateNodes(string repositoryUrl, IList<Node> nodes);
     }
 
-    public class DefaultRepositoryCatalog : IRepositoryCatalog
+    public class RepositoryCatalog : IRepositoryCatalog
     {
         private readonly object _repositoriesLock = new object();
+        private readonly object _reposLock = new object();
 
         private readonly IContextProvider _contextProvider;
         private readonly IJavaScriptSerializer _javaScriptSerializer;
 
         private IRepository[] _repositories;
+        private Repos _repos;
 
-        public DefaultRepositoryCatalog(IContextProvider contextProvider, IJavaScriptSerializer javaScriptSerializer)
+        public RepositoryCatalog(IContextProvider contextProvider, IJavaScriptSerializer javaScriptSerializer)
         {
             _contextProvider = contextProvider;
             _javaScriptSerializer = javaScriptSerializer;
@@ -45,9 +50,7 @@ namespace SourceDocs.Core.Services
 
         private IRepository[] LoadRepositories()
         {
-            var reposConfigPath = _contextProvider.MapPath("repos.json");
-            var reposStream = File.ReadAllText(reposConfigPath);
-            var repos = _javaScriptSerializer.Deserialize<Repos>(reposStream);
+            var repos = GetRepos();
 
             var result = new List<IRepository>();
 
@@ -69,28 +72,31 @@ namespace SourceDocs.Core.Services
 
         public Repos GetRepos()
         {
-            var reposConfigPath = _contextProvider.MapPath("repos.json");
-            var reposStream = File.ReadAllText(reposConfigPath);
-            var result = _javaScriptSerializer.Deserialize<Repos>(reposStream);
-
-            foreach (var item in result.Items)
+            if (_repos == null)
             {
-                item.Nodes = new[]
+                lock (_reposLock)
                 {
-                    new Node { Name = "2.1.3" },
-                    new Node { Name = "2.1.1" },
-                    new Node { Name = "2.1.0" },
-                    new Node { Name = "2.0.3" },
-                    new Node { Name = "2.0.2" },
-                    new Node { Name = "2.0.1" },
-                    new Node { Name = "2.0.0" },
-                    new Node { Name = "1.11.2" },
-                    new Node { Name = "1.11.1" },
-                    new Node { Name = "1.11.0" }
-                };
+                    if (_repos == null)
+                    {
+                        _repos = _javaScriptSerializer.Deserialize<Repos>(
+                            File.ReadAllText(_contextProvider.MapPath("repos.json")));
+                    }
+                }
             }
 
-            return result;
+            return _repos;
+        }
+
+        public void UpdateNodes(string repositoryUrl, IList<Node> nodes)
+        {
+            lock (_reposLock)
+            {
+                var repo = GetRepos().Items.FirstOrDefault(x => x.Url == repositoryUrl);
+                if (repo != null)
+                {
+                    repo.Nodes = nodes;
+                }
+            }
         }
     }
 }

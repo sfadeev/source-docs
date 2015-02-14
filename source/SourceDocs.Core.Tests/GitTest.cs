@@ -31,7 +31,7 @@ namespace SourceDocs.Core.Tests
                 WorkingDirectory = repoDir
             };
 
-            using (IRepository repo = new GitRepository(gitSettings))
+            using (var repo = new GitRepository(gitSettings))
             {
                 var config = File.Exists(configFile)
                     ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(configFile))
@@ -50,7 +50,7 @@ namespace SourceDocs.Core.Tests
 
                 while (true)
                 {
-                    config.Nodes = repo.UpdateNodes(config.Nodes).ToList();
+                    config.Nodes = repo.UpdateNodes(config.Nodes);
 
                     // todo: write config if something changed
                     serialize(configFile, config);

@@ -8,7 +8,7 @@ using SourceDocs.Core.Models;
 
 namespace SourceDocs.Core
 {
-    public class GitRepository : IRepository
+    public class GitRepository : IRepository, IDisposable
     {
         public class Settings
         {
@@ -63,7 +63,7 @@ namespace SourceDocs.Core
             get { return _settings.Url; }
         }
 
-        public IEnumerable<Node> UpdateNodes(IEnumerable<Node> nodes)
+        public IList<Node> UpdateNodes(IEnumerable<Node> nodes)
         {
             Fetch();
 
@@ -71,7 +71,7 @@ namespace SourceDocs.Core
 
             // exclude local branches removed on remote
             var result = (nodes ?? Enumerable.Empty<Node>())
-                .Where(x => branches.Any(b => b.IsRemote && b.CanonicalName == x.RemoteName)).ToList();
+                .Where(node => branches.Any(branch => branch.IsRemote && branch.CanonicalName == node.RemoteName)).ToList();
 
             foreach (var branch in branches)
             {

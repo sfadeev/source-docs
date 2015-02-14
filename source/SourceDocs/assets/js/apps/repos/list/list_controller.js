@@ -167,7 +167,7 @@
 
             model.select();
 
-            App.navigate("repo/" + Module.selectedRepoId + "/" + Module.selectedNodeName + "/" + Module.selectedPath);
+            App.navigate("repo/" + Module.selectedRepoId + "/@/" + Module.selectedNodeName + "/~/" + Module.selectedPath);
 
             // build and show breadcrumb
             var breadcrumbList = new App.Entities.RepoIndexItemCollection();

@@ -68,7 +68,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             Backbone.Cycle.SelectableModel.applyTo(this);
         },
         url: function () {
-            return App.getApiUrl("repos/" + this.options.repoId + "/" + this.options.nodeName + "/index");
+            return App.getApiUrl("repos/" + this.options.repoId + "/@/" + this.options.nodeName + "/index");
         }
     });
 
@@ -77,7 +77,7 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
             this.options = options;
         },
         url: function () {
-            return App.getApiUrl("repos/" + this.options.repoId + "/" + this.options.nodeName + "/doc/" + this.options.path);
+            return App.getApiUrl("repos/" + this.options.repoId + "/@/" + this.options.nodeName + "/~/" + this.options.path);
         }
     });
 

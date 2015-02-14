@@ -34,7 +34,7 @@ App.getCurrentRoute = function () {
 App.Router = Backbone.Router.extend({
     routes: {
         "home": "home",
-        "repo/:repoId(/:nodeName)(/*path)": "repo"
+        "repo/:repoId(/@/*nodeName)(/~/*path)": "repo"
     },
 
     home: function () {

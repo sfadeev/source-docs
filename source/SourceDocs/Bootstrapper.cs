@@ -37,9 +37,14 @@ namespace SourceDocs
             container.Register<IJavaScriptSerializer, DefaultJavaScriptSerializer>();
 
             container.Register<IEventAggregator, EventAggregator>().AsSingleton();
-            container.Register<IRepositoryCatalog, DefaultRepositoryCatalog>().AsSingleton();
+            container.Register<IRepositoryCatalog, RepositoryCatalog>().AsSingleton();
             container.Register<ITaskManager, DefaultTaskManager>().AsSingleton();
         }
+
+        /*protected override DiagnosticsConfiguration DiagnosticsConfiguration
+        {
+            get { return new DiagnosticsConfiguration { Password = "1234567" }; } // obama password :)
+        }*/
     }
 
     public class StartableRunner : IApplicationStartup

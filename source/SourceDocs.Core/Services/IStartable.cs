@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 
 namespace SourceDocs.Core.Services
@@ -47,7 +48,7 @@ namespace SourceDocs.Core.Services
                         }
                     }
                 }
-            }, null, 0, 30 * 1000);
+            }, null, 0, 60 * 1000);
         }
 
         public void UpdateRepositories()
@@ -58,11 +59,15 @@ namespace SourceDocs.Core.Services
 
             foreach (var repository in repositories)
             {
-                _notificationService.Notify("Updating repository " + repository.Url);
+                _notificationService.Notify("Updating " + repository.Url);
 
-                repository.UpdateNodes();
+                var nodes = repository.UpdateNodes();
 
-                Thread.Sleep(3 * 1000);
+                _repositoryCatalog.UpdateNodes(repository.Url, nodes);
+
+                _notificationService.Notify("Updated " + repository.Url + " nodes: " + string.Join(", ", nodes.Select(x => x.Name)));
+
+                Thread.Sleep(5 * 1000);
             }
         }
 

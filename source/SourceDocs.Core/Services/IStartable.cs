@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
+using log4net;
 
 namespace SourceDocs.Core.Services
 {
@@ -11,6 +13,8 @@ namespace SourceDocs.Core.Services
 
     public class RepositoryUpdater : IStartable, IDisposable
     {
+        public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly IRepositoryCatalog _repositoryCatalog;
         private readonly INotificationService _notificationService;
 
@@ -39,7 +43,17 @@ namespace SourceDocs.Core.Services
                             {
                                 _updateWorking = true;
 
-                                UpdateRepositories();
+                                try
+                                {
+                                    UpdateRepositories();
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (Log.IsErrorEnabled)
+                                    {
+                                        Log.Error("Failed to update repositories.", ex);
+                                    }
+                                }
                             }
                             finally
                             {
@@ -59,13 +73,25 @@ namespace SourceDocs.Core.Services
 
             foreach (var repository in repositories)
             {
-                _notificationService.Notify("Updating " + repository.Url);
+                try
+                {
+                    _notificationService.Notify("Updating " + repository.Url);
 
-                var nodes = repository.UpdateNodes();
+                    var nodes = repository.UpdateNodes();
 
-                _repositoryCatalog.UpdateNodes(repository.Url, nodes);
+                    _repositoryCatalog.UpdateNodes(repository.Url, nodes);
 
-                _notificationService.Notify("Updated " + repository.Url + " nodes: " + string.Join(", ", nodes.Select(x => x.Name)));
+                    _notificationService.Notify("Updated " + repository.Url + " nodes: " + string.Join(", ", nodes.Select(x => x.Name)));
+                }
+                catch (Exception ex)
+                {
+                    if (Log.IsErrorEnabled)
+                    {
+                        Log.Error("Failed to update repository " + repository.Url, ex);
+                    }
+
+                    _notificationService.Notify("Failed to update repository " + repository.Url + " : " + ex.Message, NotificationType.Error);
+                }
 
                 Thread.Sleep(5 * 1000);
             }

@@ -47,6 +47,13 @@ namespace SourceDocs
             base.ApplicationStartup(container, pipelines);
 
             DiagnosticsHook.Disable(pipelines);
+
+            pipelines.OnError.AddItemToStartOfPipeline((context, exception) =>
+            {
+                if (Log.IsErrorEnabled) Log.Error("Application pipeline error.", exception);
+
+                return null;
+            });
         }
 
         /*protected override DiagnosticsConfiguration DiagnosticsConfiguration

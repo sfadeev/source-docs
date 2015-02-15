@@ -1,4 +1,6 @@
-﻿using Owin;
+﻿using System;
+using Owin;
+using SourceDocs.Helpers;
 
 namespace SourceDocs
 {
@@ -6,6 +8,8 @@ namespace SourceDocs
     {
         public void Configuration(IAppBuilder app)
         {
+            AppDomain.CurrentDomain.UnhandledException += LogHelper.LogCurrentDomainUnhandledException;
+
             app.MapSignalR();
         }
     }

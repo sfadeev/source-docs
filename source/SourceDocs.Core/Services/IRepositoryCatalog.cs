@@ -70,7 +70,6 @@ namespace SourceDocs.Core.Services
 
                             _repoMap[key] = settings;
                         }
-
                     }
                 }
             }

@@ -41,13 +41,18 @@ body {
 }
 
 .panel-notifications{
-
-    background-color: @kbd-bg;
+    background-color: @gray-darker;
     color: @kbd-color;
 
     ul {
         font-family: Consolas;
+
+        li.notification-error {
+            color: @brand-danger;
+        }
+
+        li.notification-warning {
+            color: @brand-warning;
+        }
     }
 }
-
-

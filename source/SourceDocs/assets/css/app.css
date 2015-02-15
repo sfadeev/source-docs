@@ -6370,10 +6370,16 @@ body {
   overflow-y: auto;
 }
 .panel-notifications {
-  background-color: #333333;
+  background-color: #222222;
   color: #ffffff;
 }
 .panel-notifications ul {
   font-family: Consolas;
+}
+.panel-notifications ul li.notification-error {
+  color: #d9534f;
+}
+.panel-notifications ul li.notification-warning {
+  color: #f0ad4e;
 }
 /*# sourceMappingURL=app.css.map */

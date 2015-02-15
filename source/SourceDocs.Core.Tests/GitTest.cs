@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -63,7 +62,7 @@ namespace SourceDocs.Core.Tests
                         // generate docs
                         var tempDir = FileHelper.GetWorkingDir("./repos/", gitSettings.Url, "temp");
                         Console.WriteLine("Generating docs for {0} in {1}", node.Name, tempDir);
-                        EmptyDirectory(tempDir);
+                        FileHelper.EmptyDirectory(tempDir);
 
                         var index = Transform(gitSettings.WorkingDirectory, tempDir, new TransformOptions
                         {
@@ -79,34 +78,20 @@ namespace SourceDocs.Core.Tests
 
                         var outDir = FileHelper.GetWorkingDir("./repos/", gitSettings.Url, "docs", node.Name);
                         Console.WriteLine("Copying docs for {0} to {1}", node.Name, outDir);
-                        EmptyDirectory(outDir);
-                        CopyDirectory(tempDir, outDir); // ready docs
+                        FileHelper.EmptyDirectory(outDir);
 
-                        EmptyDirectory(tempDir);
+                        FileHelper.CopyDirectory(tempDir, outDir); // ready docs
 
+                        FileHelper.EmptyDirectory(tempDir);
+
+                        // update repo config
                         node.Generated = node.Updated;
-
                         serialize(gitSettings.ConfigFile, config);
                     }
 
                     Console.Out.Flush();
                     Thread.Sleep(5000);
                 }
-            }
-        }
-
-        public static void EmptyDirectory(string directoryPath)
-        {
-            var directoryInfo = new DirectoryInfo(directoryPath);
-
-            foreach (var file in directoryInfo.GetFiles())
-            {
-                file.Delete();
-            }
-
-            foreach (var dir in directoryInfo.GetDirectories())
-            {
-                dir.Delete(true);
             }
         }
 
@@ -120,7 +105,7 @@ namespace SourceDocs.Core.Tests
 
             foreach (var fileInfo in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories))
             {
-                var relativePath = GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
+                var relativePath = FileHelper.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
 
                 // todo: use more complex match with * instead of StartsWith
                 if (transformOptions.ExcludeDirectories.Any(relativePath.StartsWith)) continue;
@@ -133,8 +118,7 @@ namespace SourceDocs.Core.Tests
                     var destFileName = Path.Combine(to, relativePath);
                     var destDirectoryName = Path.GetDirectoryName(destFileName);
 
-                    if (Directory.Exists(destDirectoryName) == false)
-                        Directory.CreateDirectory(destDirectoryName);
+                    FileHelper.EnsureDirectoryExists(destDirectoryName);
 
                     var input = File.ReadAllText(fileInfo.FullName);
                     var output = transformer.Transform(input);
@@ -144,42 +128,6 @@ namespace SourceDocs.Core.Tests
             }
 
             return index;
-        }
-
-        public static void CopyDirectory(string from, string to)
-        {
-            var directoryInfo = new DirectoryInfo(from);
-
-            // todo: enumerate only files or merge with Transform method
-            foreach (var fileSystemInfo in directoryInfo.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
-            {
-                var relativePath = GetRelativePath(directoryInfo.FullName, fileSystemInfo.FullName);
-
-                var destFileName = Path.Combine(to, relativePath);
-
-                if ((fileSystemInfo.Attributes & FileAttributes.Directory) == FileAttributes.Directory)
-                {
-                    Directory.CreateDirectory(destFileName);
-                }
-                else
-                {
-                    File.Copy(fileSystemInfo.FullName, destFileName);
-                }
-            }
-        }
-
-        public static string GetRelativePath(string folderPath, string filePath)
-        {
-            var pathUri = new Uri(filePath);
-
-            if (!folderPath.EndsWith(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture)))
-            {
-                folderPath += Path.DirectorySeparatorChar;
-            }
-
-            var folderUri = new Uri(folderPath);
-
-            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
     }
 }

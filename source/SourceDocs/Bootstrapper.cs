@@ -20,8 +20,6 @@ namespace SourceDocs
         // For more information https://github.com/NancyFx/Nancy/wiki/Bootstrapper
         protected override void ConfigureConventions(NancyConventions conventions)
         {
-            if (Log.IsDebugEnabled) Log.Debug("Configuring conventions.");
-
             base.ConfigureConventions(conventions);
 
             JsonSettings.MaxJsonLength = int.MaxValue;

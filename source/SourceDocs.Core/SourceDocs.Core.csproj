@@ -67,6 +67,7 @@
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IRepositoryCatalog.cs" />
     <Compile Include="Services\IRepositoryTask.cs" />
+    <Compile Include="Services\IRepositoryTransformer.cs" />
     <Compile Include="Services\IStartable.cs" />
     <Compile Include="Services\ITaskManager.cs" />
     <Compile Include="Services\MarkdownFileTransformer.cs" />

@@ -62,7 +62,7 @@
             <div class="col-md-3 sidebar navbar-default" role="navigation">
                 <div class="" id="repo-index-region"></div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-5">
 
                 <br />
 
@@ -71,6 +71,9 @@
                 <div id="main-region"></div>
 
                 <div id="pager-region"></div>
+
+            </div>
+            <div class="col-md-4">
 
                 <div class="panel panel-default panel-notifications">
                     <div class="panel-body">
@@ -171,7 +174,7 @@
         // Keep track of the pending promises,
         // this way the indicator is only stopped when all pending promises are done.
         var promises = 0;
-        App.reqres.setHandler('progress', function (promise) {
+        App.reqres.setHandler("progress", function (promise) {
             promises++;
             NProgress.start();
 
@@ -194,11 +197,12 @@
             return App.request("progress", Backbone.$.ajax.apply(Backbone.$, arguments));
         };
 
-        $(function() {
+        // hubs
+        $(function () {
             $.connection.hub.start();
             $.connection.notificationHub.client.notify = function (message) {
                 $("#notifications").prepend("<li class='notification-" + message.type + "'>" + $("<div />").text(message.when + " - " + message.text).html() + "</li>");
-                $("#notifications li:gt(15)").remove();
+                $("#notifications li:gt(16)").remove();
             };
         });
     </script>

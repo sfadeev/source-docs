@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using log4net;
+using SourceDocs.Core.Helpers;
+using SourceDocs.Core.Models;
 
 namespace SourceDocs.Core.Services
 {
@@ -16,32 +19,37 @@ namespace SourceDocs.Core.Services
         public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly IRepositoryCatalog _repositoryCatalog;
+        private readonly IRepositoryTransformer _repositoryTransformer;
+        private readonly IContextProvider _contextProvider;
         private readonly INotificationService _notificationService;
 
-        private readonly object _updateLock = new object();
-        private volatile bool _updateWorking;
+        private readonly object _repositoryLock = new object();
+        private volatile bool _repositoryLocked;
 
         private Timer _timer;
 
-        public RepositoryUpdater(IRepositoryCatalog repositoryCatalog, INotificationService notificationService)
+        public RepositoryUpdater(IContextProvider contextProvider, INotificationService notificationService,
+            IRepositoryCatalog repositoryCatalog, IRepositoryTransformer repositoryTransformer)
         {
-            _repositoryCatalog = repositoryCatalog;
+            _contextProvider = contextProvider;
             _notificationService = notificationService;
+            _repositoryCatalog = repositoryCatalog;
+            _repositoryTransformer = repositoryTransformer;
         }
 
         public void Start()
         {
             _timer = new Timer(state =>
             {
-                if (_updateWorking == false)
+                if (_repositoryLocked == false)
                 {
-                    lock (_updateLock)
+                    lock (_repositoryLock)
                     {
-                        if (_updateWorking == false)
+                        if (_repositoryLocked == false)
                         {
                             try
                             {
-                                _updateWorking = true;
+                                _repositoryLocked = true;
 
                                 try
                                 {
@@ -57,7 +65,7 @@ namespace SourceDocs.Core.Services
                             }
                             finally
                             {
-                                _updateWorking = false;
+                                _repositoryLocked = false;
                             }
                         }
                     }
@@ -77,11 +85,43 @@ namespace SourceDocs.Core.Services
                 {
                     _notificationService.Notify("Updating " + repository.Url);
 
-                    var nodes = repository.UpdateNodes();
+                    var settings = _repositoryCatalog.GetRepositoryConfig(repository.Url);
+                    if (settings == null) continue;
 
-                    _repositoryCatalog.UpdateNodes(repository.Url, nodes);
+                    var repo = _repositoryCatalog.GetRepos().Single(x => x.Url == settings.Url);
+
+                    var nodes = repository.UpdateNodes(repo.Nodes);
+
+                    _repositoryCatalog.UpdateRepositoryConfig(repository.Url, config => config.Nodes = nodes);
 
                     _notificationService.Notify("Updated " + repository.Url + " nodes: " + string.Join(", ", nodes.Select(x => x.Name)));
+
+                    Node node;
+                    while ((node = nodes.FirstOrDefault(x => x.Generated == null || x.Updated > x.Generated)) != null)
+                    {
+                        repository.UpdateNode(node);
+
+                        _notificationService.Notify("Generating documentation for " + repository.Url + " node: " + node.Name);
+
+                        // generate docs
+                        var options = new TransformOptions
+                        {
+                            WorkingDirectory = settings.WorkingDirectory,
+                            TempDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), settings.Url, "temp"),
+                            OutputDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), settings.Url, "docs", node.Name),
+                            ExcludeDirectories = new[] { "docs", "bin", "obj", "packages", ".nuget", ".git", ".svn" },
+                            FileTransformers = new Dictionary<string, IFileTransformer>
+                            {
+                                { ".md", new MarkdownFileTransformer() },
+                                { ".cs", new SourceFileTransformer() }
+                            }
+                        };
+
+                        _repositoryTransformer.Transform(options);
+
+                        node.Generated = node.Updated;
+                        _repositoryCatalog.UpdateRepositoryConfig(repository.Url, null);
+                    }
                 }
                 catch (Exception ex)
                 {

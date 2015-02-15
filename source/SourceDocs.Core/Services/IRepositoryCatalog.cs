@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SourceDocs.Core.Helpers;
@@ -12,7 +13,9 @@ namespace SourceDocs.Core.Services
 
         Repo[] GetRepos();
 
-        void UpdateNodes(string repositoryUrl, IList<Node> nodes);
+        GitRepository.Settings GetRepositoryConfig(string repositoryUrl);
+
+        void UpdateRepositoryConfig(string repositoryUrl, Action<Repo> updateProperties);
     }
 
     public class RepositoryCatalog : IRepositoryCatalog
@@ -77,7 +80,19 @@ namespace SourceDocs.Core.Services
             return _repoMap;
         }
 
-        public void UpdateNodes(string repositoryUrl, IList<Node> nodes)
+        public GitRepository.Settings GetRepositoryConfig(string repositoryUrl)
+        {
+            lock (_reposLock)
+            {
+                var repoMap = LoadRepoMap();
+
+                var repo = repoMap.Keys.FirstOrDefault(x => x.Url == repositoryUrl);
+
+                return repo != null ? repoMap[repo] : null;
+            }
+        }
+
+        public void UpdateRepositoryConfig(string repositoryUrl, Action<Repo> updateProperties)
         {
             lock (_reposLock)
             {
@@ -86,7 +101,7 @@ namespace SourceDocs.Core.Services
                 var repo = repoMap.Keys.FirstOrDefault(x => x.Url == repositoryUrl);
                 if (repo != null)
                 {
-                    repo.Nodes = nodes;
+                    if (updateProperties != null) updateProperties(repo);
 
                     var settings = repoMap[repo];
                     File.WriteAllText(settings.ConfigFile, _javaScriptSerializer.Serialize(repo));

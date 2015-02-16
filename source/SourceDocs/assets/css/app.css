@@ -6376,10 +6376,16 @@ body {
 .panel-notifications ul {
   font-family: Consolas;
 }
-.panel-notifications ul li.notification-error {
-  color: #d9534f;
+.panel-notifications ul li.notification-info {
+  color: #337ab7;
+}
+.panel-notifications ul li.notification-success {
+  color: #5cb85c;
 }
 .panel-notifications ul li.notification-warning {
   color: #f0ad4e;
+}
+.panel-notifications ul li.notification-error {
+  color: #d9534f;
 }
 /*# sourceMappingURL=app.css.map */

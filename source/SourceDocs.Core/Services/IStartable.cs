@@ -101,7 +101,7 @@ namespace SourceDocs.Core.Services
                     {
                         repository.UpdateNode(node);
 
-                        _notificationService.Notify("Generating documentation for " + repository.Url + " node: " + node.Name);
+                        _notificationService.Notify("Generating documentation for " + repository.Url + " node: " + node.Name, NotificationType.Success);
 
                         // generate docs
                         var options = new TransformOptions

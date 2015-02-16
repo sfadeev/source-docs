@@ -61,10 +61,9 @@ namespace SourceDocs.Core.Services
                             var settings = new GitRepository.Settings
                             {
                                 Url = repo.Url,
-                                ConfigFile = Path.Combine(
-                                    FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url), "config.json"),
-                                WorkingDirectory =
-                                    FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url, "repo")
+                                BaseDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url),
+                                ConfigFile = Path.Combine(FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url), "config.json"),
+                                WorkingDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url, "repo")
                             };
 
                             var key = File.Exists(settings.ConfigFile)

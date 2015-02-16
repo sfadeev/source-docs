@@ -27,6 +27,8 @@ namespace SourceDocs.Core
             /// </summary>
             public string WorkingDirectory { get; set; }
 
+            public string BaseDirectory { get; set; }
+
             /// <summary>
             /// Patterns of branches to be monitored on changes in format +:* (to include branches) or -:*  (to exclude branches).
             /// </summary>

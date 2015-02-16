@@ -44,7 +44,7 @@ namespace SourceDocs.Core.Services
                 IFileTransformer transformer;
                 if (options.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
                 {
-                    index.Add(new IndexItem { Name = Path.GetFileName(relativePath), Path = relativePath.Replace('\\', '/') });
+                    index.Add(new IndexItem { Name = relativePath.Replace('\\', '/'), Path = relativePath.Replace('\\', '/') });
 
                     var destFileName = Path.Combine(options.TempDirectory, relativePath);
                     var destDirectoryName = Path.GetDirectoryName(destFileName);

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Nancy;
+using Nancy.Helpers;
 using SourceDocs.Core.Models;
 using SourceDocs.Core.Services;
 
@@ -41,7 +42,7 @@ namespace SourceDocs
             {
                 var repo = repositoryCatalog.GetRepos().Single(r => r.Id == x.repoId);
                 var config = repositoryCatalog.GetRepositoryConfig(repo.Url);
-                var path = Path.Combine(config.BaseDirectory, "docs", x.nodeName, x.path);
+                var path = Path.Combine(config.BaseDirectory, "docs", x.nodeName, HttpUtility.UrlDecode(x.path));
 
 
                 return new

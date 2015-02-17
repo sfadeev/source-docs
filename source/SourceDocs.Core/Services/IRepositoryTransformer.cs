@@ -27,43 +27,82 @@ namespace SourceDocs.Core.Services
         {
             if (options == null) throw new ArgumentNullException("options");
 
-            FileHelper.EnsureDirectoryExists(options.TempDirectory);
-            FileHelper.EmptyDirectory(options.TempDirectory);
-
             var index = new List<IndexItem>();
 
-            var directoryInfo = new DirectoryInfo(options.WorkingDirectory);
-
-            foreach (var fileInfo in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories))
+            if (TransformRecursive(options, index, new DirectoryInfo(options.WorkingDirectory)))
             {
-                var relativePath = FileHelper.GetRelativePath(directoryInfo.FullName, fileInfo.FullName);
+                CopyAndSerializeIndex(options, index);
+            }
+        }
+
+        private bool TransformRecursive(TransformOptions options, IList<IndexItem> items, DirectoryInfo parent)
+        {
+            Func<FileSystemInfo, IndexItem> createIndexItem = fileSystemInfo => new IndexItem
+            {
+                Name = fileSystemInfo.Name,
+                Path = FileHelper.GetRelativePath(options.WorkingDirectory, fileSystemInfo.FullName).Replace('\\', '/'),
+                Children = new List<IndexItem>()
+            };
+
+            var itemsAdded = false;
+
+            foreach (var directory in parent.EnumerateDirectories())
+            {
+                var indexItem = createIndexItem(directory);
 
                 // todo: use more complex match with * instead of StartsWith
-                if (options.ExcludeDirectories.Any(relativePath.StartsWith)) continue;
+                if (options.ExcludeDirectories.Any(indexItem.Path.StartsWith)) continue;
 
-                IFileTransformer transformer;
-                if (options.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
+                if (TransformRecursive(options, indexItem.Children, directory))
                 {
-                    index.Add(new IndexItem { Name = relativePath.Replace('\\', '/'), Path = relativePath.Replace('\\', '/') });
-
-                    var destFileName = Path.Combine(options.TempDirectory, relativePath);
-                    var destDirectoryName = Path.GetDirectoryName(destFileName);
-
-                    FileHelper.EnsureDirectoryExists(destDirectoryName);
-
-                    var input = File.ReadAllText(fileInfo.FullName);
-                    var output = transformer.Transform(input);
-
-                    File.WriteAllText(destFileName, output);
+                    items.Add(indexItem);
+                    itemsAdded = true;
                 }
             }
 
+            foreach (var fileInfo in parent.EnumerateFiles())
+            {
+                var indexItem = createIndexItem(fileInfo);
+
+                string content;
+                if (Transform(options, fileInfo, out content))
+                {
+                    items.Add(indexItem);
+                    itemsAdded = true;
+
+                    // todo: move to Transform
+                    var destFileName = Path.Combine(options.TempDirectory, indexItem.Path);
+                    FileHelper.EnsureDirectoryExists(Path.GetDirectoryName(destFileName));
+                    File.WriteAllText(destFileName, content);
+                }
+            }
+
+            return itemsAdded;
+        }
+
+        private bool Transform(TransformOptions options, FileSystemInfo fileInfo, out string output)
+        {
+            IFileTransformer transformer;
+            if (options.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
+            {
+                var input = File.ReadAllText(fileInfo.FullName);
+                output = transformer.Transform(input);
+                return true;
+            }
+
+            output = null;
+            return false;
+        }
+
+        private void CopyAndSerializeIndex(TransformOptions options, List<IndexItem> index)
+        {
             FileHelper.EmptyDirectory(options.OutputDirectory);
             FileHelper.CopyDirectory(options.TempDirectory, options.OutputDirectory);
             FileHelper.EmptyDirectory(options.TempDirectory);
 
-            var indexPath = Path.Combine(options.OutputDirectory, "index.json");
-            File.WriteAllText(indexPath, _javaScriptSerializer.Serialize(index));
+            File.WriteAllText(
+                Path.Combine(options.OutputDirectory, "index.json"),
+                _javaScriptSerializer.Serialize(index));
         }
     }
 }

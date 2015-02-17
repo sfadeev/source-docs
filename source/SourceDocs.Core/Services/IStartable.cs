@@ -113,7 +113,8 @@ namespace SourceDocs.Core.Services
                             FileTransformers = new Dictionary<string, IFileTransformer>
                             {
                                 { ".md", new MarkdownFileTransformer() },
-                                { ".cs", new SourceFileTransformer() }
+                                /*{ ".cs", new SourceFileTransformer() },
+                                { ".js", new SourceFileTransformer() },*/
                             }
                         };
 

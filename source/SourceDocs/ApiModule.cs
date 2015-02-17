@@ -21,21 +21,20 @@ namespace SourceDocs
             {
                 var repo = repositoryCatalog.GetRepos().Single(r => r.Id == x.repoId);
                 var config = repositoryCatalog.GetRepositoryConfig(repo.Url);
-                var indexPath = Path.Combine(config.BaseDirectory, "docs", x.nodeName, "index.json");
+                var path = Path.Combine(config.BaseDirectory, "docs", x.nodeName, "index.json");
 
                 var result = new IndexItem
                 {
                     Path = "item",
                     Name = x.repoId + "/" + x.nodeName,
-                    Children = javaScriptSerializer.Deserialize<List<IndexItem>>(
-                        File.ReadAllText(indexPath))
+                    Children = File.Exists(path)
+                        ? javaScriptSerializer.Deserialize<List<IndexItem>>(File.ReadAllText(path))
+                        : new List<IndexItem>()
                 };
 
                 // BuildRepoIndex(result, 5);
 
                 return result;
-
-                // return Response.AsFile(".repos/index.json");
             };
 
             Get["/repositories/{repoId}/{nodeName*}/document/{path*}"] = x =>
@@ -44,12 +43,9 @@ namespace SourceDocs
                 var config = repositoryCatalog.GetRepositoryConfig(repo.Url);
                 var path = Path.Combine(config.BaseDirectory, "docs", x.nodeName, HttpUtility.UrlDecode(x.path));
 
-
                 return new
                 {
-                    Content = File.ReadAllText(path)
-                        /*"<h1>" + x.repoId + "/" + x.nodeName + "/" + x.path + "</h1>"
-                        + File.ReadAllText(Path.Combine(Response.RootPath, ".repos/README.1.md"))*/
+                    Content = File.Exists(path) ? File.ReadAllText(path) : string.Empty
                 };
             };
         }

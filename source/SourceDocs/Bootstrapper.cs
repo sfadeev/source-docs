@@ -6,6 +6,7 @@ using Nancy.Conventions;
 using Nancy.Diagnostics;
 using Nancy.Json;
 using Nancy.TinyIoc;
+using Nancy.ViewEngines;
 using SourceDocs.Core.Services;
 using SourceDocs.Services;
 
@@ -26,6 +27,7 @@ namespace SourceDocs
 
             conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("assets"));
             conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("Scripts"));
+            // conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("api", null, ".cs"));
         }
 
         protected override void ConfigureApplicationContainer(TinyIoCContainer container)

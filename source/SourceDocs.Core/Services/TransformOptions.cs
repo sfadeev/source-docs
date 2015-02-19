@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using SourceDocs.Core.Services;
 
-namespace SourceDocs.Core
+namespace SourceDocs.Core.Services
 {
     // todo: split to environment and settings
     public class TransformOptions

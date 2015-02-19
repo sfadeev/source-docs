@@ -25,7 +25,7 @@ namespace SourceDocs
 
                 var result = new IndexItem
                 {
-                    Path = "item",
+                    Path = "#",
                     Name = x.repoId + "/" + x.nodeName,
                     Children = File.Exists(path)
                         ? javaScriptSerializer.Deserialize<List<IndexItem>>(File.ReadAllText(path))

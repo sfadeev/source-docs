@@ -80,14 +80,13 @@ namespace SourceDocs.Core.Services
             return itemsAdded;
         }
 
-        private bool Transform(TransformOptions options, FileSystemInfo fileInfo, out string output)
+        private static bool Transform(TransformOptions options, FileInfo fileInfo, out string output)
         {
             IFileTransformer transformer;
             if (options.FileTransformers.TryGetValue(fileInfo.Extension, out transformer))
             {
-                var input = File.ReadAllText(fileInfo.FullName);
-                output = transformer.Transform(input);
-                return true;
+                output = transformer.Transform(fileInfo);
+                return output != null;
             }
 
             output = null;

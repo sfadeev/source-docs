@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -7,33 +8,40 @@ namespace SourceDocs.Core.Services
 {
     public class SourceFileTransformer : IFileTransformer
     {
-        public string Transform(string input)
+        public string Transform(FileInfo fileInfo)
         {
-            var sections = Parse(Languages[".js"], Regex.Split(input, @"\r?\n|\r"));
+            Language language;
+            if (Languages.TryGetValue(fileInfo.Extension, out language))
+            {
+                var sections = Parse(language, File.ReadAllLines(fileInfo.FullName));
 
-            Hightlight(sections);
-            var output = GenerateHtml(sections);
+                Hightlight(sections);
+                return GenerateHtml(language, sections);
+            }
 
-            return output; // simple for now
+            return null;
         }
 
         private static IList<Section> Parse(Language language, string[] lines)
         {
-            List<Section> sections = new List<Section>();
-            var hasCode = false;
+            var sections = new List<Section>();
             var docsText = new StringBuilder();
             var codeText = new StringBuilder();
 
-            Action<string, string> save = (docs, code) => sections.Add(new Section() { DocsHtml = docs, CodeHtml = code });
+            Action<string, string> save = (docs, code) => sections.Add(new Section { DocsHtml = docs, CodeHtml = code });
             Func<string, string> mapToMarkdown = docs =>
             {
                 if (language.MarkdownMaps != null)
                 {
                     foreach (var map in language.MarkdownMaps)
+                    {
                         docs = Regex.Replace(docs, map.Key, map.Value, RegexOptions.Multiline);
+                    }
                 }
                 return docs;
             };
+
+            var hasCode = false;
 
             foreach (var line in lines)
             {
@@ -54,6 +62,7 @@ namespace SourceDocs.Core.Services
                     codeText.AppendLine(line);
                 }
             }
+
             save(mapToMarkdown(docsText.ToString()), codeText.ToString());
 
             return sections;
@@ -67,16 +76,15 @@ namespace SourceDocs.Core.Services
                 SafeMode = false
             };
 
-            for (var i = 0; i < sections.Count; i++)
+            foreach (var section in sections)
             {
-                var section = sections[i];
                 section.DocsHtml = md.Transform(section.DocsHtml);
                 section.CodeHtml = System.Web.HttpUtility.HtmlEncode(section.CodeHtml);
             }
         }
 
         // todo: use Nustache
-        private static string GenerateHtml(IList<Section> sections)
+        private static string GenerateHtml(Language language, IList<Section> sections)
         {
             var result = new StringBuilder();
 
@@ -88,9 +96,9 @@ namespace SourceDocs.Core.Services
 
                 result.AppendFormat(@"
 <div class=""row"" id=""section_{0}"">
-<div class=""col-md-6"">{1}</div>
-<div class=""col-md-6"">{2}</div>
-</div>", index, section.DocsHtml, section.CodeHtml);
+<div class=""col-md-4"">{1}</div>
+<div class=""col-md-8""><pre><code class=""hljs {3}"">{2}</code></pre></div>
+</div>", index, section.DocsHtml, section.CodeHtml, language.Name);
             }
 
             result.AppendLine(@"</div>");
@@ -98,7 +106,8 @@ namespace SourceDocs.Core.Services
             return result.ToString();
         }
 
-        private static readonly Dictionary<string, Language> Languages = new Dictionary<string, Language> {
+        private static readonly Dictionary<string, Language> Languages = new Dictionary<string, Language>
+        {
 			{ ".js", new Language {
 				Name = "javascript",
 				Symbol = "//"
@@ -115,7 +124,7 @@ namespace SourceDocs.Core.Services
 				}
 			}},
 			{ ".vb", new Language {
-				Name = "vb.net",
+				Name = "vbnet",
 				Symbol = "'+",
 				MarkdownMaps = new Dictionary<string, string> {
 					{ @"<c>([^<]*)</c>", "`$1`" },
@@ -142,6 +151,4 @@ namespace SourceDocs.Core.Services
         public Regex CommentFilter { get { return new Regex(@"(^#![/]|^\s*#\{)"); } }
         public IDictionary<string, string> MarkdownMaps;
     }
-
-
 }

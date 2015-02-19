@@ -201,6 +201,12 @@
 
                 App.mainRegion.show(new Module.RepoDocView({ model: doc }));
 
+                if (hljs) {
+                    App.mainRegion.$el.find("pre code").each(function (i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                }
+
             });
         },
 

@@ -88,7 +88,7 @@ namespace SourceDocs.Core.Services
         {
             var result = new StringBuilder();
 
-            result.AppendLine(@"<div class=""container-fluid"">");
+            result.AppendLine(@"<div class=""container-fluid source-code"">");
 
             for (var index = 0; index < sections.Count; index++)
             {
@@ -97,7 +97,7 @@ namespace SourceDocs.Core.Services
                 result.AppendFormat(@"
 <div class=""row"" id=""section_{0}"">
 <div class=""col-md-4"">{1}</div>
-<div class=""col-md-8""><pre><code class=""hljs {3}"">{2}</code></pre></div>
+<div class=""col-md-8""><pre><code class=""hljs language-{3}"">{2}</code></pre></div>
 </div>", index, section.DocsHtml, section.CodeHtml, language.Name);
             }
 

@@ -6382,7 +6382,7 @@ body {
   color: #ffffff;
 }
 .panel-notifications ul {
-  font-family: Consolas;
+  font-family: Consolas, source-code-pro, monospace;
 }
 .panel-notifications ul li.notification-info {
   color: #337ab7;

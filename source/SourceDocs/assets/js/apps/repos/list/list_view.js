@@ -87,7 +87,7 @@
             e.preventDefault();
             Module.trigger("Repos.List:selectIndexItem", this.model);
         },
-
+        
         modelEvents: {
             "change selected deselected": "render"
         },
@@ -130,6 +130,15 @@
             if (children) {
                 this.collection = new App.Entities.RepoIndexItemCollection(children);
             }
+        },
+
+        events: {
+            "keyup input": "search"
+        },
+
+        search: function (e) {
+            e.preventDefault();
+            console.log($(e.target).val());
         },
 
         onAttach: function () {

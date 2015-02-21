@@ -53,7 +53,7 @@ namespace SourceDocs.Core.Services
 
                                 try
                                 {
-                                    UpdateRepositories();
+                                    // UpdateRepositories();
                                 }
                                 catch (Exception ex)
                                 {

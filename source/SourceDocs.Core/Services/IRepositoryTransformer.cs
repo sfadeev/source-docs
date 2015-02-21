@@ -29,19 +29,18 @@ namespace SourceDocs.Core.Services
 
             var index = new List<IndexItem>();
 
-            if (TransformRecursive(options, index, new DirectoryInfo(options.WorkingDirectory)))
+            if (TransformRecursive(options, () => index, new DirectoryInfo(options.WorkingDirectory)))
             {
                 CopyAndSerializeIndex(options, index);
             }
         }
 
-        private bool TransformRecursive(TransformOptions options, IList<IndexItem> items, DirectoryInfo parent)
+        private bool TransformRecursive(TransformOptions options, Func<IList<IndexItem>> getItems, DirectoryInfo parent)
         {
             Func<FileSystemInfo, IndexItem> createIndexItem = fileSystemInfo => new IndexItem
             {
                 Name = fileSystemInfo.Name,
-                Path = FileHelper.GetRelativePath(options.WorkingDirectory, fileSystemInfo.FullName).Replace('\\', '/'),
-                Children = new List<IndexItem>()
+                Path = FileHelper.GetRelativePath(options.WorkingDirectory, fileSystemInfo.FullName).Replace('\\', '/')
             };
 
             var itemsAdded = false;
@@ -53,9 +52,9 @@ namespace SourceDocs.Core.Services
                 // todo: use more complex match with * instead of StartsWith
                 if (options.ExcludeDirectories.Any(indexItem.Path.StartsWith)) continue;
 
-                if (TransformRecursive(options, indexItem.Children, directory))
+                if (TransformRecursive(options, () => indexItem.Children ?? (indexItem.Children = new List<IndexItem>()), directory))
                 {
-                    items.Add(indexItem);
+                    getItems().Add(indexItem);
                     itemsAdded = true;
                 }
             }
@@ -67,7 +66,7 @@ namespace SourceDocs.Core.Services
                 string content;
                 if (Transform(options, fileInfo, out content))
                 {
-                    items.Add(indexItem);
+                    getItems().Add(indexItem);
                     itemsAdded = true;
 
                     // todo: move to Transform

@@ -150,10 +150,19 @@
                     Module.Controller.selectIndexItem(selectedModel);
                 }
 
-                console.log("rendering index of " + repoId + "/" + nodeName);
+                Module.Controller.renderIndex();
 
-                App.repoIndexRegion.show(new Module.RepoIndexView({ model: index }));
             });
+        },
+
+        renderIndex: function (searchTerm) {
+
+            Module.index.searchTerm = searchTerm;
+
+            console.log("rendering index", { selectedRepoId: Module.selectedRepoId, selectedNodeName: Module.selectedNodeName, searchTerm: Module.index.searchTerm });
+
+            App.repoIndexRegion.show(new Module.RepoIndexView({ model: Module.index }));
+
         },
 
         selectIndexItem: function(model) {
@@ -181,7 +190,6 @@
             App.breadcrumbRegion.show(
                 new Module.RepoBreadcrumbListView({ model: model, collection: breadcrumbList })
                 .on("childview:navigate", function(e) {
-                    console.log("breadcrumb navigate", e);
                     Module.Controller.selectIndexItem(e.model);
                 })
             );
@@ -201,6 +209,7 @@
 
                 App.mainRegion.show(new Module.RepoDocView({ model: doc }));
 
+                // todo: create plugin and highlight on document show
                 if (hljs) {
                     App.mainRegion.$el.find("pre code").each(function (i, block) {
                         hljs.highlightBlock(block);
@@ -219,6 +228,10 @@
 
         selectPath: function(path) {
             Module.selectedPath = path;
+        },
+
+        search: function (searchTerm) {
+            Module.Controller.renderIndex(searchTerm);
         }
 
     };

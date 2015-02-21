@@ -16,6 +16,9 @@
         },
         selectPath: function(path) {
             Module.List.Controller.selectPath(path);
+        },
+        search: function (term) {
+            Module.List.Controller.search(term);
         }
     };
 
@@ -37,6 +40,10 @@
 
     App.commands.setHandler("Repos:selectPath", function(path) {
         API.selectPath(path);
+    });
+
+    App.commands.setHandler("Repos:search", function (term) {
+        API.search(term);
     });
 
     /*App.on("contacts:list", function () {

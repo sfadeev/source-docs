@@ -7,5 +7,7 @@ source-docs
 
 * UI
     * Add quick search in index
+    * Display repositories in folders
     * Display nodes for feature/xyz branches as tree
     * Display top X nodes - too many nodes are not fits in screen
+    * Generate TOC for .md files and annotated sources

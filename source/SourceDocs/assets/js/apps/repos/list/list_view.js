@@ -122,6 +122,7 @@
     Module.RepoIndexView = Marionette.CompositeView.extend({
         template: "#repo-index-template",
         tagName: "div",
+        className: "index-tree",
         childViewContainer: "ul",
         childView: Module.RepoIndexListView,
 
@@ -138,18 +139,19 @@
 
         search: function (e) {
             e.preventDefault();
-            console.log($(e.target).val());
+
+            App.commands.execute("Repos:search", $(e.target).val());
         },
 
         onAttach: function () {
-            console.log("binding hotkeys for index view");
+            // console.log("binding hotkeys for index view");
 
             $(document).bind("keydown", "left", this.navigatePrevious);
             $(document).bind("keydown", "right", this.navigateNext);
         },
 
         onDestroy: function () {
-            console.log("unbinding hotkeys for index view");
+            // console.log("unbinding hotkeys for index view");
 
             $(document).unbind("keydown", this.navigatePrevious);
             $(document).unbind("keydown", this.navigateNext);

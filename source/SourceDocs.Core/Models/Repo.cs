@@ -2,14 +2,11 @@
 
 namespace SourceDocs.Core.Models
 {
-    public class Repos
-    {
-        public IList<Repo> Items { get; set; }
-    }
-
     public class Repo
     {
         public string Id { get; set; }
+
+        public string Title { get; set; }
 
         public string Url { get; set; }
 

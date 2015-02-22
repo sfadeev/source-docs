@@ -32,14 +32,18 @@
 
                 var repo = items.find(function(x) { return x.get("id") === id; });
 
-                if (repo === undefined && items.length > 0) {
-                    repo = items.at(0);
-                    Module.selectedRepoId = repo.get("id");
+                if (repo === undefined /*&& items.length > 0*/) {
+                    repo = items.find(function (x) { return x.get("url") != undefined; });
+                    /*repo = items.at(0);
+                    Module.selectedRepoId = repo.get("id");*/
                 }
 
                 if (repo) {
+                    Module.selectedRepoId = repo.get("id");
                     repo.select();
                     Module.repos.set("title", repo.get("id"));
+                } else {
+                    Module.selectedRepoId = null;
                 }
             }
         },

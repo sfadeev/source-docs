@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Events\TaskAdded.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
+    <Compile Include="Models\RepoConfig.cs" />
     <Compile Include="Services\IEventAggregator.cs" />
     <Compile Include="GitRepository.cs" />
     <Compile Include="Services\IFileTransformer.cs" />

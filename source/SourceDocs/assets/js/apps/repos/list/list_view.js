@@ -1,7 +1,21 @@
 ﻿App.module("Repos.List", function(Module, App, Backbone, Marionette, $, _) {
 
     Module.RepoView = Marionette.ItemView.extend({
-        template: "#repos-link",
+        // template: "#repos-link",
+        getTemplate: function(){
+            if (this.model.get("url")){
+                return "#repos-link";
+            } else {
+                return "#repos-link-header";
+            }
+        },
+        className: function () {
+            if (this.model.get("url")) {
+                return "";
+            } else {
+                return "dropdown-header";
+            }
+        },
         tagName: "li",
 
         events: {

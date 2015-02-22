@@ -51,22 +51,27 @@ namespace SourceDocs.Core.Services
                 {
                     if (_repoMap == null)
                     {
-                        var repos = _javaScriptSerializer.Deserialize<Repos>(
-                            File.ReadAllText(_contextProvider.MapPath("repositories.json"))).Items;
+                        var repos = _javaScriptSerializer.Deserialize<RepoConfig>(
+                            File.ReadAllText(_contextProvider.MapPath("repositories.json"))).Repositories;
 
                         _repoMap = new Dictionary<Repo, GitRepository.Settings>();
 
                         foreach (var repo in repos)
                         {
-                            var settings = new GitRepository.Settings
-                            {
-                                Url = repo.Url,
-                                BaseDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url),
-                                ConfigFile = Path.Combine(FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url), "config.json"),
-                                WorkingDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url, "repo")
-                            };
+                            GitRepository.Settings settings = null;
 
-                            var key = File.Exists(settings.ConfigFile)
+                            if (repo.Id != null && repo.Url != null)
+                            {
+                                settings = new GitRepository.Settings
+                                {
+                                    Url = repo.Url,
+                                    BaseDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url),
+                                    ConfigFile = Path.Combine(FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url), "config.json"),
+                                    WorkingDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url, "repo")
+                                };
+                            }
+
+                            var key = settings != null && File.Exists(settings.ConfigFile)
                                 ? _javaScriptSerializer.Deserialize<Repo>(File.ReadAllText(settings.ConfigFile))
                                 : repo;
 

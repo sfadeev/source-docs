@@ -6288,6 +6288,9 @@ button.close {
 body {
   padding-top: 50px;
 }
+.navbar .dropdown-header {
+  background-color: #e5e5e5;
+}
 .sidebar {
   padding-left: 0;
   padding-right: 0;

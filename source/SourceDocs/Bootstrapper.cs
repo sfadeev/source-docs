@@ -27,7 +27,6 @@ namespace SourceDocs
 
             conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("assets"));
             conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("Scripts"));
-            // conventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("api", null, ".cs"));
         }
 
         protected override void ConfigureApplicationContainer(TinyIoCContainer container)
@@ -58,7 +57,7 @@ namespace SourceDocs
 
         /*protected override DiagnosticsConfiguration DiagnosticsConfiguration
         {
-            get { return new DiagnosticsConfiguration { Password = "1234567" }; } // obama password :)
+            get { return new DiagnosticsConfiguration { Password = "1234567" }; }
         }*/
     }
 

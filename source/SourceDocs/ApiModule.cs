@@ -23,18 +23,19 @@ namespace SourceDocs
                 var config = repositoryCatalog.GetRepositoryConfig(repo.Url);
                 var path = Path.Combine(config.BaseDirectory, "docs", x.nodeName, "index.json");
 
-                var result = new IndexItem
+                IList<IndexItem> index = null;
+
+                if (File.Exists(path))
+                {
+                    index = javaScriptSerializer.Deserialize<List<IndexItem>>(File.ReadAllText(path));
+                }
+
+                return new IndexItem
                 {
                     Path = "#",
                     Name = x.repoId + "/" + x.nodeName,
-                    Children = File.Exists(path)
-                        ? javaScriptSerializer.Deserialize<List<IndexItem>>(File.ReadAllText(path))
-                        : new List<IndexItem>()
+                    Children = index
                 };
-
-                // BuildRepoIndex(result, 5);
-
-                return result;
             };
 
             Get["/repositories/{repoId}/{nodeName*}/document/{path*}"] = x =>
@@ -48,27 +49,6 @@ namespace SourceDocs
                     Content = File.Exists(path) ? File.ReadAllText(path) : string.Empty
                 };
             };
-        }
-
-        public static void BuildRepoIndex(IndexItem parent, int level)
-        {
-            for (var i = 1; i < level; i++)
-            {
-                var item = new IndexItem
-                {
-                    Path = parent.Path + "/" + i,
-                    Name = parent.Name + " Item " + i
-                };
-
-                parent.Children.Add(item);
-
-                if (level > 0)
-                {
-                    item.Children = new List<IndexItem>();
-
-                    BuildRepoIndex(item, level - 1);
-                }
-            }
         }
     }
 }

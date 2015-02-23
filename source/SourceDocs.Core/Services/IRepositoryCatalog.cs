@@ -35,7 +35,7 @@ namespace SourceDocs.Core.Services
 
         public IRepository[] GetRepositories()
         {
-            return LoadRepoMap().Select(x => (IRepository)new GitRepository(x.Value)).ToArray();
+            return LoadRepoMap().Where(x => x.Value != null).Select(x => (IRepository)new GitRepository(x.Value)).ToArray();
         }
 
         public Repo[] GetRepos()

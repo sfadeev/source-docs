@@ -73,7 +73,7 @@ namespace SourceDocs.Core.Tests
                             }
                         };
 
-                        new RepositoryTransformer(new DefaultJavaScriptSerializer(), null).Transform(options);
+                        new RepositoryTransformer(new DefaultJavaScriptSerializer()).Transform(options);
 
                         // update repo config
                         node.Generated = node.Updated;

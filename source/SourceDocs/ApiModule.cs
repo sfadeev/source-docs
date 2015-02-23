@@ -33,7 +33,7 @@ namespace SourceDocs
                 return new IndexItem
                 {
                     Path = "#",
-                    Name = x.repoId + "/" + x.nodeName,
+                    Name = x.repoId + " / " + x.nodeName,
                     Children = index
                 };
             };

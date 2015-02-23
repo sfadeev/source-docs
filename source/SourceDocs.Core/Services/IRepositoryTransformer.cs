@@ -15,12 +15,10 @@ namespace SourceDocs.Core.Services
     public class RepositoryTransformer : IRepositoryTransformer
     {
         private readonly IJavaScriptSerializer _javaScriptSerializer;
-        private readonly INotificationService _notificationService;
 
-        public RepositoryTransformer(IJavaScriptSerializer javaScriptSerializer, INotificationService notificationService)
+        public RepositoryTransformer(IJavaScriptSerializer javaScriptSerializer)
         {
             _javaScriptSerializer = javaScriptSerializer;
-            _notificationService = notificationService;
         }
 
         public void Transform(TransformOptions options)
@@ -51,6 +49,8 @@ namespace SourceDocs.Core.Services
 
                 // todo: use more complex match with * instead of StartsWith
                 if (options.ExcludeDirectories.Any(indexItem.Path.StartsWith)) continue;
+
+                indexItem.Path = null; // reset path to null for dirs after exclude check (todo: remove hack)
 
                 if (TransformRecursive(options, () => indexItem.Children ?? (indexItem.Children = new List<IndexItem>()), directory))
                 {

@@ -32,7 +32,7 @@
 
                 var repo = items.find(function(x) { return x.get("id") === id; });
 
-                if (repo === undefined /*&& items.length > 0*/) {
+                if (repo === undefined && items.length > 0) {
                     repo = items.find(function (x) { return x.get("url") != undefined; });
                     /*repo = items.at(0);
                     Module.selectedRepoId = repo.get("id");*/
@@ -148,7 +148,8 @@
                     // Module.selectedPath = null;
                 }
                 if (selectedModel === undefined && childrenList.length > 0) {
-                    selectedModel = childrenList.at(0);
+                    selectedModel = childrenList.find(function (x) { return x.get("path") != null; });
+                    // selectedModel = childrenList.at(0);
                 }
                 if (selectedModel) {
                     Module.Controller.selectIndexItem(selectedModel);
@@ -180,53 +181,62 @@
 
             model.select();
 
-            App.navigate(Module.selectedRepoId + "/" + Module.selectedNodeName + "/~/" + Module.selectedPath);
+            if (Module.selectedPath) {
 
-            // build and show breadcrumb
-            var breadcrumbList = new App.Entities.RepoIndexItemCollection();
-            var breadcrumbItem = model;
-            do {
-                breadcrumbList.add(breadcrumbItem, { at: 0 });
-                breadcrumbItem = breadcrumbItem.get("sibling:parent");
+                App.navigate(Module.selectedRepoId + "/" + Module.selectedNodeName + "/~/" + Module.selectedPath);
 
-            } while (breadcrumbItem)
+                // build and show breadcrumb
+                var breadcrumbList = new App.Entities.RepoIndexItemCollection();
+                var breadcrumbItem = model;
+                do {
+                    breadcrumbList.add(breadcrumbItem, { at: 0 });
+                    breadcrumbItem = breadcrumbItem.get("sibling:parent");
 
-            App.breadcrumbRegion.show(
-                new Module.RepoBreadcrumbListView({ model: model, collection: breadcrumbList })
-                .on("childview:navigate", function(e) {
-                    Module.Controller.selectIndexItem(e.model);
-                })
-            );
+                } while (breadcrumbItem)
 
-            // build and show pager
-            App.pagerRegion.show(
-                new Module.RepoPagerView({ model: model })
-                .on({
-                    "navigate:previous": function() { Module.Controller.selectSiblingIndexItem("previous"); },
-                    "navigate:next": function() { Module.Controller.selectSiblingIndexItem("next"); }
-                })
-            );
+                App.breadcrumbRegion.show(
+                    new Module.RepoBreadcrumbListView({ model: model, collection: breadcrumbList })
+                    .on("childview:navigate", function(e) {
+                        Module.Controller.selectIndexItem(e.model);
+                    })
+                );
 
-            // load and show doc
-            App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, model.get("path")).done(function(doc) {
-                console.log("rendering document", doc);
+                // build and show pager
+                App.pagerRegion.show(
+                    new Module.RepoPagerView({ model: model })
+                    .on({
+                        "navigate:previous": function() { Module.Controller.selectSiblingIndexItem("previous"); },
+                        "navigate:next": function() { Module.Controller.selectSiblingIndexItem("next"); }
+                    })
+                );
 
-                App.mainRegion.show(new Module.RepoDocView({ model: doc }));
+                // load and show doc
+                App.request("Entities:loadRepoDoc", Module.selectedRepoId, Module.selectedNodeName, Module.selectedPath).done(function(doc) {
+                    console.log("rendering document", doc);
 
-                // todo: create plugin and highlight on document show
-                if (hljs) {
-                    App.mainRegion.$el.find("pre code").each(function (i, block) {
-                        hljs.highlightBlock(block);
-                    });
-                }
+                    App.mainRegion.show(new Module.RepoDocView({ model: doc }));
 
-            });
+                    // todo: create plugin and highlight on document show
+                    if (hljs) {
+                        App.mainRegion.$el.find("pre code").each(function(i, block) {
+                            hljs.highlightBlock(block);
+                        });
+                    }
+
+                });
+            }
         },
 
         selectSiblingIndexItem: function (direction) {
-            if (Module.selectedIndexItem) {
-                var sibling = Module.selectedIndexItem.get("sibling:" + direction);
-                if (sibling) Module.Controller.selectIndexItem(sibling);
+            var item = Module.selectedIndexItem;
+            if (item) {
+                do {
+                    item = item.get("sibling:" + direction);
+                    if (item && item.get("path")) {
+                        Module.Controller.selectIndexItem(item);
+                        return;
+                    }
+                } while (item)
             }
         },
 

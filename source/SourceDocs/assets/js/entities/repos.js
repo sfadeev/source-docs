@@ -41,6 +41,9 @@ App.module("Entities", function(Entities, App, Backbone, Marionette, $, _) {
         }
     });
 
+    Entities.RepoSearchModel = Backbone.Model.extend({
+    });
+
     Entities.RepoIndexItemModel = Backbone.Model.extend({
         initialize: function () {
             Backbone.Cycle.SelectableModel.applyTo(this);

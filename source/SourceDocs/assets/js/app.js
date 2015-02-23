@@ -13,6 +13,7 @@ App.getApiUrl = function(path) {
 App.addRegions({
     reposRegion: "#repos-region",
     nodesRegion: "#nodes-region",
+    repoSearchRegion: "#repo-search-region",
     repoIndexRegion: "#repo-index-region",
     breadcrumbRegion: "#breadcrumb-region",
     mainRegion: "#main-region",

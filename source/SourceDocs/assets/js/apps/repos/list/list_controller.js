@@ -74,6 +74,7 @@
         // todo: do not empty region till sure it should be empty to prevent flickering
         emptyNodeRegions: function () {
 
+            App.repoSearchRegion.empty();
             App.repoIndexRegion.empty();
             App.breadcrumbRegion.empty();
             App.mainRegion.empty();
@@ -156,6 +157,9 @@
                 }
 
                 Module.Controller.renderIndex();
+
+                var repoSearchModel = new App.Entities.RepoSearchModel(/*{ term: searchTerm }*/);
+                App.repoSearchRegion.show(new Module.RepoSearchView({ model: repoSearchModel }));
 
             });
         },

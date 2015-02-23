@@ -133,9 +133,24 @@
         }
     });
 
+    Module.RepoSearchView = Marionette.ItemView.extend({
+        template: "#repo-search-template",
+        className: "navbar-form sidebar-search",
+
+        events: {
+            "keyup input": "search"
+        },
+
+        search: function(e) {
+            e.preventDefault();
+
+            App.commands.execute("Repos:search", $(e.target).val());
+        }
+    });
+
     Module.RepoIndexView = Marionette.CompositeView.extend({
         template: "#repo-index-template",
-        tagName: "div",
+        // tagName: "div",
         className: "index-tree",
         childViewContainer: "ul",
         childView: Module.RepoIndexListView,
@@ -145,16 +160,6 @@
             if (children) {
                 this.collection = new App.Entities.RepoIndexItemCollection(children);
             }
-        },
-
-        events: {
-            "keyup input": "search"
-        },
-
-        search: function (e) {
-            e.preventDefault();
-
-            App.commands.execute("Repos:search", $(e.target).val());
         },
 
         onAttach: function () {
@@ -183,9 +188,8 @@
     });
 
     Module.RepoDocView = Marionette.ItemView.extend({
-        template: "#repo-doc-template"
+        template: "<div>{{{ content }}}</div>"
     });
-
 
     Module.RepoBreadcrumbView = Marionette.ItemView.extend({
         template: "#repo-doc-breadcrumb-link",

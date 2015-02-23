@@ -61,16 +61,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 sidebar navbar-default" role="navigation">
-                <div class="navbar-form sidebar-search">
-                    <form class="form-inline" role="search">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search for...">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">Go!</button>
-                            </span>
-                        </div><!-- /input-group -->
-                    </form>
-                </div>
+                <div id="repo-search-region"></div>
                 <div id="repo-index-region"></div>
             </div>
             <div class="col-md-9">
@@ -78,11 +69,8 @@
                 <br />
 
                 <div id="breadcrumb-region"></div>
-
                 <div id="main-region"></div>
-
                 <div id="pager-region"></div>
-
 
                 <div class="panel panel-default panel-notifications">
                     <div class="panel-body">
@@ -122,6 +110,19 @@
         <a href="#{{ name }}">{{ name }}</a>
     </script>
 
+    <script type="text/x-handlebars-template" id="repo-search-template">
+        <!--div class="navbar-form sidebar-search"-->
+            <form class="form-inline" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" value="{{ term }}" placeholder="Search for...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                </div>
+            </form>
+        <!--/div-->
+    </script>
+
     <script type="text/x-handlebars-template" id="repo-index-template">
         <ul class="nav"></ul>
     </script>
@@ -129,10 +130,6 @@
     <script type="text/x-handlebars-template" id="repo-index-link">
         <a href="#{{ path }}">{{ name }}</a>
         <ul class="nav"></ul>
-    </script>
-
-    <script type="text/x-handlebars-template" id="repo-doc-template">
-        {{{ content }}}
     </script>
 
     <script type="text/x-handlebars-template" id="repo-doc-breadcrumb-template">

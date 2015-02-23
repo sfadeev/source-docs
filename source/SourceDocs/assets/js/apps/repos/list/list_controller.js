@@ -95,7 +95,10 @@
                 var node = nodes.find(function(x) { return x.get("name") === name; });
 
                 if (node === undefined && nodes.length > 0) {
-                    node = nodes.at(0);
+                    node =
+                        nodes.find(function (x) { return x.get("name") === "master"; }) ||
+                        nodes.at(0);
+
                     Module.selectedNodeName = node.get("name");
                 }
 
@@ -145,13 +148,15 @@
 
                 var selectedModel;
                 if (Module.selectedPath) {
-                    selectedModel = childrenList.find(function (x) { return x.get("path") === Module.selectedPath; });
-                    // Module.selectedPath = null;
+                    selectedModel =
+                        childrenList.find(function (x) { return x.get("path") === Module.selectedPath; });
                 }
-                if (selectedModel === undefined && childrenList.length > 0) {
-                    selectedModel = childrenList.find(function (x) { return x.get("path") != null; });
-                    // selectedModel = childrenList.at(0);
+                if (selectedModel === undefined) {
+                    selectedModel =
+                        childrenList.find(function (x) { return x.get("path") === "README.md"; }) ||
+                        childrenList.find(function (x) { return x.get("path") != null; });
                 }
+
                 if (selectedModel) {
                     Module.Controller.selectIndexItem(selectedModel);
                 }
@@ -167,6 +172,21 @@
         renderIndex: function (searchTerm) {
 
             Module.index.searchTerm = searchTerm;
+
+            Module.index.get("childrenList").each(function (item) {
+
+                var match = !searchTerm || !item.get("name") || item.get("name").indexOf(searchTerm) > -1;
+
+                item.set("visible", match);
+
+                if (match) {
+                    var parent = item.get("sibling:parent");
+                    while (parent) {
+                        parent.set("visible", true);
+                        parent = parent.get("sibling:parent");
+                    }
+                }
+            });
 
             console.log("rendering index", { selectedRepoId: Module.selectedRepoId, selectedNodeName: Module.selectedNodeName, searchTerm: Module.index.searchTerm });
 
@@ -236,7 +256,7 @@
             if (item) {
                 do {
                     item = item.get("sibling:" + direction);
-                    if (item && item.get("path")) {
+                    if (item && item.get("visible") && item.get("path")) {
                         Module.Controller.selectIndexItem(item);
                         return;
                     }
@@ -249,7 +269,9 @@
         },
 
         search: function (searchTerm) {
-            Module.Controller.renderIndex(searchTerm);
+            if (searchTerm !== Module.index.searchTerm) {
+                Module.Controller.renderIndex(searchTerm);
+            }
         }
 
     };

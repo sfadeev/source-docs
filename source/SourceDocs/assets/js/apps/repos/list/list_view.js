@@ -127,6 +127,12 @@
                 this.$el.removeClass("active");
             };
 
+            if (this.model.get("visible")) {
+                this.$el.removeClass("hidden");
+            } else {
+                this.$el.addClass("hidden");
+            };
+
             if (_.isUndefined(this.collection)) {
                 this.$("ul:first").remove();
             }

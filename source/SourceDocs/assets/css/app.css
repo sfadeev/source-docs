@@ -6287,6 +6287,7 @@ button.close {
 }
 body {
   padding-top: 50px;
+  font-family: Open Sans;
 }
 .navbar .dropdown-header {
   background-color: #e5e5e5;
@@ -6371,6 +6372,8 @@ body {
 }
 .source-code pre code {
   background-color: transparent;
+  font-family: Consolas, source-code-pro, monospace;
+  font-size: 14px;
 }
 .sidebar___ {
   position: fixed;

@@ -61,10 +61,9 @@
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Models\RepoConfig.cs" />
     <Compile Include="Services\IEventAggregator.cs" />
-    <Compile Include="GitRepository.cs" />
+    <Compile Include="Services\GitRepository.cs" />
     <Compile Include="Services\IFileTransformer.cs" />
     <Compile Include="Models\IndexItem.cs" />
-    <Compile Include="IRepository.cs" />
     <Compile Include="Services\IJavaScriptSerializer.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IRepositoryCatalog.cs" />

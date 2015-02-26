@@ -9,11 +9,11 @@ namespace SourceDocs.Core.Services
 {
     public interface IRepositoryCatalog
     {
-        IRepository[] GetRepositories();
+        IRepositoryHandler[] GetRepositories();
 
         Repo[] GetRepos();
 
-        GitRepository.Settings GetRepositoryConfig(string repositoryUrl);
+        GitRepositoryHandler.Settings GetRepositoryConfig(string repositoryUrl);
 
         void UpdateRepositoryConfig(string repositoryUrl, Action<Repo> updateProperties);
     }
@@ -25,7 +25,7 @@ namespace SourceDocs.Core.Services
         private readonly IContextProvider _contextProvider;
         private readonly IJavaScriptSerializer _javaScriptSerializer;
 
-        private IDictionary<Repo, GitRepository.Settings> _repoMap;
+        private IDictionary<Repo, GitRepositoryHandler.Settings> _repoMap;
 
         public RepositoryCatalog(IContextProvider contextProvider, IJavaScriptSerializer javaScriptSerializer)
         {
@@ -33,9 +33,9 @@ namespace SourceDocs.Core.Services
             _javaScriptSerializer = javaScriptSerializer;
         }
 
-        public IRepository[] GetRepositories()
+        public IRepositoryHandler[] GetRepositories()
         {
-            return LoadRepoMap().Where(x => x.Value != null).Select(x => (IRepository)new GitRepository(x.Value)).ToArray();
+            return LoadRepoMap().Where(x => x.Value != null).Select(x => (IRepositoryHandler)new GitRepositoryHandler(x.Value)).ToArray();
         }
 
         public Repo[] GetRepos()
@@ -43,7 +43,7 @@ namespace SourceDocs.Core.Services
             return LoadRepoMap().Keys.ToArray();
         }
 
-        private IDictionary<Repo, GitRepository.Settings> LoadRepoMap()
+        private IDictionary<Repo, GitRepositoryHandler.Settings> LoadRepoMap()
         {
             if (_repoMap == null)
             {
@@ -54,15 +54,15 @@ namespace SourceDocs.Core.Services
                         var repos = _javaScriptSerializer.Deserialize<RepoConfig>(
                             File.ReadAllText(_contextProvider.MapPath("repositories.json"))).Repositories;
 
-                        _repoMap = new Dictionary<Repo, GitRepository.Settings>();
+                        _repoMap = new Dictionary<Repo, GitRepositoryHandler.Settings>();
 
                         foreach (var repo in repos)
                         {
-                            GitRepository.Settings settings = null;
+                            GitRepositoryHandler.Settings settings = null;
 
                             if (repo.Id != null && repo.Url != null)
                             {
-                                settings = new GitRepository.Settings
+                                settings = new GitRepositoryHandler.Settings
                                 {
                                     Url = repo.Url,
                                     BaseDirectory = FileHelper.GetWorkingDir(_contextProvider.MapPath("."), repo.Url),
@@ -84,7 +84,7 @@ namespace SourceDocs.Core.Services
             return _repoMap;
         }
 
-        public GitRepository.Settings GetRepositoryConfig(string repositoryUrl)
+        public GitRepositoryHandler.Settings GetRepositoryConfig(string repositoryUrl)
         {
             lock (_reposLock)
             {

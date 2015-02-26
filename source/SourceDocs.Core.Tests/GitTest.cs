@@ -21,14 +21,14 @@ namespace SourceDocs.Core.Tests
         [TestCase("c:\\data\\projects\\temp\\SomeRepo")]
         public void WorkflowTest(string repoUrl)
         {
-            var gitSettings = new GitRepository.Settings
+            var gitSettings = new GitRepositoryHandler.Settings
             {
                 Url = repoUrl,
                 ConfigFile = Path.Combine(FileHelper.GetWorkingDir("./repos/", repoUrl), "config.json"),
                 WorkingDirectory = FileHelper.GetWorkingDir("./repos/", repoUrl, "repo")
             };
 
-            using (var repo = new GitRepository(gitSettings))
+            using (var repo = new GitRepositoryHandler(gitSettings))
             {
                 var config = File.Exists(gitSettings.ConfigFile)
                     ? JsonConvert.DeserializeObject<Repo>(File.ReadAllText(gitSettings.ConfigFile))

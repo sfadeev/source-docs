@@ -6,9 +6,19 @@ using System.Linq;
 using LibGit2Sharp;
 using SourceDocs.Core.Models;
 
-namespace SourceDocs.Core
+namespace SourceDocs.Core.Services
 {
-    public class GitRepository : IRepository, IDisposable
+    public interface IRepositoryHandler
+    {
+        // todo: remove
+        string Url { get; }
+
+        IList<Node> UpdateNodes(IEnumerable<Node> nodes = null);
+
+        bool UpdateNode(Node node);
+    }
+
+    public class GitRepositoryHandler : IRepositoryHandler, IDisposable
     {
         public class Settings
         {
@@ -47,7 +57,7 @@ namespace SourceDocs.Core
         private readonly Repository _git;
 
         // todo: set specified timeout to delayed generate
-        public GitRepository(Settings settings)
+        public GitRepositoryHandler(Settings settings)
         {
             if (settings == null) throw new ArgumentNullException("settings");
 

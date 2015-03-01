@@ -128,6 +128,7 @@
   <ItemGroup>
     <Content Include="assets\js\app.js" />
     <Content Include="assets\js\apps\repos\list\list_controller.js" />
+    <None Include="assets\js\example.jsx" />
     <Content Include="assets\js\apps\repos\list\list_view.js" />
     <Content Include="assets\js\apps\repos\repos_app.js" />
     <Content Include="assets\js\entities\repos.js" />

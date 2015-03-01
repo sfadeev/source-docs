@@ -74,7 +74,7 @@
         // todo: do not empty region till sure it should be empty to prevent flickering
         emptyNodeRegions: function () {
 
-            App.repoSearchRegion.empty();
+            // App.repoSearchRegion.empty();
             App.repoIndexRegion.empty();
             App.breadcrumbRegion.empty();
             App.mainRegion.empty();
@@ -175,7 +175,7 @@
 
             Module.index.get("childrenList").each(function (item) {
 
-                var match = !searchTerm || !item.get("name") || item.get("name").indexOf(searchTerm) > -1;
+                var match = !searchTerm || !item.get("name") || item.get("name").search(new RegExp(searchTerm, "i")) > -1;
 
                 item.set("visible", match);
 
@@ -190,8 +190,11 @@
 
             console.log("rendering index", { selectedRepoId: Module.selectedRepoId, selectedNodeName: Module.selectedNodeName, searchTerm: Module.index.searchTerm });
 
-            App.repoIndexRegion.show(new Module.RepoIndexView({ model: Module.index }));
+            // App.repoIndexRegion.show(new Module.RepoIndexView({ model: Module.index }));
 
+            React.render(
+                React.createElement(RepositoryIndex, Module.index), document.getElementById("repo-index-region")
+            );
         },
 
         selectIndexItem: function(model) {

@@ -9,7 +9,7 @@ namespace SourceDocs.Core.Services
 {
     public interface IRepositoryCatalog
     {
-        IRepositoryHandler[] GetRepositories();
+        GitRepositoryHandler.Settings[] GetRepositories();
 
         Repo[] GetRepos();
 
@@ -33,9 +33,9 @@ namespace SourceDocs.Core.Services
             _javaScriptSerializer = javaScriptSerializer;
         }
 
-        public IRepositoryHandler[] GetRepositories()
+        public GitRepositoryHandler.Settings[] GetRepositories()
         {
-            return LoadRepoMap().Where(x => x.Value != null).Select(x => (IRepositoryHandler)new GitRepositoryHandler(x.Value)).ToArray();
+            return LoadRepoMap().Where(x => x.Value != null).Select(x => x.Value).ToArray();
         }
 
         public Repo[] GetRepos()
@@ -52,7 +52,7 @@ namespace SourceDocs.Core.Services
                     if (_repoMap == null)
                     {
                         var repos = _javaScriptSerializer.Deserialize<RepoConfig>(
-                            File.ReadAllText(_contextProvider.MapPath("repositories.json"))).Repositories;
+                            File.ReadAllText(_contextProvider.MapPath("repositories.js"))).Repositories;
 
                         _repoMap = new Dictionary<Repo, GitRepositoryHandler.Settings>();
 

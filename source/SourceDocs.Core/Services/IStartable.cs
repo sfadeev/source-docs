@@ -53,7 +53,7 @@ namespace SourceDocs.Core.Services
 
                                 try
                                 {
-                                    // UpdateRepositories();
+                                    UpdateRepositories();
                                 }
                                 catch (Exception ex)
                                 {
@@ -77,12 +77,12 @@ namespace SourceDocs.Core.Services
         {
             _notificationService.Notify("Checking for updates in repositories ...");
 
-            var repositories = _repositoryCatalog.GetRepositories();
-
-            foreach (var repository in repositories)
+            foreach (var repositorySettings in _repositoryCatalog.GetRepositories())
             {
                 try
                 {
+                    var repository = new GitRepositoryHandler(repositorySettings);
+
                     _notificationService.Notify("Updating " + repository.Url);
 
                     var settings = _repositoryCatalog.GetRepositoryConfig(repository.Url);
@@ -128,10 +128,10 @@ namespace SourceDocs.Core.Services
                 {
                     if (Log.IsErrorEnabled)
                     {
-                        Log.Error("Failed to update repository " + repository.Url, ex);
+                        Log.Error("Failed to update repository " + repositorySettings.Url, ex);
                     }
 
-                    _notificationService.Notify("Failed to update repository " + repository.Url + " : " + ex.Message, NotificationType.Error);
+                    _notificationService.Notify("Failed to update repository " + repositorySettings.Url + " : " + ex.Message, NotificationType.Error);
                 }
 
                 Thread.Sleep(5 * 1000);

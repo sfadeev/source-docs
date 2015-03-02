@@ -192,9 +192,7 @@
 
             // App.repoIndexRegion.show(new Module.RepoIndexView({ model: Module.index }));
 
-            React.render(
-                React.createElement(RepositoryIndex, Module.index), document.getElementById("repo-index-region")
-            );
+            App.renderRepositoryIndex(Module.index, "repo-index-region");
         },
 
         selectIndexItem: function(model) {

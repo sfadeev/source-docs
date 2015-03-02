@@ -38,12 +38,9 @@ var RepositoryIndexList = React.createClass({
     }
 });
 
-var RepositoryIndex = React.createClass({
-    render: function() {
-        // console.log("RepositoryIndex.render", this.props);
-        return (
-            <RepositoryIndexList children={this.props.attributes.children} />
-        );
-    }
-});
-
+App.renderRepositoryIndex = function(model, elementId) {
+    React.render(
+      <RepositoryIndexList children={model.get("children")} />,
+      document.getElementById(elementId)
+    );
+}

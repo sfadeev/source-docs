@@ -281,4 +281,7 @@
     Module.on("Repos.List:selectIndexItem", Module.Controller.selectIndexItem);
     Module.on("Repos.List:selectSiblingIndexItem", Module.Controller.selectSiblingIndexItem);
 
+    $(document).bind("keydown", "left", function () { Module.Controller.selectSiblingIndexItem("previous"); });
+    $(document).bind("keydown", "right", function () { Module.Controller.selectSiblingIndexItem("next"); });
+
 });

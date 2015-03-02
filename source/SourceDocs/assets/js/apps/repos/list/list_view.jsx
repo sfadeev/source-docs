@@ -1,4 +1,9 @@
 ﻿var RepositoryIndexItem = React.createClass({
+    handleClick: function(e) {
+        e.preventDefault();
+
+        App.Repos.List.trigger("Repos.List:selectIndexItem", this.props.data);
+    },
     render: function() {
         // console.log("RepositoryIndexItem.render", this.props);
         var children;
@@ -15,7 +20,9 @@
 
         return (
             <li className={className}>
-                <a href={this.props.data.attributes.path}>{this.props.data.attributes.name}</a>
+                <a href={this.props.data.attributes.path} onClick={this.handleClick}>
+                    {this.props.data.attributes.name}
+                </a>
                 {children}
             </li>
         );
@@ -40,7 +47,6 @@ var RepositoryIndexList = React.createClass({
 
 App.renderRepositoryIndex = function(model, elementId) {
     React.render(
-      <RepositoryIndexList children={model.get("children")} />,
-      document.getElementById(elementId)
+      <RepositoryIndexList children={model.get("children")} />, document.getElementById(elementId)
     );
 }

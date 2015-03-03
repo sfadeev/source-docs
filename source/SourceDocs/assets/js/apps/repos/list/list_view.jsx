@@ -7,6 +7,7 @@
               <RepositoryItem data={item} />
             );
         });
+        
         return (
             <li className="dropdown">
                 <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -30,33 +31,24 @@ var RepositoryItem = React.createClass({
     render: function() {
         // console.log("RepositoryItem.render", this.props);
 
-        var className = "";
-        var children;
-
         if (this.props.data.attributes.url) {
-            if (this.props.data.selected) className = "active";
+            var className = this.props.data.selected ? "active" : "";
 
-            children = (
-                <a href={this.props.data.attributes.url} onClick={this._onClick}>
-                    {this.props.data.attributes.id}
-                </a>
+            return (
+                <li className={className}>
+                    <a href={this.props.data.attributes.url} onClick={this._onClick}>
+                        {this.props.data.attributes.id}
+                    </a>
+                </li>
             );
         }
         else {
-            className = "dropdown-header";
-
-            children = (
-                <span>
+            return (
+                <li className="dropdown-header">
                     {this.props.data.attributes.id}
-                </span>
+                </li>
             );
         }
-
-        return (
-            <li className={className}>
-                {children}
-            </li>
-        );
     }
 });
 
@@ -95,12 +87,13 @@ var RepositoryIndexItem = React.createClass({
 var RepositoryIndexList = React.createClass({
     render: function() {
         // console.log("RepositoryIndexList.render", this.props);
-        
+
         var items = this.props.children.map(function(item, index) {
             return (
               <RepositoryIndexItem data={item} />
             );
         });
+
         return (
             <ul className="nav">
                 {items}
@@ -114,6 +107,7 @@ App.renderRepository = function(model, elementId) {
       <RepositoryList data={model} />, document.getElementById(elementId)
     );
 }
+
 App.renderRepositoryIndex = function(model, elementId) {
     React.render(
       <RepositoryIndexList children={model.get("children")} />, document.getElementById(elementId)

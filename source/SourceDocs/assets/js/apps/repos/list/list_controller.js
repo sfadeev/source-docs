@@ -8,13 +8,15 @@
 
                 console.log("rendering repos list", repos);
 
-                var view = new Module.RepoListView({ model: repos });
+                /*var view = new Module.RepoListView({ model: repos });
 
                 view.on("childview:navigate", function(childView, model) {
                     App.commands.execute("Repos:selectRepo", model.get("id"));
                 });
 
-                App.reposRegion.show(view);
+                App.reposRegion.show(view);*/
+
+                App.renderRepository(Module.repos, "repos-region");
 
                 App.commands.execute("Repos:selectRepo", Module.selectedRepoId);
             });
@@ -40,11 +42,13 @@
 
                 if (repo) {
                     Module.selectedRepoId = repo.get("id");
-                    repo.select();
+                    repo.select(); // force update
                     Module.repos.set("title", repo.get("id"));
                 } else {
                     Module.selectedRepoId = null;
                 }
+
+                App.renderRepository(Module.repos, "repos-region");
             }
         },
 
@@ -75,10 +79,10 @@
         emptyNodeRegions: function () {
 
             // App.repoSearchRegion.empty();
-            App.repoIndexRegion.empty();
-            App.breadcrumbRegion.empty();
-            App.mainRegion.empty();
-            App.pagerRegion.empty();
+            // App.repoIndexRegion.empty();
+            // App.breadcrumbRegion.empty();
+            // App.mainRegion.empty();
+            // App.pagerRegion.empty();
         },
 
         selectNode: function(name) {
@@ -173,9 +177,11 @@
 
             Module.index.searchTerm = searchTerm;
 
+            var searchRegExp = searchTerm ? new RegExp(searchTerm, "i") : null;
+
             Module.index.get("childrenList").each(function (item) {
 
-                var match = !searchTerm || !item.get("name") || item.get("name").search(new RegExp(searchTerm, "i")) > -1;
+                var match = !searchRegExp || !item.get("name") || item.get("name").search(searchRegExp) > -1;
 
                 item.set("visible", match);
 

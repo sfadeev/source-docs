@@ -277,6 +277,7 @@
     <Content Include="assets\js\marionette.handlebars.js" />
     <Content Include="log4net.config" />
     <Content Include="Views\test.cshtml" />
+    <Content Include="Views\index2.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

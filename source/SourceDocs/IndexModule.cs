@@ -8,7 +8,7 @@ namespace SourceDocs
         {
             Get[""] = parameters =>
             {
-                return View["index"];
+                return View["index2"];
             };
 
             Get["/test"] = x =>

@@ -5,12 +5,54 @@ var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var _repos = [];
+var _repos = [],
+	_selected;
 
 var RepoStore = assign({}, EventEmitter.prototype, {
 
   getAll: function() {
     return _repos;
+  },
+
+  find: function(predicate) {
+  	for (var i = 0; i < _repos.length; i++) {
+  		if (predicate(_repos[i])) {
+  			return _repos[i];
+  		}
+  	}
+
+  	return null;
+  },
+
+  select: function(id) {
+  	var selected;
+
+  	if (id) {
+	  	for (var i = 0; i < _repos.length; i++) {
+	  		var item = _repos[i];
+	  		item.selected = (item.id == id);
+	  		if (item.selected) {
+	  			selected = item;
+	  		}
+	  	}
+  	}
+
+  	if (!selected) {
+  		selected = this.find(function (item) {
+  			return item.url != undefined;
+  		});
+  	}
+
+  	if (_selected) _selected.selected = false;
+
+  	if (selected) {
+  		_selected = selected;
+  		_selected.selected = true;
+  		_repos.title = _selected.id;
+  	}
+  	else {
+		_repos.title = null;
+  	}
   },
 
   emitChange: function() {
@@ -37,6 +79,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
     switch(action.actionType) {
       case AppConstants.RECEIVE_REPOSITORIES:
         _repos = action.data;
+        RepoStore.select();
+        RepoStore.emitChange();
+        break;
+
+      case AppConstants.SELECT_REPOSITORY:
+        RepoStore.select(action.id);
         RepoStore.emitChange();
         break;
 
@@ -51,10 +99,5 @@ var RepoStore = assign({}, EventEmitter.prototype, {
     return true; // No errors. Needed by promise in Dispatcher.
   })
 });
-
-/*AppDispatcher.register(function(payload){
-  console.log(payload);
-  return true;
-});*/
 
 module.exports = RepoStore;

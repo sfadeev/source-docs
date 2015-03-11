@@ -29,7 +29,7 @@ var RepositoryList = React.createClass({
     render: function() {
         console.log("RepositoryList.render", this.state);
 
-        // return (<div />);
+        // return null;
 
         var items = this.state.repositories.map(function(item, index) {
             return (
@@ -40,7 +40,7 @@ var RepositoryList = React.createClass({
         return (
             <li className="dropdown">
                 <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                    {this.state.title} 
+                    {this.state.repositories.title} 
                     <span className="caret"></span>
                 </a>
                 <ul className="dropdown-menu" role="menu">

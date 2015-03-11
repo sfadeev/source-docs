@@ -8,6 +8,12 @@ var AppActions = {
       data: data
     })
   },
+  selectRepository: function(id){
+    AppDispatcher.handleViewAction({
+      actionType:AppConstants.SELECT_REPOSITORY,
+      id: id
+    })
+  },
   addItem: function(item){
     AppDispatcher.handleViewAction({
       actionType:AppConstants.ADD_ITEM,

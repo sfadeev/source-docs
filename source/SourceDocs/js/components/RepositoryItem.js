@@ -1,10 +1,12 @@
 /** @jsx React.DOM */
 var React = require('react');
+var AppActions = require('../actions/AppActions');
 
 var RepositoryItem = React.createClass({
     _onClick: function(e) {
         e.preventDefault();
-        console.log("RepositoryItem._onClick", this.props);
+
+        AppActions.selectRepository(this.props.data.id);
         // App.commands.execute("Repos:selectRepo", this.props.data.attributes.id);
     },
     render: function() {

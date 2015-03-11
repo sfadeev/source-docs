@@ -21432,6 +21432,12 @@ var AppActions = {
       data: data
     })
   },
+  selectRepository: function(id){
+    AppDispatcher.handleViewAction({
+      actionType:AppConstants.SELECT_REPOSITORY,
+      id: id
+    })
+  },
   addItem: function(item){
     AppDispatcher.handleViewAction({
       actionType:AppConstants.ADD_ITEM,
@@ -21446,11 +21452,13 @@ module.exports = AppActions
 },{"../constants/AppConstants":170,"../dispatcher/AppDispatcher":171}],167:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+var AppActions = require('../actions/AppActions');
 
 var RepositoryItem = React.createClass({displayName: "RepositoryItem",
     _onClick: function(e) {
         e.preventDefault();
-        console.log("RepositoryItem._onClick", this.props);
+
+        AppActions.selectRepository(this.props.data.id);
         // App.commands.execute("Repos:selectRepo", this.props.data.attributes.id);
     },
     render: function() {
@@ -21479,7 +21487,7 @@ var RepositoryItem = React.createClass({displayName: "RepositoryItem",
 
 module.exports = RepositoryItem;
 
-},{"react":165}],168:[function(require,module,exports){
+},{"../actions/AppActions":166,"react":165}],168:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var RepoStore = require('../stores/RepoStore');
@@ -21511,7 +21519,7 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
     render: function() {
         console.log("RepositoryList.render", this.state);
 
-        // return (<div />);
+        // return null;
 
         var items = this.state.repositories.map(function(item, index) {
             return (
@@ -21522,7 +21530,7 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
         return (
             React.createElement("li", {className: "dropdown"}, 
                 React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, 
-                    this.state.title, 
+                    this.state.repositories.title, 
                     React.createElement("span", {className: "caret"})
                 ), 
                 React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -21566,6 +21574,7 @@ module.exports = App;
 },{"../actions/AppActions":166,"../stores/AppStore":173,"./RepositoryList":168,"react":165}],170:[function(require,module,exports){
 module.exports = {
   RECEIVE_REPOSITORIES: 'RECEIVE_REPOSITORIES',
+  SELECT_REPOSITORY: 'SELECT_REPOSITORY',
   ADD_ITEM: 'ADD_ITEM',
   REMOVE_ITEM: 'REMOVE_ITEM'
 };
@@ -21654,12 +21663,54 @@ var assign = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var _repos = [];
+var _repos = [],
+	_selected;
 
 var RepoStore = assign({}, EventEmitter.prototype, {
 
   getAll: function() {
     return _repos;
+  },
+
+  find: function(predicate) {
+  	for (var i = 0; i < _repos.length; i++) {
+  		if (predicate(_repos[i])) {
+  			return _repos[i];
+  		}
+  	}
+
+  	return null;
+  },
+
+  select: function(id) {
+  	var selected;
+
+  	if (id) {
+	  	for (var i = 0; i < _repos.length; i++) {
+	  		var item = _repos[i];
+	  		item.selected = (item.id == id);
+	  		if (item.selected) {
+	  			selected = item;
+	  		}
+	  	}
+  	}
+
+  	if (!selected) {
+  		selected = this.find(function (item) {
+  			return item.url != undefined;
+  		});
+  	}
+
+  	if (_selected) _selected.selected = false;
+
+  	if (selected) {
+  		_selected = selected;
+  		_selected.selected = true;
+  		_repos.title = _selected.id;
+  	}
+  	else {
+		_repos.title = null;
+  	}
   },
 
   emitChange: function() {
@@ -21686,6 +21737,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
     switch(action.actionType) {
       case AppConstants.RECEIVE_REPOSITORIES:
         _repos = action.data;
+        RepoStore.select();
+        RepoStore.emitChange();
+        break;
+
+      case AppConstants.SELECT_REPOSITORY:
+        RepoStore.select(action.id);
         RepoStore.emitChange();
         break;
 
@@ -21700,11 +21757,6 @@ var RepoStore = assign({}, EventEmitter.prototype, {
     return true; // No errors. Needed by promise in Dispatcher.
   })
 });
-
-/*AppDispatcher.register(function(payload){
-  console.log(payload);
-  return true;
-});*/
 
 module.exports = RepoStore;
 

@@ -21437,25 +21437,78 @@ var AppActions = {
       actionType:AppConstants.SELECT_REPOSITORY,
       id: id
     })
+  },
+  selectRepositoryBranch: function(id){
+    AppDispatcher.handleViewAction({
+      actionType:AppConstants.SELECT_REPOSITORY_BRANCH,
+      id: id
+    })
   }
 }
 
 module.exports = AppActions
 
 
-},{"../constants/AppConstants":169,"../dispatcher/AppDispatcher":170}],167:[function(require,module,exports){
+},{"../constants/AppConstants":171,"../dispatcher/AppDispatcher":172}],167:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
-var AppActions = require('../actions/AppActions');
-var RepoStore = require('../stores/RepoStore');
-// var RepositoryItem = require('./RepositoryItem');
+var RepositoryBranchItem = React.createClass({displayName: "RepositoryBranchItem",
+    
+    _onClick: function(e) {
+        e.preventDefault();
 
-function getState() {
-  return {
-    repositories: RepoStore.getRepositories()
-  };
-}
+        this.props.onSelect(this.props.data);
+    },
+
+    render: function() {
+
+        var className = this.props.data.selected ? "active" : "";
+
+        return (
+            React.createElement("li", {className: className}, 
+                React.createElement("a", {href: "#" + this.props.data.name, onClick: this._onClick}, 
+                    this.props.data.name
+                )
+            )
+        );
+    }
+});
+
+var RepositoryBranchList = React.createClass({displayName: "RepositoryBranchList",
+
+    render: function() {
+
+        if (this.props.data) {
+            var items = this.props.data.nodes.map(function(item, index) {
+                return (
+                  React.createElement(RepositoryBranchItem, {data: item, onSelect: this.props.onSelect})
+                );
+            }, this);
+            
+            return (
+                React.createElement("li", {className: "dropdown"}, 
+                    React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, 
+                        this.props.data.nodes.title, 
+                        React.createElement("span", {className: "caret"})
+                    ), 
+                    React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+                        items
+                    )
+                )
+            );
+        }
+
+        return null;
+    },
+
+});
+
+module.exports = RepositoryBranchList;
+
+},{"react":165}],168:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
 
 var RepositoryItem = React.createClass({displayName: "RepositoryItem",
     
@@ -21466,14 +21519,13 @@ var RepositoryItem = React.createClass({displayName: "RepositoryItem",
     },
 
     render: function() {
-        // console.log("RepositoryItem.render", this.props);
 
         if (this.props.data.url) {
             var className = this.props.data.selected ? "active" : "";
 
             return (
                 React.createElement("li", {className: className}, 
-                    React.createElement("a", {href: this.props.data.url, onClick: this._onClick}, 
+                    React.createElement("a", {href: this.props.data.id, onClick: this._onClick}, 
                         this.props.data.id
                     )
                 )
@@ -21491,12 +21543,60 @@ var RepositoryItem = React.createClass({displayName: "RepositoryItem",
 
 var RepositoryList = React.createClass({displayName: "RepositoryList",
 
+    render: function() {
+
+        var items = this.props.data.map(function(item, index) {
+            return (
+              React.createElement(RepositoryItem, {data: item, onSelect: this.props.onSelect})
+            );
+        }, this);
+        
+        return (
+            React.createElement("li", {className: "dropdown"}, 
+                React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, 
+                    this.props.data.title, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+                    items
+                )
+            )
+        );
+    },
+
+});
+
+module.exports = RepositoryList;
+
+},{"react":165}],169:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
+var AppActions = require('../actions/AppActions');
+var RepoStore = require('../stores/RepoStore');
+
+var RepositoryList = require('./RepositoryList');
+var RepositoryBranchList = require('./RepositoryBranchList');
+
+function getState() {
+  return {
+    repositories: RepoStore.getRepositories(),
+    selectedRepository: RepoStore.getSelectedRepository()
+  };
+}
+
+var RepositorySelector = React.createClass({displayName: "RepositorySelector",
+
     _onChange: function() {
         this.setState(getState());
     },
 
-    _onSelect: function(item) {
+    _onSelectRepository: function(item) {
         AppActions.selectRepository(item.id);
+    },
+
+    _onSelectRepositoryBranch: function(item) {
+        AppActions.selectRepositoryBranch(item.name);
     },
 
     getInitialState: function() {
@@ -21515,50 +21615,31 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
     * @return {object}
     */
     render: function() {
-        console.log("RepositoryList.render", this.state);
+        console.log("RepositorySelector.render", this.state);
 
-        // return null;
-
-        var items = this.state.repositories.map(function(item, index) {
-            return (
-              React.createElement(RepositoryItem, {data: item, onSelect: this._onSelect})
-            );
-        }, this);
-        
         return (
-            React.createElement("li", {className: "dropdown"}, 
-                React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, 
-                    this.state.repositories.title, 
-                    React.createElement("span", {className: "caret"})
-                ), 
-                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                    items
-                )
+            React.createElement("ul", {className: "nav navbar-nav"}, 
+                React.createElement(RepositoryList, {data: this.state.repositories, onSelect: this._onSelectRepository}), 
+                React.createElement(RepositoryBranchList, {data: this.state.selectedRepository, onSelect: this._onSelectRepositoryBranch})
             )
         );
     },
 
 });
 
-module.exports = RepositoryList;
+module.exports = RepositorySelector;
 
-},{"../actions/AppActions":166,"../stores/RepoStore":173,"react":165}],168:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":174,"./RepositoryBranchList":167,"./RepositoryList":168,"react":165}],170:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+
 var AppActions = require('../actions/AppActions');
-var AppStore = require('../stores/AppStore');
-var RepositoryList = require('./RepositoryList');
+var RepositorySelector = require('./RepositorySelector');
 
 var App = React.createClass({displayName: "App",
-    /*handleClick:function(){
-      AppActions.addItem('this is the item');
-    },*/
     render:function(){
       return (
-        React.createElement(RepositoryList, null)
-        /*<div className="wrapper">
-          <h3 onClick={this.handleClick}>Click this Title, then check console</h3>
-        </div>*/
+        React.createElement(RepositorySelector, null)
       )
     }
   });
@@ -21566,14 +21647,15 @@ var App = React.createClass({displayName: "App",
 module.exports = App;
 
 
-},{"../actions/AppActions":166,"../stores/AppStore":172,"./RepositoryList":167,"react":165}],169:[function(require,module,exports){
+},{"../actions/AppActions":166,"./RepositorySelector":169,"react":165}],171:[function(require,module,exports){
 module.exports = {
   LOAD_REPOSITORIES: 'LOAD_REPOSITORIES',
-  SELECT_REPOSITORY: 'SELECT_REPOSITORY'
+  SELECT_REPOSITORY: 'SELECT_REPOSITORY',
+  SELECT_REPOSITORY_BRANCH: 'SELECT_REPOSITORY_BRANCH'
 };
 
 
-},{}],170:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('object-assign');
 
@@ -21608,7 +21690,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 module.exports = AppDispatcher;
 
 
-},{"flux":14,"object-assign":19}],171:[function(require,module,exports){
+},{"flux":14,"object-assign":19}],173:[function(require,module,exports){
 /** @jsx React.DOM */
 // var jQuery = require('jquery-browserify');
 var bootstrap = require('bootstrap');
@@ -21627,30 +21709,7 @@ React.render(
 WebApiUtils.getRepositories();
 
 
-},{"./components/app.js":168,"./utils/WebApiUtils.js":174,"bootstrap":1,"react":165}],172:[function(require,module,exports){
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var EventEmitter = require('events').EventEmitter;
-var AppConstants = require('../constants/AppConstants');
-var assign = require('object-assign');
-
-
-var CHANGE_EVENT = 'change';
-
-var AppStore = assign({}, EventEmitter.prototype, {
-  emitChange: function() {
-    this.emit(CHANGE_EVENT);
-  }
-});
-
-AppDispatcher.register(function(payload){
-  // console.log(payload);
-  return true;
-});
-
-module.exports = AppStore;
-
-
-},{"../constants/AppConstants":169,"../dispatcher/AppDispatcher":170,"events":17,"object-assign":19}],173:[function(require,module,exports){
+},{"./components/app.js":170,"./utils/WebApiUtils.js":175,"bootstrap":1,"react":165}],174:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
@@ -21659,8 +21718,9 @@ var AppConstants = require('../constants/AppConstants');
 
 var CHANGE_EVENT = 'change';
 
-var _repos = [],
-	_selected;
+var _repositories = [],
+	_selectedRepositoryId,
+	_selectedRepositoryBranchId;
 
 var RepoStore = assign({}, EventEmitter.prototype, {
 
@@ -21675,39 +21735,83 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		return null;
 	},
 
+	setRepositories: function(data) {
+
+		_repositories = data;
+
+		this.selectRepository();
+	},
+
 	getRepositories: function() {
-		return _repos;
+		return _repositories;
 	},
 
 	selectRepository: function(id) {
-		var selected;
+		var selected = this.getSelectedRepository();
+
+	  	if (selected) {
+	  		selected.selected = false;
+	  		selected = null;
+	  	}
 
 		if (id) {
-		  	for (var i = 0; i < _repos.length; i++) {
-		  		var item = _repos[i];
-		  		item.selected = (item.id == id);
-		  		if (item.selected) {
-		  			selected = item;
-		  		}
-		  	}
+			selected = this._find(_repositories, function (item) {
+	  			return item.id == id;
+	  		});
 		}
 
 	  	if (!selected) {
-	  		selected = this._find(_repos, function (item) {
+	  		selected = this._find(_repositories, function (item) {
 	  			return item.url != undefined;
 	  		});
 	  	}
 
-	  	if (_selected) _selected.selected = false;
-
 	  	if (selected) {
-	  		_selected = selected;
-	  		_selected.selected = true;
-	  		_repos.title = _selected.id;
+	  		selected.selected = true;
+
+	  		_selectedRepositoryId = selected.id;
+	  		_repositories.title = selected.id;
 	  	}
 	  	else {
-			_repos.title = null;
+	  		_selectedRepositoryId = null;
+			_repositories.title = null;
 	  	}
+
+	  	this.selectRepositoryBranch();
+	},
+
+	selectRepositoryBranch: function(id) {
+
+		var selected,
+			selectedRepository = this.getSelectedRepository();
+		
+		if (selectedRepository) {
+			if (id) {
+				selected = this._find(selectedRepository.nodes, function (item) {
+		  			return item.name == id;
+		  		});
+	  		}
+
+		  	if (!selected && selectedRepository.nodes.length > 0) {
+		  		selected = this._find(selectedRepository.nodes, function (item) {
+		  			return item.name == "master";
+		  		}) || selectedRepository.nodes[0];
+		  	}
+
+	  		if (selected) {
+	  			selected.selected = true;
+	  			selectedRepository.nodes.title = selected.name;
+	  		}
+		}
+	},
+
+	getSelectedRepository: function() {
+		if (_selectedRepositoryId) {
+			return this._find(_repositories, function (item) {
+	  			return item.id == _selectedRepositoryId;
+	  		});
+  		}
+  		return null;
 	},
 
 	emitChange: function() {
@@ -21733,13 +21837,17 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 		switch(action.actionType) {
 			case AppConstants.LOAD_REPOSITORIES:
-				_repos = action.data;
-				RepoStore.selectRepository();
+				RepoStore.setRepositories(action.data);
 				RepoStore.emitChange();
 				break;
 
 			case AppConstants.SELECT_REPOSITORY:
 				RepoStore.selectRepository(action.id);
+				RepoStore.emitChange();
+				break;
+
+			case AppConstants.SELECT_REPOSITORY_BRANCH:
+				RepoStore.selectRepositoryBranch(action.id);
 				RepoStore.emitChange();
 				break;
 		}
@@ -21751,7 +21859,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 module.exports = RepoStore;
 
 
-},{"../constants/AppConstants":169,"../dispatcher/AppDispatcher":170,"events":17,"object-assign":19}],174:[function(require,module,exports){
+},{"../constants/AppConstants":171,"../dispatcher/AppDispatcher":172,"events":17,"object-assign":19}],175:[function(require,module,exports){
 // var $ = require('jquery');
 var AppActions = require('../actions/AppActions');
 
@@ -21767,4 +21875,4 @@ module.exports = {
 
 };
 
-},{"../actions/AppActions":166}]},{},[171])
+},{"../actions/AppActions":166}]},{},[173])

@@ -6,8 +6,9 @@ var AppConstants = require('../constants/AppConstants');
 
 var CHANGE_EVENT = 'change';
 
-var _repos = [],
-	_selected;
+var _repositories = [],
+	_selectedRepositoryId,
+	_selectedRepositoryBranchId;
 
 var RepoStore = assign({}, EventEmitter.prototype, {
 
@@ -22,39 +23,83 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		return null;
 	},
 
+	setRepositories: function(data) {
+
+		_repositories = data;
+
+		this.selectRepository();
+	},
+
 	getRepositories: function() {
-		return _repos;
+		return _repositories;
 	},
 
 	selectRepository: function(id) {
-		var selected;
+		var selected = this.getSelectedRepository();
+
+	  	if (selected) {
+	  		selected.selected = false;
+	  		selected = null;
+	  	}
 
 		if (id) {
-		  	for (var i = 0; i < _repos.length; i++) {
-		  		var item = _repos[i];
-		  		item.selected = (item.id == id);
-		  		if (item.selected) {
-		  			selected = item;
-		  		}
-		  	}
+			selected = this._find(_repositories, function (item) {
+	  			return item.id == id;
+	  		});
 		}
 
 	  	if (!selected) {
-	  		selected = this._find(_repos, function (item) {
+	  		selected = this._find(_repositories, function (item) {
 	  			return item.url != undefined;
 	  		});
 	  	}
 
-	  	if (_selected) _selected.selected = false;
-
 	  	if (selected) {
-	  		_selected = selected;
-	  		_selected.selected = true;
-	  		_repos.title = _selected.id;
+	  		selected.selected = true;
+
+	  		_selectedRepositoryId = selected.id;
+	  		_repositories.title = selected.id;
 	  	}
 	  	else {
-			_repos.title = null;
+	  		_selectedRepositoryId = null;
+			_repositories.title = null;
 	  	}
+
+	  	this.selectRepositoryBranch();
+	},
+
+	selectRepositoryBranch: function(id) {
+
+		var selected,
+			selectedRepository = this.getSelectedRepository();
+		
+		if (selectedRepository) {
+			if (id) {
+				selected = this._find(selectedRepository.nodes, function (item) {
+		  			return item.name == id;
+		  		});
+	  		}
+
+		  	if (!selected && selectedRepository.nodes.length > 0) {
+		  		selected = this._find(selectedRepository.nodes, function (item) {
+		  			return item.name == "master";
+		  		}) || selectedRepository.nodes[0];
+		  	}
+
+	  		if (selected) {
+	  			selected.selected = true;
+	  			selectedRepository.nodes.title = selected.name;
+	  		}
+		}
+	},
+
+	getSelectedRepository: function() {
+		if (_selectedRepositoryId) {
+			return this._find(_repositories, function (item) {
+	  			return item.id == _selectedRepositoryId;
+	  		});
+  		}
+  		return null;
 	},
 
 	emitChange: function() {
@@ -80,13 +125,17 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 		switch(action.actionType) {
 			case AppConstants.LOAD_REPOSITORIES:
-				_repos = action.data;
-				RepoStore.selectRepository();
+				RepoStore.setRepositories(action.data);
 				RepoStore.emitChange();
 				break;
 
 			case AppConstants.SELECT_REPOSITORY:
 				RepoStore.selectRepository(action.id);
+				RepoStore.emitChange();
+				break;
+
+			case AppConstants.SELECT_REPOSITORY_BRANCH:
+				RepoStore.selectRepositoryBranch(action.id);
 				RepoStore.emitChange();
 				break;
 		}

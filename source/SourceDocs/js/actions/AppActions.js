@@ -13,6 +13,12 @@ var AppActions = {
       actionType:AppConstants.SELECT_REPOSITORY,
       id: id
     })
+  },
+  selectRepositoryBranch: function(id){
+    AppDispatcher.handleViewAction({
+      actionType:AppConstants.SELECT_REPOSITORY_BRANCH,
+      id: id
+    })
   }
 }
 

@@ -8,9 +8,9 @@ var React = require('react');
 var App = require('./components/app.js');
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
-WebApiUtils.getRepositories();
-
 React.render(
   <App />,
   document.getElementById('main')
 );
+
+WebApiUtils.getRepositories();

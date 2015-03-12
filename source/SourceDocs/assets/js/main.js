@@ -21428,7 +21428,7 @@ var AppConstants = require('../constants/AppConstants');
 var AppActions = {
   receiveRepositories: function(data){
     AppDispatcher.handleServerAction({
-      actionType:AppConstants.RECEIVE_REPOSITORIES,
+      actionType:AppConstants.LOAD_REPOSITORIES,
       data: data
     })
   },
@@ -21437,30 +21437,34 @@ var AppActions = {
       actionType:AppConstants.SELECT_REPOSITORY,
       id: id
     })
-  },
-  addItem: function(item){
-    AppDispatcher.handleViewAction({
-      actionType:AppConstants.ADD_ITEM,
-      item: item
-    })
   }
 }
 
 module.exports = AppActions
 
 
-},{"../constants/AppConstants":170,"../dispatcher/AppDispatcher":171}],167:[function(require,module,exports){
+},{"../constants/AppConstants":169,"../dispatcher/AppDispatcher":170}],167:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+
 var AppActions = require('../actions/AppActions');
+var RepoStore = require('../stores/RepoStore');
+// var RepositoryItem = require('./RepositoryItem');
+
+function getState() {
+  return {
+    repositories: RepoStore.getRepositories()
+  };
+}
 
 var RepositoryItem = React.createClass({displayName: "RepositoryItem",
+    
     _onClick: function(e) {
         e.preventDefault();
 
-        AppActions.selectRepository(this.props.data.id);
-        // App.commands.execute("Repos:selectRepo", this.props.data.attributes.id);
+        this.props.onSelect(this.props.data);
     },
+
     render: function() {
         // console.log("RepositoryItem.render", this.props);
 
@@ -21485,21 +21489,15 @@ var RepositoryItem = React.createClass({displayName: "RepositoryItem",
     }
 });
 
-module.exports = RepositoryItem;
-
-},{"../actions/AppActions":166,"react":165}],168:[function(require,module,exports){
-/** @jsx React.DOM */
-var React = require('react');
-var RepoStore = require('../stores/RepoStore');
-var RepositoryItem = require('./RepositoryItem');
-
-function getState() {
-  return {
-    repositories: RepoStore.getAll()
-  };
-}
-
 var RepositoryList = React.createClass({displayName: "RepositoryList",
+
+    _onChange: function() {
+        this.setState(getState());
+    },
+
+    _onSelect: function(item) {
+        AppActions.selectRepository(item.id);
+    },
 
     getInitialState: function() {
         return getState();
@@ -21523,9 +21521,9 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
 
         var items = this.state.repositories.map(function(item, index) {
             return (
-              React.createElement(RepositoryItem, {data: item})
+              React.createElement(RepositoryItem, {data: item, onSelect: this._onSelect})
             );
-        });
+        }, this);
         
         return (
             React.createElement("li", {className: "dropdown"}, 
@@ -21540,14 +21538,11 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
         );
     },
 
-    _onChange: function() {
-        this.setState(getState());
-    }
 });
 
 module.exports = RepositoryList;
 
-},{"../stores/RepoStore":174,"./RepositoryItem":167,"react":165}],169:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":173,"react":165}],168:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var AppActions = require('../actions/AppActions');
@@ -21571,16 +21566,14 @@ var App = React.createClass({displayName: "App",
 module.exports = App;
 
 
-},{"../actions/AppActions":166,"../stores/AppStore":173,"./RepositoryList":168,"react":165}],170:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/AppStore":172,"./RepositoryList":167,"react":165}],169:[function(require,module,exports){
 module.exports = {
-  RECEIVE_REPOSITORIES: 'RECEIVE_REPOSITORIES',
-  SELECT_REPOSITORY: 'SELECT_REPOSITORY',
-  ADD_ITEM: 'ADD_ITEM',
-  REMOVE_ITEM: 'REMOVE_ITEM'
+  LOAD_REPOSITORIES: 'LOAD_REPOSITORIES',
+  SELECT_REPOSITORY: 'SELECT_REPOSITORY'
 };
 
 
-},{}],171:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('object-assign');
 
@@ -21594,6 +21587,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'SERVER_ACTION',
       action: action
     };
+    console.log("AppDispatcher.handleServerAction", payload);
     this.dispatch(payload);
   },
 
@@ -21606,6 +21600,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'VIEW_ACTION',
       action: action
     };
+    console.log("AppDispatcher.handleViewAction", payload);
     this.dispatch(payload);
   }
 });
@@ -21613,7 +21608,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 module.exports = AppDispatcher;
 
 
-},{"flux":14,"object-assign":19}],172:[function(require,module,exports){
+},{"flux":14,"object-assign":19}],171:[function(require,module,exports){
 /** @jsx React.DOM */
 // var jQuery = require('jquery-browserify');
 var bootstrap = require('bootstrap');
@@ -21624,15 +21619,15 @@ var React = require('react');
 var App = require('./components/app.js');
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
-WebApiUtils.getRepositories();
-
 React.render(
   React.createElement(App, null),
   document.getElementById('main')
 );
 
+WebApiUtils.getRepositories();
 
-},{"./components/app.js":169,"./utils/WebApiUtils.js":175,"bootstrap":1,"react":165}],173:[function(require,module,exports){
+
+},{"./components/app.js":168,"./utils/WebApiUtils.js":174,"bootstrap":1,"react":165}],172:[function(require,module,exports){
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var AppConstants = require('../constants/AppConstants');
@@ -21648,18 +21643,19 @@ var AppStore = assign({}, EventEmitter.prototype, {
 });
 
 AppDispatcher.register(function(payload){
-  console.log(payload);
+  // console.log(payload);
   return true;
 });
 
 module.exports = AppStore;
 
 
-},{"../constants/AppConstants":170,"../dispatcher/AppDispatcher":171,"events":17,"object-assign":19}],174:[function(require,module,exports){
-var AppDispatcher = require('../dispatcher/AppDispatcher');
+},{"../constants/AppConstants":169,"../dispatcher/AppDispatcher":170,"events":17,"object-assign":19}],173:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
-var AppConstants = require('../constants/AppConstants');
 var assign = require('object-assign');
+
+var AppDispatcher = require('../dispatcher/AppDispatcher');
+var AppConstants = require('../constants/AppConstants');
 
 var CHANGE_EVENT = 'change';
 
@@ -21668,100 +21664,94 @@ var _repos = [],
 
 var RepoStore = assign({}, EventEmitter.prototype, {
 
-  getAll: function() {
-    return _repos;
-  },
+	// todo: use array.find
+	_find: function(array, predicate) {
+		for (var i = 0; i < array.length; i++) {
+			if (predicate(array[i])) {
+				return array[i];
+			}
+		}
 
-  find: function(predicate) {
-  	for (var i = 0; i < _repos.length; i++) {
-  		if (predicate(_repos[i])) {
-  			return _repos[i];
-  		}
-  	}
+		return null;
+	},
 
-  	return null;
-  },
+	getRepositories: function() {
+		return _repos;
+	},
 
-  select: function(id) {
-  	var selected;
+	selectRepository: function(id) {
+		var selected;
 
-  	if (id) {
-	  	for (var i = 0; i < _repos.length; i++) {
-	  		var item = _repos[i];
-	  		item.selected = (item.id == id);
-	  		if (item.selected) {
-	  			selected = item;
-	  		}
+		if (id) {
+		  	for (var i = 0; i < _repos.length; i++) {
+		  		var item = _repos[i];
+		  		item.selected = (item.id == id);
+		  		if (item.selected) {
+		  			selected = item;
+		  		}
+		  	}
+		}
+
+	  	if (!selected) {
+	  		selected = this._find(_repos, function (item) {
+	  			return item.url != undefined;
+	  		});
 	  	}
-  	}
 
-  	if (!selected) {
-  		selected = this.find(function (item) {
-  			return item.url != undefined;
-  		});
-  	}
+	  	if (_selected) _selected.selected = false;
 
-  	if (_selected) _selected.selected = false;
+	  	if (selected) {
+	  		_selected = selected;
+	  		_selected.selected = true;
+	  		_repos.title = _selected.id;
+	  	}
+	  	else {
+			_repos.title = null;
+	  	}
+	},
 
-  	if (selected) {
-  		_selected = selected;
-  		_selected.selected = true;
-  		_repos.title = _selected.id;
-  	}
-  	else {
-		_repos.title = null;
-  	}
-  },
+	emitChange: function() {
+		this.emit(CHANGE_EVENT);
+	},
 
-  emitChange: function() {
-    this.emit(CHANGE_EVENT);
-  },
+	/**
+	* @param {function} callback
+	*/
+	addChangeListener: function(callback) {
+		this.on(CHANGE_EVENT, callback);
+	},
 
-  /**
-   * @param {function} callback
-   */
-  addChangeListener: function(callback) {
-    this.on(CHANGE_EVENT, callback);
-  },
+	/**
+	* @param {function} callback
+	*/
+	removeChangeListener: function(callback) {
+		this.removeListener(CHANGE_EVENT, callback);
+	},
 
-  /**
-   * @param {function} callback
-   */
-  removeChangeListener: function(callback) {
-    this.removeListener(CHANGE_EVENT, callback);
-  },
+	dispatcherIndex: AppDispatcher.register(function(payload) {
+		var action = payload.action;
 
-  dispatcherIndex: AppDispatcher.register(function(payload) {
-    var action = payload.action;
+		switch(action.actionType) {
+			case AppConstants.LOAD_REPOSITORIES:
+				_repos = action.data;
+				RepoStore.selectRepository();
+				RepoStore.emitChange();
+				break;
 
-    switch(action.actionType) {
-      case AppConstants.RECEIVE_REPOSITORIES:
-        _repos = action.data;
-        RepoStore.select();
-        RepoStore.emitChange();
-        break;
+			case AppConstants.SELECT_REPOSITORY:
+				RepoStore.selectRepository(action.id);
+				RepoStore.emitChange();
+				break;
+		}
 
-      case AppConstants.SELECT_REPOSITORY:
-        RepoStore.select(action.id);
-        RepoStore.emitChange();
-        break;
-
-      /*case TodoConstants.TODO_DESTROY:
-        destroy(action.id);
-        TodoStore.emitChange();
-        break;*/
-
-      // add more cases for other actionTypes, like TODO_UPDATE, etc.
-    }
-
-    return true; // No errors. Needed by promise in Dispatcher.
-  })
+		return true; // No errors. Needed by promise in Dispatcher.
+	})
 });
 
 module.exports = RepoStore;
 
 
-},{"../constants/AppConstants":170,"../dispatcher/AppDispatcher":171,"events":17,"object-assign":19}],175:[function(require,module,exports){
+},{"../constants/AppConstants":169,"../dispatcher/AppDispatcher":170,"events":17,"object-assign":19}],174:[function(require,module,exports){
 // var $ = require('jquery');
 var AppActions = require('../actions/AppActions');
 
@@ -21777,4 +21767,4 @@ module.exports = {
 
 };
 
-},{"../actions/AppActions":166}]},{},[172])
+},{"../actions/AppActions":166}]},{},[171])

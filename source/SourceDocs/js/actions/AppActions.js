@@ -4,7 +4,7 @@ var AppConstants = require('../constants/AppConstants');
 var AppActions = {
   receiveRepositories: function(data){
     AppDispatcher.handleServerAction({
-      actionType:AppConstants.RECEIVE_REPOSITORIES,
+      actionType:AppConstants.LOAD_REPOSITORIES,
       data: data
     })
   },
@@ -12,12 +12,6 @@ var AppActions = {
     AppDispatcher.handleViewAction({
       actionType:AppConstants.SELECT_REPOSITORY,
       id: id
-    })
-  },
-  addItem: function(item){
-    AppDispatcher.handleViewAction({
-      actionType:AppConstants.ADD_ITEM,
-      item: item
     })
   }
 }

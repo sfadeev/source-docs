@@ -3,10 +3,12 @@ var assign = require('object-assign');
 
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
+var WebApiUtils = require('../utils/WebApiUtils.js');
 
 var CHANGE_EVENT = 'change';
 
 var _repositories = [],
+	_repositoryIndex = {},
 	_selectedRepositoryId,
 	_selectedRepositoryBranchId;
 
@@ -28,6 +30,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		_repositories = data;
 
 		this.selectRepository();
+	},
+
+	setRepositoryIndex: function(data) {
+
+		_repositoryIndex = data;
+
 	},
 
 	getRepositories: function() {
@@ -98,6 +106,8 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	  			_selectedRepositoryBranchId = selected.name;
 	  			selectedRepository.nodes.title = selected.name;
+
+	  			WebApiUtils.loadRepositoryIndex(_selectedRepositoryId, _selectedRepositoryBranchId);
 	  		}
 	  		else {
 	  			_selectedRepositoryBranchId = null;
@@ -127,6 +137,10 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		return null;
 	},
 
+	getSelectedRepositoryIndex: function() {
+		return _repositoryIndex;
+	},
+
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
 	},
@@ -151,6 +165,11 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		switch(action.actionType) {
 			case AppConstants.LOAD_REPOSITORIES:
 				RepoStore.setRepositories(action.data);
+				RepoStore.emitChange();
+				break;
+
+			case AppConstants.LOAD_REPOSITORY_INDEX:
+				RepoStore.setRepositoryIndex(action.data);
 				RepoStore.emitChange();
 				break;
 

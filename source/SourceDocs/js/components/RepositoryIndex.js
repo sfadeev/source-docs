@@ -1,82 +1,42 @@
-﻿var RepositoryList = React.createClass({
-    render: function() {
-        // console.log("RepositoryList.render", this.props);
+﻿/** @jsx React.DOM */
+var React = require('react');
 
-        var items = this.props.data.attributes.items.map(function(item, index) {
-            return (
-              <RepositoryItem data={item} />
-            );
-        });
-        
-        return (
-            <li className="dropdown">
-                <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                    {this.props.data.attributes.title} 
-                    <span className="caret"></span>
-                </a>
-                <ul className="dropdown-menu" role="menu">
-                    {items}
-                </ul>
-            </li>
-        );
-    }
-});
+var AppActions = require('../actions/AppActions');
+var RepoStore = require('../stores/RepoStore');
 
-var RepositoryItem = React.createClass({
-    _onClick: function(e) {
-        e.preventDefault();
-
-        App.commands.execute("Repos:selectRepo", this.props.data.attributes.id);
-    },
-    render: function() {
-        // console.log("RepositoryItem.render", this.props);
-
-        if (this.props.data.attributes.url) {
-            var className = this.props.data.selected ? "active" : "";
-
-            return (
-                <li className={className}>
-                    <a href={this.props.data.attributes.url} onClick={this._onClick}>
-                        {this.props.data.attributes.id}
-                    </a>
-                </li>
-            );
-        }
-        else {
-            return (
-                <li className="dropdown-header">
-                    {this.props.data.attributes.id}
-                </li>
-            );
-        }
-    }
-});
+function getState() {
+  return {
+    index: RepoStore.getSelectedRepositoryIndex()
+  };
+}
 
 var RepositoryIndexItem = React.createClass({
+
     _onClick: function(e) {
         e.preventDefault();
 
-        App.Repos.List.trigger("Repos.List:selectIndexItem", this.props.data);
+        // App.Repos.List.trigger("Repos.List:selectIndexItem", this.props.data);
     },
+
     render: function() {
         // console.log("RepositoryIndexItem.render", this.props);
         
         var children;
 
-        if (this.props.data.attributes.children) {
+        if (this.props.data.children) {
             children = (
-                <RepositoryIndexList children={this.props.data.attributes.children} />
+                <RepositoryIndexList children={this.props.data.children} />
             );
         }
 
-        var className = "nav-level-" + this.props.data.attributes.level;
+        var className = "nav-level-" + this.props.data.level;
         if (this.props.data.selected) className += " active";
-        if (this.props.data.attributes.visible == false) className += " hidden";
+        if (this.props.data.visible == false) className += " hidden";
 
         return (
             <li className={className}>
-                <a href={this.props.data.attributes.path} onClick={this._onClick}>
-                    {this.props.data.attributes.name}
+                <a href={this.props.data.path} onClick={this._onClick}>
+                    {this.props.data.name}
                 </a>
                 {children}
             </li>
@@ -85,6 +45,7 @@ var RepositoryIndexItem = React.createClass({
 });
 
 var RepositoryIndexList = React.createClass({
+
     render: function() {
         // console.log("RepositoryIndexList.render", this.props);
 
@@ -102,7 +63,38 @@ var RepositoryIndexList = React.createClass({
     }
 });
 
-App.renderRepository = function(model, elementId) {
+var RepositoryIndex = React.createClass({
+ 
+     getInitialState: function() {
+        return getState();
+    },
+
+    componentDidMount: function() {
+        RepoStore.addChangeListener(this._onChange);
+    },
+
+    componentWillUnmount: function() {
+        RepoStore.removeChangeListener(this._onChange);
+    },
+
+    _onChange: function() {
+        this.setState(getState());
+    },
+
+    render: function() {
+        console.log("RepositoryIndex.render", this.state);
+
+        if (this.state.index && this.state.index.children) {
+            return (
+              <RepositoryIndexList children={this.state.index.children} />
+            );
+        }
+
+        return null;
+    }
+});
+
+/*App.renderRepository = function(model, elementId) {
     React.render(
       <RepositoryList data={model} />, document.getElementById(elementId)
     );
@@ -112,4 +104,6 @@ App.renderRepositoryIndex = function(model, elementId) {
     React.render(
       <RepositoryIndexList children={model.get("children")} />, document.getElementById(elementId)
     );
-}
+}*/
+
+module.exports = RepositoryIndex;

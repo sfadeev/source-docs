@@ -21562,11 +21562,11 @@ var RepositoryIndexItem = React.createClass({displayName: "RepositoryIndexItem",
 
         if (this.props.data.children) {
             children = (
-                React.createElement(RepositoryIndexList, {children: this.props.data.children})
+                React.createElement(RepositoryIndexList, {children: this.props.data.children, level: this.props.level + 1})
             );
         }
 
-        var className = "nav-level-" + this.props.data.level;
+        var className = "nav-level-" + this.props.level;
         if (this.props.data.selected) className += " active";
         if (this.props.data.visible == false) className += " hidden";
 
@@ -21588,9 +21588,9 @@ var RepositoryIndexList = React.createClass({displayName: "RepositoryIndexList",
 
         var items = this.props.children.map(function(item, index) {
             return (
-              React.createElement(RepositoryIndexItem, {data: item})
+              React.createElement(RepositoryIndexItem, {data: item, level: this.props.level + 1})
             );
-        });
+        }, this);
 
         return (
             React.createElement("ul", {className: "nav"}, 
@@ -21619,11 +21619,11 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
     },
 
     render: function() {
-        console.log("RepositoryIndex.render", this.state);
+        // console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (
-              React.createElement(RepositoryIndexList, {children: this.state.index.children})
+              React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 0})
             );
         }
 
@@ -21726,17 +21726,6 @@ function getState() {
 
 var RepositorySelector = React.createClass({displayName: "RepositorySelector",
 
-    _onChange: function() {
-        this.setState(getState());
-    },
-
-    _onSelectRepository: function(repository) {
-        AppActions.selectRepository(repository.id);
-    },
-
-    _onSelectRepositoryBranch: function(branch) {
-        AppActions.selectRepositoryBranch(branch.name);
-    },
 
     getInitialState: function() {
         return getState();
@@ -21750,11 +21739,23 @@ var RepositorySelector = React.createClass({displayName: "RepositorySelector",
         RepoStore.removeChangeListener(this._onChange);
     },
 
+    _onChange: function() {
+        this.setState(getState());
+    },
+
+    _onSelectRepository: function(repository) {
+        AppActions.selectRepository(repository.id);
+    },
+
+    _onSelectRepositoryBranch: function(branch) {
+        AppActions.selectRepositoryBranch(branch.name);
+    },
+
     /**
     * @return {object}
     */
     render: function() {
-        console.log("RepositorySelector.render", this.state);
+        // console.log("RepositorySelector.render", this.state);
 
         return (
             React.createElement("ul", {className: "nav navbar-nav"}, 
@@ -21791,7 +21792,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'SERVER_ACTION',
       action: action
     };
-    console.log("AppDispatcher.handleServerAction", payload);
+    // console.log("AppDispatcher.handleServerAction", payload);
     this.dispatch(payload);
   },
 
@@ -21804,7 +21805,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'VIEW_ACTION',
       action: action
     };
-    console.log("AppDispatcher.handleViewAction", payload);
+    // console.log("AppDispatcher.handleViewAction", payload);
     this.dispatch(payload);
   }
 });

@@ -16,17 +16,6 @@ function getState() {
 
 var RepositorySelector = React.createClass({
 
-    _onChange: function() {
-        this.setState(getState());
-    },
-
-    _onSelectRepository: function(repository) {
-        AppActions.selectRepository(repository.id);
-    },
-
-    _onSelectRepositoryBranch: function(branch) {
-        AppActions.selectRepositoryBranch(branch.name);
-    },
 
     getInitialState: function() {
         return getState();
@@ -40,11 +29,23 @@ var RepositorySelector = React.createClass({
         RepoStore.removeChangeListener(this._onChange);
     },
 
+    _onChange: function() {
+        this.setState(getState());
+    },
+
+    _onSelectRepository: function(repository) {
+        AppActions.selectRepository(repository.id);
+    },
+
+    _onSelectRepositoryBranch: function(branch) {
+        AppActions.selectRepositoryBranch(branch.name);
+    },
+
     /**
     * @return {object}
     */
     render: function() {
-        console.log("RepositorySelector.render", this.state);
+        // console.log("RepositorySelector.render", this.state);
 
         return (
             <ul className="nav navbar-nav">

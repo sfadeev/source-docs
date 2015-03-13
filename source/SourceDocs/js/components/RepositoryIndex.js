@@ -25,11 +25,11 @@ var RepositoryIndexItem = React.createClass({
 
         if (this.props.data.children) {
             children = (
-                <RepositoryIndexList children={this.props.data.children} />
+                <RepositoryIndexList children={this.props.data.children} level={this.props.level + 1} />
             );
         }
 
-        var className = "nav-level-" + this.props.data.level;
+        var className = "nav-level-" + this.props.level;
         if (this.props.data.selected) className += " active";
         if (this.props.data.visible == false) className += " hidden";
 
@@ -51,9 +51,9 @@ var RepositoryIndexList = React.createClass({
 
         var items = this.props.children.map(function(item, index) {
             return (
-              <RepositoryIndexItem data={item} />
+              <RepositoryIndexItem data={item} level={this.props.level + 1} />
             );
-        });
+        }, this);
 
         return (
             <ul className="nav">
@@ -82,11 +82,11 @@ var RepositoryIndex = React.createClass({
     },
 
     render: function() {
-        console.log("RepositoryIndex.render", this.state);
+        // console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (
-              <RepositoryIndexList children={this.state.index.children} />
+              <RepositoryIndexList children={this.state.index.children} level={0} />
             );
         }
 

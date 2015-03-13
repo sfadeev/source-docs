@@ -20,12 +20,12 @@ var RepositorySelector = React.createClass({
         this.setState(getState());
     },
 
-    _onSelectRepository: function(item) {
-        AppActions.selectRepository(item.id);
+    _onSelectRepository: function(repository) {
+        AppActions.selectRepository(repository.id);
     },
 
-    _onSelectRepositoryBranch: function(item) {
-        AppActions.selectRepositoryBranch(item.name);
+    _onSelectRepositoryBranch: function(branch) {
+        AppActions.selectRepositoryBranch(branch.name);
     },
 
     getInitialState: function() {

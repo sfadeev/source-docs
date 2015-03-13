@@ -21591,12 +21591,12 @@ var RepositorySelector = React.createClass({displayName: "RepositorySelector",
         this.setState(getState());
     },
 
-    _onSelectRepository: function(item) {
-        AppActions.selectRepository(item.id);
+    _onSelectRepository: function(repository) {
+        AppActions.selectRepository(repository.id);
     },
 
-    _onSelectRepositoryBranch: function(item) {
-        AppActions.selectRepositoryBranch(item.name);
+    _onSelectRepositoryBranch: function(branch) {
+        AppActions.selectRepositoryBranch(branch.name);
     },
 
     getInitialState: function() {
@@ -21747,6 +21747,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	},
 
 	selectRepository: function(id) {
+
 		var selected = this.getSelectedRepository();
 
 	  	if (selected) {
@@ -21782,10 +21783,16 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	selectRepositoryBranch: function(id) {
 
-		var selected,
+		var selected = this.getSelectedRepositoryBranch(),
 			selectedRepository = this.getSelectedRepository();
 		
 		if (selectedRepository) {
+
+			if (selected) {
+		  		selected.selected = false;
+		  		selected = null;
+	  		}
+
 			if (id) {
 				selected = this._find(selectedRepository.nodes, function (item) {
 		  			return item.name == id;
@@ -21800,7 +21807,13 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	  		if (selected) {
 	  			selected.selected = true;
+
+	  			_selectedRepositoryBranchId = selected.name;
 	  			selectedRepository.nodes.title = selected.name;
+	  		}
+	  		else {
+	  			_selectedRepositoryBranchId = null;
+	  			selectedRepository.nodes.title = null;
 	  		}
 		}
 	},
@@ -21811,6 +21824,18 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  			return item.id == _selectedRepositoryId;
 	  		});
   		}
+  		return null;
+	},
+
+	getSelectedRepositoryBranch: function() {
+	
+		var selectedRepository = this.getSelectedRepository();
+		if (selectedRepository && _selectedRepositoryBranchId) {
+			return this._find(selectedRepository.nodes, function (item) {
+	  			return item.name == _selectedRepositoryBranchId;
+	  		});
+  		}
+
   		return null;
 	},
 

@@ -77,7 +77,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  	this.selectRepositoryBranch();
 	},
 
-	selectRepositoryBranch: function(id) {
+	selectRepositoryBranch: function(name) {
 
 		var selected = this.getSelectedRepositoryBranch(),
 			selectedRepository = this.getSelectedRepository();
@@ -89,9 +89,9 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		  		selected = null;
 	  		}
 
-			if (id) {
+			if (name) {
 				selected = this._find(selectedRepository.nodes, function (item) {
-		  			return item.name == id;
+		  			return item.name == name;
 		  		});
 	  		}
 
@@ -179,7 +179,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 				break;
 
 			case AppConstants.SELECT_REPOSITORY_BRANCH:
-				RepoStore.selectRepositoryBranch(action.id);
+				RepoStore.selectRepositoryBranch(action.name);
 				RepoStore.emitChange();
 				break;
 		}

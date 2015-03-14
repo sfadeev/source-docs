@@ -23,10 +23,17 @@ var AppActions = {
 		})
 	},
 	
-	selectRepositoryBranch: function(id){
+	selectRepositoryBranch: function(name){
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY_BRANCH,
-			id: id
+			name: name
+		})
+	},
+
+	selectRepositoryIndexItem: function(path){
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.SELECT_REPOSITORY_INDEX_ITEM,
+			path: path
 		})
 	},
 

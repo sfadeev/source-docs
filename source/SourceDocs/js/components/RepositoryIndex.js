@@ -4,18 +4,12 @@ var React = require('react');
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
 
-function getState() {
-  return {
-    index: RepoStore.getSelectedRepositoryIndex()
-  };
-}
-
 var RepositoryIndexItem = React.createClass({
 
     _onClick: function(e) {
         e.preventDefault();
 
-        // App.Repos.List.trigger("Repos.List:selectIndexItem", this.props.data);
+        this.props.onSelect(this.props.data);
     },
 
     render: function() {
@@ -25,7 +19,7 @@ var RepositoryIndexItem = React.createClass({
 
         if (this.props.data.children) {
             children = (
-                <RepositoryIndexList children={this.props.data.children} level={this.props.level + 1} />
+                <RepositoryIndexList children={this.props.data.children} level={this.props.level + 1} onSelect={this.props.onSelect} />
             );
         }
 
@@ -51,7 +45,7 @@ var RepositoryIndexList = React.createClass({
 
         var items = this.props.children.map(function(item, index) {
             return (
-              <RepositoryIndexItem data={item} level={this.props.level + 1} />
+              <RepositoryIndexItem data={item} level={this.props.level + 1} onSelect={this.props.onSelect} />
             );
         }, this);
 
@@ -64,9 +58,15 @@ var RepositoryIndexList = React.createClass({
 });
 
 var RepositoryIndex = React.createClass({
- 
-     getInitialState: function() {
-        return getState();
+
+    getState: function() {
+      return {
+        index: RepoStore.getSelectedRepositoryIndex()
+      };
+    },
+
+    getInitialState: function() {
+        return this.getState();
     },
 
     componentDidMount: function() {
@@ -78,7 +78,11 @@ var RepositoryIndex = React.createClass({
     },
 
     _onChange: function() {
-        this.setState(getState());
+        this.setState(this.getState());
+    },
+
+    _onSelectItem: function(item) {
+        AppActions.selectRepositoryIndexItem(item.path);
     },
 
     render: function() {
@@ -86,24 +90,12 @@ var RepositoryIndex = React.createClass({
 
         if (this.state.index && this.state.index.children) {
             return (
-              <RepositoryIndexList children={this.state.index.children} level={0} />
+              <RepositoryIndexList children={this.state.index.children} level={0} onSelect={this._onSelectItem} />
             );
         }
 
         return null;
     }
 });
-
-/*App.renderRepository = function(model, elementId) {
-    React.render(
-      <RepositoryList data={model} />, document.getElementById(elementId)
-    );
-}
-
-App.renderRepositoryIndex = function(model, elementId) {
-    React.render(
-      <RepositoryIndexList children={model.get("children")} />, document.getElementById(elementId)
-    );
-}*/
 
 module.exports = RepositoryIndex;

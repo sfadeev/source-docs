@@ -6299,62 +6299,62 @@ body {
 .sidebar .nav-level-1 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 15px;
+  padding-left: 7.5px;
 }
 .sidebar .nav-level-2 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 30px;
+  padding-left: 15px;
 }
 .sidebar .nav-level-3 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 45px;
+  padding-left: 22.5px;
 }
 .sidebar .nav-level-4 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 60px;
+  padding-left: 30px;
 }
 .sidebar .nav-level-5 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 75px;
+  padding-left: 37.5px;
 }
 .sidebar .nav-level-6 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 90px;
+  padding-left: 45px;
 }
 .sidebar .nav-level-7 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 105px;
+  padding-left: 52.5px;
 }
 .sidebar .nav-level-8 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 120px;
+  padding-left: 60px;
 }
 .sidebar .nav-level-9 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 135px;
+  padding-left: 67.5px;
 }
 .sidebar .nav-level-10 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 150px;
+  padding-left: 75px;
 }
 .sidebar .nav-level-11 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 165px;
+  padding-left: 82.5px;
 }
 .sidebar .nav-level-12 a {
   /* color: @navbar-default-link-color; */
   padding: 5px;
-  padding-left: 180px;
+  padding-left: 90px;
 }
 .sidebar .active > a {
   color: #555555;

@@ -21447,10 +21447,17 @@ var AppActions = {
 		})
 	},
 	
-	selectRepositoryBranch: function(id){
+	selectRepositoryBranch: function(name){
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY_BRANCH,
-			id: id
+			name: name
+		})
+	},
+
+	selectRepositoryIndexItem: function(path){
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.SELECT_REPOSITORY_INDEX_ITEM,
+			path: path
 		})
 	},
 
@@ -21541,18 +21548,12 @@ var React = require('react');
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
 
-function getState() {
-  return {
-    index: RepoStore.getSelectedRepositoryIndex()
-  };
-}
-
 var RepositoryIndexItem = React.createClass({displayName: "RepositoryIndexItem",
 
     _onClick: function(e) {
         e.preventDefault();
 
-        // App.Repos.List.trigger("Repos.List:selectIndexItem", this.props.data);
+        this.props.onSelect(this.props.data);
     },
 
     render: function() {
@@ -21562,7 +21563,7 @@ var RepositoryIndexItem = React.createClass({displayName: "RepositoryIndexItem",
 
         if (this.props.data.children) {
             children = (
-                React.createElement(RepositoryIndexList, {children: this.props.data.children, level: this.props.level + 1})
+                React.createElement(RepositoryIndexList, {children: this.props.data.children, level: this.props.level + 1, onSelect: this.props.onSelect})
             );
         }
 
@@ -21588,7 +21589,7 @@ var RepositoryIndexList = React.createClass({displayName: "RepositoryIndexList",
 
         var items = this.props.children.map(function(item, index) {
             return (
-              React.createElement(RepositoryIndexItem, {data: item, level: this.props.level + 1})
+              React.createElement(RepositoryIndexItem, {data: item, level: this.props.level + 1, onSelect: this.props.onSelect})
             );
         }, this);
 
@@ -21601,9 +21602,15 @@ var RepositoryIndexList = React.createClass({displayName: "RepositoryIndexList",
 });
 
 var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
- 
-     getInitialState: function() {
-        return getState();
+
+    getState: function() {
+      return {
+        index: RepoStore.getSelectedRepositoryIndex()
+      };
+    },
+
+    getInitialState: function() {
+        return this.getState();
     },
 
     componentDidMount: function() {
@@ -21615,7 +21622,11 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
     },
 
     _onChange: function() {
-        this.setState(getState());
+        this.setState(this.getState());
+    },
+
+    _onSelectItem: function(item) {
+        AppActions.selectRepositoryIndexItem(item.path);
     },
 
     render: function() {
@@ -21623,25 +21634,13 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
         if (this.state.index && this.state.index.children) {
             return (
-              React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 0})
+              React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 0, onSelect: this._onSelectItem})
             );
         }
 
         return null;
     }
 });
-
-/*App.renderRepository = function(model, elementId) {
-    React.render(
-      <RepositoryList data={model} />, document.getElementById(elementId)
-    );
-}
-
-App.renderRepositoryIndex = function(model, elementId) {
-    React.render(
-      <RepositoryIndexList children={model.get("children")} />, document.getElementById(elementId)
-    );
-}*/
 
 module.exports = RepositoryIndex;
 
@@ -21774,7 +21773,8 @@ module.exports = {
   LOAD_REPOSITORIES: 'LOAD_REPOSITORIES',
   LOAD_REPOSITORY_INDEX: 'LOAD_REPOSITORY_INDEX',
   SELECT_REPOSITORY: 'SELECT_REPOSITORY',
-  SELECT_REPOSITORY_BRANCH: 'SELECT_REPOSITORY_BRANCH'
+  SELECT_REPOSITORY_BRANCH: 'SELECT_REPOSITORY_BRANCH',
+  SELECT_REPOSITORY_INDEX_ITEM: 'SELECT_REPOSITORY_INDEX_ITEM'
 };
 
 
@@ -21792,7 +21792,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'SERVER_ACTION',
       action: action
     };
-    // console.log("AppDispatcher.handleServerAction", payload);
+    console.log("AppDispatcher.handleServerAction", payload);
     this.dispatch(payload);
   },
 
@@ -21805,7 +21805,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'VIEW_ACTION',
       action: action
     };
-    // console.log("AppDispatcher.handleViewAction", payload);
+    console.log("AppDispatcher.handleViewAction", payload);
     this.dispatch(payload);
   }
 });
@@ -21919,7 +21919,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  	this.selectRepositoryBranch();
 	},
 
-	selectRepositoryBranch: function(id) {
+	selectRepositoryBranch: function(name) {
 
 		var selected = this.getSelectedRepositoryBranch(),
 			selectedRepository = this.getSelectedRepository();
@@ -21931,9 +21931,9 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		  		selected = null;
 	  		}
 
-			if (id) {
+			if (name) {
 				selected = this._find(selectedRepository.nodes, function (item) {
-		  			return item.name == id;
+		  			return item.name == name;
 		  		});
 	  		}
 
@@ -22021,7 +22021,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 				break;
 
 			case AppConstants.SELECT_REPOSITORY_BRANCH:
-				RepoStore.selectRepositoryBranch(action.id);
+				RepoStore.selectRepositoryBranch(action.name);
 				RepoStore.emitChange();
 				break;
 		}

@@ -45,7 +45,7 @@ var RepositoryIndexList = React.createClass({
 
         var items = this.props.children.map(function(item, index) {
             return (
-              <RepositoryIndexItem data={item} level={this.props.level + 1} onSelect={this.props.onSelect} />
+              <RepositoryIndexItem data={item} level={this.props.level} onSelect={this.props.onSelect} />
             );
         }, this);
 
@@ -90,7 +90,7 @@ var RepositoryIndex = React.createClass({
 
         if (this.state.index && this.state.index.children) {
             return (
-              <RepositoryIndexList children={this.state.index.children} level={0} onSelect={this._onSelectItem} />
+              <RepositoryIndexList children={this.state.index.children} level={1} onSelect={this._onSelectItem} />
             );
         }
 

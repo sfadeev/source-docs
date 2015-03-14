@@ -17,6 +17,14 @@ module.exports = {
 	}).done(function(data) {
 	  AppActions.receiveRepositoryIndex(data);
 	});
+  },
+
+  loadRepositoryDocument: function(repositoryId, branchName, path) {
+  	$.ajax({
+	  url: "/api/repositories/" + repositoryId + "/" + branchName + "/document/" + path
+	}).done(function(data) {
+	  AppActions.receiveRepositoryDocument(data);
+	});
   }
 
 };

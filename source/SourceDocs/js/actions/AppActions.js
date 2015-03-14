@@ -16,6 +16,13 @@ var AppActions = {
 		})
 	},
 
+	receiveRepositoryDocument: function(data){
+		AppDispatcher.handleServerAction({
+			actionType:AppConstants.LOAD_REPOSITORY_DOCUMENT,
+			data: data
+		})
+	},
+
 	selectRepository: function(id){
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY,

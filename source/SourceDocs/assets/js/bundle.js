@@ -21440,6 +21440,13 @@ var AppActions = {
 		})
 	},
 
+	receiveRepositoryDocument: function(data){
+		AppDispatcher.handleServerAction({
+			actionType:AppConstants.LOAD_REPOSITORY_DOCUMENT,
+			data: data
+		})
+	},
+
 	selectRepository: function(id){
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY,
@@ -21466,7 +21473,7 @@ var AppActions = {
 module.exports = AppActions
 
 
-},{"../constants/AppConstants":172,"../dispatcher/AppDispatcher":173}],167:[function(require,module,exports){
+},{"../constants/AppConstants":173,"../dispatcher/AppDispatcher":174}],167:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21484,7 +21491,7 @@ var App = React.createClass({displayName: "App",
 module.exports = App;
 
 
-},{"../actions/AppActions":166,"./RepositorySelector":171,"react":165}],168:[function(require,module,exports){
+},{"../actions/AppActions":166,"./RepositorySelector":172,"react":165}],168:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21548,6 +21555,64 @@ var React = require('react');
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
 
+var RepositoryDocument = React.createClass({displayName: "RepositoryDocument",
+
+    getState: function() {
+      return {
+        document: RepoStore.getSelectedRepositoryDocument()
+      };
+    },
+
+    getInitialState: function() {
+        return this.getState();
+    },
+
+    componentDidMount: function() {
+        RepoStore.addChangeListener(this._onChange);
+    },
+
+    componentWillUnmount: function() {
+        RepoStore.removeChangeListener(this._onChange);
+    },
+
+    _onChange: function() {
+        this.setState(this.getState());
+    },
+
+    /*componentDidMount: function () {
+        this.highlight();
+    },*/
+
+    componentDidUpdate: function () {
+        this.highlight();
+    },
+
+    highlight: function () {
+        var nodes = this.getDOMNode().querySelectorAll("pre code");
+        for (var i = 0; i < nodes.length; i = i + 1) {
+            hljs.highlightBlock(nodes[i]);
+        }
+    },
+
+    render: function() {
+        // console.log("RepositoryDocument.render", this.state);
+
+        return (
+            React.createElement("div", {className: "content", 
+                dangerouslySetInnerHTML: {__html: this.state.document ? this.state.document.content : null}})
+        );
+    }
+});
+
+module.exports = RepositoryDocument;
+
+},{"../actions/AppActions":166,"../stores/RepoStore":176,"react":165}],170:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
+var AppActions = require('../actions/AppActions');
+var RepoStore = require('../stores/RepoStore');
+
 var RepositoryIndexItem = React.createClass({displayName: "RepositoryIndexItem",
 
     _onClick: function(e) {
@@ -21589,7 +21654,7 @@ var RepositoryIndexList = React.createClass({displayName: "RepositoryIndexList",
 
         var items = this.props.children.map(function(item, index) {
             return (
-              React.createElement(RepositoryIndexItem, {data: item, level: this.props.level + 1, onSelect: this.props.onSelect})
+              React.createElement(RepositoryIndexItem, {data: item, level: this.props.level, onSelect: this.props.onSelect})
             );
         }, this);
 
@@ -21634,7 +21699,7 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
         if (this.state.index && this.state.index.children) {
             return (
-              React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 0, onSelect: this._onSelectItem})
+              React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 1, onSelect: this._onSelectItem})
             );
         }
 
@@ -21644,7 +21709,7 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
 module.exports = RepositoryIndex;
 
-},{"../actions/AppActions":166,"../stores/RepoStore":175,"react":165}],170:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":176,"react":165}],171:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21706,7 +21771,7 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
 
 module.exports = RepositoryList;
 
-},{"react":165}],171:[function(require,module,exports){
+},{"react":165}],172:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21768,17 +21833,18 @@ var RepositorySelector = React.createClass({displayName: "RepositorySelector",
 
 module.exports = RepositorySelector;
 
-},{"../actions/AppActions":166,"../stores/RepoStore":175,"./RepositoryBranchList":168,"./RepositoryList":170,"react":165}],172:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":176,"./RepositoryBranchList":168,"./RepositoryList":171,"react":165}],173:[function(require,module,exports){
 module.exports = {
   LOAD_REPOSITORIES: 'LOAD_REPOSITORIES',
   LOAD_REPOSITORY_INDEX: 'LOAD_REPOSITORY_INDEX',
+  LOAD_REPOSITORY_DOCUMENT: 'LOAD_REPOSITORY_DOCUMENT',
   SELECT_REPOSITORY: 'SELECT_REPOSITORY',
   SELECT_REPOSITORY_BRANCH: 'SELECT_REPOSITORY_BRANCH',
   SELECT_REPOSITORY_INDEX_ITEM: 'SELECT_REPOSITORY_INDEX_ITEM'
 };
 
 
-},{}],173:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('object-assign');
 
@@ -21813,7 +21879,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 module.exports = AppDispatcher;
 
 
-},{"flux":14,"object-assign":19}],174:[function(require,module,exports){
+},{"flux":14,"object-assign":19}],175:[function(require,module,exports){
 /** @jsx React.DOM */
 // var jQuery = require('jquery-browserify');
 var bootstrap = require('bootstrap');
@@ -21823,6 +21889,7 @@ var React = require('react');
 // Posted question at: https://gist.github.com/sebmarkbage/ae327f2eda03bf165261
 var App = require('./components/App.js');
 var RepositoryIndex = require('./components/RepositoryIndex.js');
+var RepositoryDocument = require('./components/RepositoryDocument.js');
 
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
@@ -21836,10 +21903,15 @@ React.render(
 	document.getElementById('repo-index-region')
 );
 
+React.render(
+	React.createElement(RepositoryDocument, null),
+	document.getElementById('document-region')
+);
+
 WebApiUtils.loadRepositories();
 
 
-},{"./components/App.js":167,"./components/RepositoryIndex.js":169,"./utils/WebApiUtils.js":176,"bootstrap":1,"react":165}],175:[function(require,module,exports){
+},{"./components/App.js":167,"./components/RepositoryDocument.js":169,"./components/RepositoryIndex.js":170,"./utils/WebApiUtils.js":177,"bootstrap":1,"react":165}],176:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
@@ -21851,6 +21923,7 @@ var CHANGE_EVENT = 'change';
 
 var _repositories = [],
 	_repositoryIndex = {},
+	_repositoryDocument,
 	_selectedRepositoryId,
 	_selectedRepositoryBranchId;
 
@@ -21863,21 +21936,21 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 				return array[i];
 			}
 		}
-
 		return null;
 	},
 
 	setRepositories: function(data) {
-
 		_repositories = data;
-
 		this.selectRepository();
 	},
 
 	setRepositoryIndex: function(data) {
-
 		_repositoryIndex = data;
+		this.selectRepositoryIndexItem();
+	},
 
+	setRepositoryDocument: function(data) {
+		_repositoryDocument = data;
 	},
 
 	getRepositories: function() {
@@ -21958,6 +22031,13 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		}
 	},
 
+	selectRepositoryIndexItem: function(path) {
+
+	  	WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, path || "README.md");
+
+		this.emitChange();
+	},
+
 	getSelectedRepository: function() {
 		if (_selectedRepositoryId) {
 			return this._find(_repositories, function (item) {
@@ -21967,15 +22047,13 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		return null;
 	},
 
-	getSelectedRepositoryBranch: function() {
-	
+	getSelectedRepositoryBranch: function() {	
 		var selectedRepository = this.getSelectedRepository();
 		if (selectedRepository && _selectedRepositoryBranchId) {
 			return this._find(selectedRepository.nodes, function (item) {
 	  			return item.name == _selectedRepositoryBranchId;
 	  		});
   		}
-
   		return null;
 	},
 
@@ -21983,20 +22061,18 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		return _repositoryIndex;
 	},
 
+	getSelectedRepositoryDocument: function() {	
+  		return _repositoryDocument;
+	},
+
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
 	},
 
-	/**
-	* @param {function} callback
-	*/
 	addChangeListener: function(callback) {
 		this.on(CHANGE_EVENT, callback);
 	},
 
-	/**
-	* @param {function} callback
-	*/
 	removeChangeListener: function(callback) {
 		this.removeListener(CHANGE_EVENT, callback);
 	},
@@ -22015,6 +22091,11 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 				RepoStore.emitChange();
 				break;
 
+			case AppConstants.LOAD_REPOSITORY_DOCUMENT:
+				RepoStore.setRepositoryDocument(action.data);
+				RepoStore.emitChange();
+				break;
+
 			case AppConstants.SELECT_REPOSITORY:
 				RepoStore.selectRepository(action.id);
 				RepoStore.emitChange();
@@ -22023,6 +22104,10 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 			case AppConstants.SELECT_REPOSITORY_BRANCH:
 				RepoStore.selectRepositoryBranch(action.name);
 				RepoStore.emitChange();
+				break;
+
+			case AppConstants.SELECT_REPOSITORY_INDEX_ITEM:
+				RepoStore.selectRepositoryIndexItem(action.path);
 				break;
 		}
 
@@ -22033,7 +22118,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 module.exports = RepoStore;
 
 
-},{"../constants/AppConstants":172,"../dispatcher/AppDispatcher":173,"../utils/WebApiUtils.js":176,"events":17,"object-assign":19}],176:[function(require,module,exports){
+},{"../constants/AppConstants":173,"../dispatcher/AppDispatcher":174,"../utils/WebApiUtils.js":177,"events":17,"object-assign":19}],177:[function(require,module,exports){
 // var $ = require('jquery');
 var AppActions = require('../actions/AppActions');
 
@@ -22053,8 +22138,16 @@ module.exports = {
 	}).done(function(data) {
 	  AppActions.receiveRepositoryIndex(data);
 	});
+  },
+
+  loadRepositoryDocument: function(repositoryId, branchName, path) {
+  	$.ajax({
+	  url: "/api/repositories/" + repositoryId + "/" + branchName + "/document/" + path
+	}).done(function(data) {
+	  AppActions.receiveRepositoryDocument(data);
+	});
   }
 
 };
 
-},{"../actions/AppActions":166}]},{},[174])
+},{"../actions/AppActions":166}]},{},[175])

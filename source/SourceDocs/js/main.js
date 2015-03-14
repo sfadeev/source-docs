@@ -7,6 +7,7 @@ var React = require('react');
 // Posted question at: https://gist.github.com/sebmarkbage/ae327f2eda03bf165261
 var App = require('./components/App.js');
 var RepositoryIndex = require('./components/RepositoryIndex.js');
+var RepositoryDocument = require('./components/RepositoryDocument.js');
 
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
@@ -18,6 +19,11 @@ React.render(
 React.render(
 	<RepositoryIndex />,
 	document.getElementById('repo-index-region')
+);
+
+React.render(
+	<RepositoryDocument />,
+	document.getElementById('document-region')
 );
 
 WebApiUtils.loadRepositories();

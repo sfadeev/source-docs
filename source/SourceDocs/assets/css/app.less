@@ -22,7 +22,7 @@ body {
         .nav-level-@{i} a {
             /* color: @navbar-default-link-color; */
             padding: 5px; 
-            padding-left: @navbar-padding-horizontal * 0.5 * @i;
+            padding-left: @navbar-padding-horizontal * @i;
         }
 
         .generate-levels(@n, (@i + 1));

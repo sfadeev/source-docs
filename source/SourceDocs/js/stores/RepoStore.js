@@ -9,9 +9,11 @@ var CHANGE_EVENT = 'change';
 
 var _repositories = [],
 	_repositoryIndex = {},
+	_repositoryIndexList = [],
 	_repositoryDocument,
 	_selectedRepositoryId,
-	_selectedRepositoryBranchId;
+	_selectedRepositoryBranchId,
+	_selectedRepositoryDocumentPath;
 
 var RepoStore = assign({}, EventEmitter.prototype, {
 
@@ -27,12 +29,41 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	setRepositories: function(data) {
 		_repositories = data;
-		this.selectRepository();
+		
+		this.selectRepository(_selectedRepositoryId);
 	},
 
 	setRepositoryIndex: function(data) {
+
 		_repositoryIndex = data;
-		this.selectRepositoryIndexItem();
+		_repositoryIndexList = [];
+
+		var prevChild;
+		var buildRepositoryIndexListRecursive = function(parent, children) {
+            if (parent.children) {
+                for (var i = 0; i < parent.children.length; i++) {
+
+                    var child = parent.children[i];
+
+                    _repositoryIndexList.push(child);
+
+                    child["sibling:parent"] = parent;
+
+                    if (prevChild) {
+                        child["sibling:previous"] = prevChild;
+                        prevChild["sibling:next"] = child;
+                    }
+
+                    prevChild = child;
+
+                    buildRepositoryIndexListRecursive(child);
+                }
+            }
+        };
+
+		buildRepositoryIndexListRecursive(_repositoryIndex);
+
+		this.selectRepositoryIndexItem(_selectedRepositoryDocumentPath);
 	},
 
 	setRepositoryDocument: function(data) {
@@ -119,7 +150,37 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	selectRepositoryIndexItem: function(path) {
 
-	  	WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, path || "README.md");
+		var selected = this.getSelectedRepositoryIndexItem();
+
+		if (selected) {
+	  		selected.selected = false;
+	  		selected = null;
+  		}
+
+		if (path) {
+			selected = this._find(_repositoryIndexList, function (item) {
+	  			return item.path == path;
+	  		});
+  		}
+
+	  	if (!selected && _repositoryIndexList.length > 0) {
+	  		selected = this._find(_repositoryIndexList, function (item) {
+	  			return item.path == "README.md";
+	  		}) || this._find(_repositoryIndexList, function (item) {
+	  			return item.path != null;
+	  		});
+	  	}
+
+	  	if (selected) {
+	  		selected.selected = true;
+
+  			_selectedRepositoryDocumentPath = selected.path;
+
+	  		WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, _selectedRepositoryDocumentPath);
+  		}
+  		else {
+  			_selectedRepositoryDocumentPath = null;
+  		}
 
 		this.emitChange();
 	},
@@ -138,6 +199,15 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		if (selectedRepository && _selectedRepositoryBranchId) {
 			return this._find(selectedRepository.nodes, function (item) {
 	  			return item.name == _selectedRepositoryBranchId;
+	  		});
+  		}
+  		return null;
+	},
+
+	getSelectedRepositoryIndexItem: function() {	
+		if (_repositoryIndexList && _selectedRepositoryDocumentPath) {
+			return this._find(_repositoryIndexList, function (item) {
+	  			return item.path == _selectedRepositoryDocumentPath;
 	  		});
   		}
   		return null;

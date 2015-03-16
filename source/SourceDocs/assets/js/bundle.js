@@ -21675,10 +21675,8 @@ var RepositoryIndexList = React.createClass({displayName: "RepositoryIndexList",
 
 var RepositoryIndexSearch = React.createClass({displayName: "RepositoryIndexSearch",
 
-    _onKeyDown: function(e) {
-        // e.preventDefault();
-        console.log(e.target.value);
-        // this.props.onSearch(e);
+    _onChange: function(e) {
+        this.props.onSearch(e.target.value);
     },
 
     render: function() {
@@ -21688,7 +21686,7 @@ var RepositoryIndexSearch = React.createClass({displayName: "RepositoryIndexSear
             React.createElement("div", {className: "navbar-form sidebar-search"}, 
                 React.createElement("form", {className: "form-inline", role: "search"}, 
                     React.createElement("div", {className: "input-group"}, 
-                        React.createElement("input", {type: "text", onKeyDown: this._onKeyDown, className: "form-control", value: "", placeholder: "Search for..."}), 
+                        React.createElement("input", {type: "text", onChange: this._onChange, className: "form-control", value: this.props.value, placeholder: "Search for..."}), 
                         React.createElement("span", {className: "input-group-btn"}, 
                             React.createElement("button", {className: "btn btn-default", type: "button"}, "Go!")
                         )
@@ -21732,12 +21730,12 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
     },
 
     render: function() {
-        // console.log("RepositoryIndex.render", this.state);
+        console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (
                 React.createElement("div", {className: "col-md-3 sidebar navbar-default", role: "navigation"}, 
-                    React.createElement(RepositoryIndexSearch, {onSearch: this._onSearchItem}), 
+                    React.createElement(RepositoryIndexSearch, {value: this.state.index.searchTerm, onSearch: this._onSearchItem}), 
                     React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 1, onSelect: this._onSelectItem})
                 )
             );
@@ -21984,7 +21982,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	setRepositories: function(data) {
 		_repositories = data;
-		
+
 		this.selectRepository(_selectedRepositoryId);
 	},
 
@@ -22019,6 +22017,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		buildRepositoryIndexListRecursive(_repositoryIndex);
 
 		this.selectRepositoryIndexItem(_selectedRepositoryDocumentPath);
+		// this.searchRepositoryIndexItem("");
 	},
 
 	setRepositoryDocument: function(data) {
@@ -22136,8 +22135,27 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		else {
   			_selectedRepositoryDocumentPath = null;
   		}
+	},
 
-		this.emitChange();
+	searchRepositoryIndexItem: function(term) {
+		_repositoryIndex.searchTerm = term;
+
+		var searchRegExp = term ? new RegExp(term, "i") : null;
+
+		for (var i = 0; i < _repositoryIndexList.length; i++) {
+			var item = _repositoryIndexList[i];
+			var match = !searchRegExp || !item.name || item.name.search(searchRegExp) > -1;
+
+            item.visible = match;
+
+            if (match) {
+                var parent = item["sibling:parent"];
+                while (parent) {
+                    parent.visible = true;
+                    parent = parent["sibling:parent"];
+                }
+            }
+		};
 	},
 
 	getSelectedRepository: function() {
@@ -22219,6 +22237,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 			case AppConstants.SELECT_REPOSITORY_INDEX_ITEM:
 				RepoStore.selectRepositoryIndexItem(action.path);
+				RepoStore.emitChange();
+				break;
+
+			case AppConstants.SEARCH_REPOSITORY_INDEX_ITEM:
+				RepoStore.searchRepositoryIndexItem(action.term);
+				RepoStore.emitChange();
 				break;
 		}
 

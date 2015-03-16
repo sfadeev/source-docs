@@ -29,7 +29,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 	setRepositories: function(data) {
 		_repositories = data;
-		
+
 		this.selectRepository(_selectedRepositoryId);
 	},
 
@@ -64,6 +64,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		buildRepositoryIndexListRecursive(_repositoryIndex);
 
 		this.selectRepositoryIndexItem(_selectedRepositoryDocumentPath);
+		// this.searchRepositoryIndexItem("");
 	},
 
 	setRepositoryDocument: function(data) {
@@ -181,8 +182,27 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		else {
   			_selectedRepositoryDocumentPath = null;
   		}
+	},
 
-		this.emitChange();
+	searchRepositoryIndexItem: function(term) {
+		_repositoryIndex.searchTerm = term;
+
+		var searchRegExp = term ? new RegExp(term, "i") : null;
+
+		for (var i = 0; i < _repositoryIndexList.length; i++) {
+			var item = _repositoryIndexList[i];
+			var match = !searchRegExp || !item.name || item.name.search(searchRegExp) > -1;
+
+            item.visible = match;
+
+            if (match) {
+                var parent = item["sibling:parent"];
+                while (parent) {
+                    parent.visible = true;
+                    parent = parent["sibling:parent"];
+                }
+            }
+		};
 	},
 
 	getSelectedRepository: function() {
@@ -264,6 +284,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 			case AppConstants.SELECT_REPOSITORY_INDEX_ITEM:
 				RepoStore.selectRepositoryIndexItem(action.path);
+				RepoStore.emitChange();
+				break;
+
+			case AppConstants.SEARCH_REPOSITORY_INDEX_ITEM:
+				RepoStore.searchRepositoryIndexItem(action.term);
+				RepoStore.emitChange();
 				break;
 		}
 

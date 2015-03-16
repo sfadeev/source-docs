@@ -21468,6 +21468,13 @@ var AppActions = {
 		})
 	},
 
+	searchRepositoryIndexItem: function(term){
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.SEARCH_REPOSITORY_INDEX_ITEM,
+			term: term
+		})
+	},
+
 }
 
 module.exports = AppActions
@@ -21666,6 +21673,32 @@ var RepositoryIndexList = React.createClass({displayName: "RepositoryIndexList",
     }
 });
 
+var RepositoryIndexSearch = React.createClass({displayName: "RepositoryIndexSearch",
+
+    _onKeyDown: function(e) {
+        // e.preventDefault();
+        console.log(e.target.value);
+        // this.props.onSearch(e);
+    },
+
+    render: function() {
+        // console.log("RepositoryIndexSearch.render", this.props);
+
+        return (
+            React.createElement("div", {className: "navbar-form sidebar-search"}, 
+                React.createElement("form", {className: "form-inline", role: "search"}, 
+                    React.createElement("div", {className: "input-group"}, 
+                        React.createElement("input", {type: "text", onKeyDown: this._onKeyDown, className: "form-control", value: "", placeholder: "Search for..."}), 
+                        React.createElement("span", {className: "input-group-btn"}, 
+                            React.createElement("button", {className: "btn btn-default", type: "button"}, "Go!")
+                        )
+                    )
+                )
+            )
+        );
+    }
+});
+
 var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
     getState: function() {
@@ -21694,12 +21727,19 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
         AppActions.selectRepositoryIndexItem(item.path);
     },
 
+    _onSearchItem: function(term) {
+        AppActions.searchRepositoryIndexItem(term);
+    },
+
     render: function() {
         // console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (
-              React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 1, onSelect: this._onSelectItem})
+                React.createElement("div", {className: "col-md-3 sidebar navbar-default", role: "navigation"}, 
+                    React.createElement(RepositoryIndexSearch, {onSearch: this._onSearchItem}), 
+                    React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 1, onSelect: this._onSelectItem})
+                )
             );
         }
 
@@ -21840,7 +21880,8 @@ module.exports = {
   LOAD_REPOSITORY_DOCUMENT: 'LOAD_REPOSITORY_DOCUMENT',
   SELECT_REPOSITORY: 'SELECT_REPOSITORY',
   SELECT_REPOSITORY_BRANCH: 'SELECT_REPOSITORY_BRANCH',
-  SELECT_REPOSITORY_INDEX_ITEM: 'SELECT_REPOSITORY_INDEX_ITEM'
+  SELECT_REPOSITORY_INDEX_ITEM: 'SELECT_REPOSITORY_INDEX_ITEM',
+  SEARCH_REPOSITORY_INDEX_ITEM: 'SEARCH_REPOSITORY_INDEX_ITEM'
 };
 
 

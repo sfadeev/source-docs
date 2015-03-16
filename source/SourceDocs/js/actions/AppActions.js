@@ -44,6 +44,13 @@ var AppActions = {
 		})
 	},
 
+	searchRepositoryIndexItem: function(term){
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.SEARCH_REPOSITORY_INDEX_ITEM,
+			term: term
+		})
+	},
+
 }
 
 module.exports = AppActions

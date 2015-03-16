@@ -57,6 +57,32 @@ var RepositoryIndexList = React.createClass({
     }
 });
 
+var RepositoryIndexSearch = React.createClass({
+
+    _onKeyDown: function(e) {
+        // e.preventDefault();
+        console.log(e.target.value);
+        // this.props.onSearch(e);
+    },
+
+    render: function() {
+        // console.log("RepositoryIndexSearch.render", this.props);
+
+        return (
+            <div className="navbar-form sidebar-search">
+                <form className="form-inline" role="search">
+                    <div className="input-group">
+                        <input type="text" onKeyDown={this._onKeyDown} className="form-control" value="" placeholder="Search for..." />
+                        <span className="input-group-btn">
+                            <button className="btn btn-default" type="button">Go!</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        );
+    }
+});
+
 var RepositoryIndex = React.createClass({
 
     getState: function() {
@@ -85,12 +111,19 @@ var RepositoryIndex = React.createClass({
         AppActions.selectRepositoryIndexItem(item.path);
     },
 
+    _onSearchItem: function(term) {
+        AppActions.searchRepositoryIndexItem(term);
+    },
+
     render: function() {
         // console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (
-              <RepositoryIndexList children={this.state.index.children} level={1} onSelect={this._onSelectItem} />
+                <div className="col-md-3 sidebar navbar-default" role="navigation">
+                    <RepositoryIndexSearch onSearch={this._onSearchItem} />
+                    <RepositoryIndexList children={this.state.index.children} level={1} onSelect={this._onSelectItem} />
+                </div>
             );
         }
 

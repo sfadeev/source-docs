@@ -21426,49 +21426,56 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 
 var AppActions = {
-	receiveRepositories: function(data){
+	receiveRepositories: function(data) {
 		AppDispatcher.handleServerAction({
 			actionType:AppConstants.LOAD_REPOSITORIES,
 			data: data
 		})
 	},
 
-	receiveRepositoryIndex: function(data){
+	receiveRepositoryIndex: function(data) {
 		AppDispatcher.handleServerAction({
 			actionType:AppConstants.LOAD_REPOSITORY_INDEX,
 			data: data
 		})
 	},
 
-	receiveRepositoryDocument: function(data){
+	receiveRepositoryDocument: function(data) {
 		AppDispatcher.handleServerAction({
 			actionType:AppConstants.LOAD_REPOSITORY_DOCUMENT,
 			data: data
 		})
 	},
 
-	selectRepository: function(id){
+	selectRepository: function(id) {
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY,
 			id: id
 		})
 	},
 	
-	selectRepositoryBranch: function(name){
+	selectRepositoryBranch: function(name) {
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY_BRANCH,
 			name: name
 		})
 	},
 
-	selectRepositoryIndexItem: function(path){
+	selectRepositoryIndexItem: function(path) {
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SELECT_REPOSITORY_INDEX_ITEM,
 			path: path
 		})
 	},
 
-	searchRepositoryIndexItem: function(term){
+	selectSiblingRepositoryIndexItem: function(direction) {
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.SELECT_SIBLING_REPOSITORY_INDEX_ITEM,
+			direction: direction
+		})
+	},
+
+	searchRepositoryIndexItem: function(term) {
 		AppDispatcher.handleViewAction({
 			actionType:AppConstants.SEARCH_REPOSITORY_INDEX_ITEM,
 			term: term
@@ -21686,10 +21693,10 @@ var RepositoryIndexSearch = React.createClass({displayName: "RepositoryIndexSear
             React.createElement("div", {className: "navbar-form sidebar-search"}, 
                 React.createElement("form", {className: "form-inline", role: "search"}, 
                     React.createElement("div", {className: "input-group"}, 
-                        React.createElement("input", {type: "text", onChange: this._onChange, className: "form-control", value: this.props.value, placeholder: "Search for..."}), 
-                        React.createElement("span", {className: "input-group-btn"}, 
-                            React.createElement("button", {className: "btn btn-default", type: "button"}, "Go!")
-                        )
+                        React.createElement("input", {type: "text", onChange: this._onChange, className: "form-control", value: this.props.value, placeholder: "Search for..."})
+                        /*<span className="input-group-btn">
+                            <button className="btn btn-default" type="button">Go!</button>
+                        </span>*/
                     )
                 )
             )
@@ -21711,10 +21718,18 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
     componentDidMount: function() {
         RepoStore.addChangeListener(this._onChange);
+
+        // console.log("binding hotkeys for index view");
+        $(document).bind("keydown", "left", this.navigatePrevious);
+        $(document).bind("keydown", "right", this.navigateNext);
     },
 
     componentWillUnmount: function() {
         RepoStore.removeChangeListener(this._onChange);
+
+        // console.log("unbinding hotkeys for index view");
+        $(document).unbind("keydown", this.navigatePrevious);
+        $(document).unbind("keydown", this.navigateNext);
     },
 
     _onChange: function() {
@@ -21729,8 +21744,18 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
         AppActions.searchRepositoryIndexItem(term);
     },
 
+    navigatePrevious: function (e) {
+        e.preventDefault();
+        AppActions.selectSiblingRepositoryIndexItem("previous");
+    },
+
+    navigateNext: function (e) {
+        e.preventDefault();
+        AppActions.selectSiblingRepositoryIndexItem("next");
+    },
+
     render: function() {
-        console.log("RepositoryIndex.render", this.state);
+        // console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (
@@ -21879,6 +21904,7 @@ module.exports = {
   SELECT_REPOSITORY: 'SELECT_REPOSITORY',
   SELECT_REPOSITORY_BRANCH: 'SELECT_REPOSITORY_BRANCH',
   SELECT_REPOSITORY_INDEX_ITEM: 'SELECT_REPOSITORY_INDEX_ITEM',
+  SELECT_SIBLING_REPOSITORY_INDEX_ITEM: 'SELECT_SIBLING_REPOSITORY_INDEX_ITEM',
   SEARCH_REPOSITORY_INDEX_ITEM: 'SEARCH_REPOSITORY_INDEX_ITEM'
 };
 
@@ -21897,7 +21923,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'SERVER_ACTION',
       action: action
     };
-    console.log("AppDispatcher.handleServerAction", payload);
+    // console.log("AppDispatcher.handleServerAction", payload);
     this.dispatch(payload);
   },
 
@@ -21910,7 +21936,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'VIEW_ACTION',
       action: action
     };
-    console.log("AppDispatcher.handleViewAction", payload);
+    // console.log("AppDispatcher.handleViewAction", payload);
     this.dispatch(payload);
   }
 });
@@ -22017,7 +22043,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		buildRepositoryIndexListRecursive(_repositoryIndex);
 
 		this.selectRepositoryIndexItem(_selectedRepositoryDocumentPath);
-		// this.searchRepositoryIndexItem("");
+		this.searchRepositoryIndexItem("");
 	},
 
 	setRepositoryDocument: function(data) {
@@ -22100,6 +22126,30 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  			selectedRepository.nodes.title = null;
 	  		}
 		}
+	},
+
+	selectSiblingRepositoryIndexItem: function(direction) {
+		var item, selected;
+		item = selected = this.getSelectedRepositoryIndexItem();
+
+		if (item) {
+			do {
+				item = item["sibling:" + direction];
+				if (item && item.visible && item.path) {
+
+					// todo: merge with selectRepositoryIndexItem
+					selected.selected = false;
+					
+					item.selected = true;
+					_selectedRepositoryDocumentPath = item.path;
+					WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, _selectedRepositoryDocumentPath);
+
+					return true;
+				}
+			} while (item)
+		}
+
+		return false;
 	},
 
 	selectRepositoryIndexItem: function(path) {
@@ -22238,6 +22288,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 			case AppConstants.SELECT_REPOSITORY_INDEX_ITEM:
 				RepoStore.selectRepositoryIndexItem(action.path);
 				RepoStore.emitChange();
+				break;
+
+			case AppConstants.SELECT_SIBLING_REPOSITORY_INDEX_ITEM:
+				if (RepoStore.selectSiblingRepositoryIndexItem(action.direction)) {
+					RepoStore.emitChange();					
+				}
 				break;
 
 			case AppConstants.SEARCH_REPOSITORY_INDEX_ITEM:

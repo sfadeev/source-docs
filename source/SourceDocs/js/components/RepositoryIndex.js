@@ -71,9 +71,9 @@ var RepositoryIndexSearch = React.createClass({
                 <form className="form-inline" role="search">
                     <div className="input-group">
                         <input type="text" onChange={this._onChange} className="form-control" value={this.props.value} placeholder="Search for..." />
-                        <span className="input-group-btn">
+                        {/*<span className="input-group-btn">
                             <button className="btn btn-default" type="button">Go!</button>
-                        </span>
+                        </span>*/}
                     </div>
                 </form>
             </div>
@@ -95,10 +95,18 @@ var RepositoryIndex = React.createClass({
 
     componentDidMount: function() {
         RepoStore.addChangeListener(this._onChange);
+
+        // console.log("binding hotkeys for index view");
+        $(document).bind("keydown", "left", this.navigatePrevious);
+        $(document).bind("keydown", "right", this.navigateNext);
     },
 
     componentWillUnmount: function() {
         RepoStore.removeChangeListener(this._onChange);
+
+        // console.log("unbinding hotkeys for index view");
+        $(document).unbind("keydown", this.navigatePrevious);
+        $(document).unbind("keydown", this.navigateNext);
     },
 
     _onChange: function() {
@@ -113,8 +121,18 @@ var RepositoryIndex = React.createClass({
         AppActions.searchRepositoryIndexItem(term);
     },
 
+    navigatePrevious: function (e) {
+        e.preventDefault();
+        AppActions.selectSiblingRepositoryIndexItem("previous");
+    },
+
+    navigateNext: function (e) {
+        e.preventDefault();
+        AppActions.selectSiblingRepositoryIndexItem("next");
+    },
+
     render: function() {
-        console.log("RepositoryIndex.render", this.state);
+        // console.log("RepositoryIndex.render", this.state);
 
         if (this.state.index && this.state.index.children) {
             return (

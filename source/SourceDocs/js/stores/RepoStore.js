@@ -278,6 +278,19 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		return breadcrumb;
 	},
 
+	getSelectedRepositoryPager: function() {	
+  		var item = this.getSelectedRepositoryIndexItem();
+
+		if (item) {
+            return {
+            	previous: item["sibling:previous"],
+            	next: item["sibling:next"]
+            };
+        }
+
+  		return null;
+	},
+
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
 	},

@@ -21619,7 +21619,7 @@ var RepositoryDocumentContent = React.createClass({displayName: "RepositoryDocum
             hljs.highlightBlock(nodes[i]);
         }
     },
-    
+
     render: function() {
         // console.log("RepositoryDocumentContent.render", this.props);
 
@@ -21629,12 +21629,58 @@ var RepositoryDocumentContent = React.createClass({displayName: "RepositoryDocum
     }
 });
 
+var RepositoryDocumentPager = React.createClass({displayName: "RepositoryDocumentPager",
+
+    _onClickPrevious: function(e) {
+        e.preventDefault();
+        this.props.onSelect(this.props.data.previous);
+    },
+    _onClickNext: function(e) {
+        e.preventDefault();
+        this.props.onSelect(this.props.data.next);
+    },
+
+    render: function() {
+        // console.log("RepositoryDocumentPager.render", this.props);
+
+        if (this.props.data) {
+            var previous, next;
+
+            if (this.props.data.previous) {
+                previous = (
+                    React.createElement("li", {className: "previous"}, 
+                        React.createElement("a", {href: "#", onClick: this._onClickPrevious}, React.createElement("span", {"aria-hidden": "true"}, "←"), " ", this.props.data.previous.name)
+                    )
+                );
+            }
+            if (this.props.data.next) {
+                next = (
+                    React.createElement("li", {className: "next"}, 
+                        React.createElement("a", {href: "#", onClick: this._onClickNext}, this.props.data.next.name, " ", React.createElement("span", {"aria-hidden": "true"}, "→"))
+                    )
+                );
+            }
+
+            return (
+                React.createElement("nav", null, 
+                  React.createElement("ul", {className: "pager"}, 
+                    previous, next
+                  )
+                )
+            );
+        }
+
+        return null;
+    }
+});
+
 var RepositoryDocument = React.createClass({displayName: "RepositoryDocument",
 
     getState: function() {
         return {
             breadcrumb: RepoStore.getSelectedRepositoryBreadcrumb(),
-            document: RepoStore.getSelectedRepositoryDocument()
+            document: RepoStore.getSelectedRepositoryDocument(),
+            pager: RepoStore.getSelectedRepositoryPager()
         };
     },
 
@@ -21665,7 +21711,9 @@ var RepositoryDocument = React.createClass({displayName: "RepositoryDocument",
             React.createElement("div", {className: "col-md-9"}, 
                 React.createElement("br", null), 
                 React.createElement(RepositoryBreadcrumb, {data: this.state.breadcrumb, onSelect: this._onSelectItem}), 
-                React.createElement(RepositoryDocumentContent, {data: this.state.document})
+                React.createElement(RepositoryDocumentPager, {data: this.state.pager, onSelect: this._onSelectItem}), 
+                React.createElement(RepositoryDocumentContent, {data: this.state.document}), 
+                React.createElement(RepositoryDocumentPager, {data: this.state.pager, onSelect: this._onSelectItem})
             )
         );
     }
@@ -22308,6 +22356,19 @@ var RepoStore = assign({}, EventEmitter.prototype, {
         }
 
   		return breadcrumb;
+	},
+
+	getSelectedRepositoryPager: function() {	
+  		var item = this.getSelectedRepositoryIndexItem();
+
+		if (item) {
+            return {
+            	previous: item["sibling:previous"],
+            	next: item["sibling:next"]
+            };
+        }
+
+  		return null;
 	},
 
 	emitChange: function() {

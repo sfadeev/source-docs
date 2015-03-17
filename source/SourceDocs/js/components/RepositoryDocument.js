@@ -72,7 +72,7 @@ var RepositoryDocumentContent = React.createClass({
             hljs.highlightBlock(nodes[i]);
         }
     },
-    
+
     render: function() {
         // console.log("RepositoryDocumentContent.render", this.props);
 
@@ -82,12 +82,58 @@ var RepositoryDocumentContent = React.createClass({
     }
 });
 
+var RepositoryDocumentPager = React.createClass({
+
+    _onClickPrevious: function(e) {
+        e.preventDefault();
+        this.props.onSelect(this.props.data.previous);
+    },
+    _onClickNext: function(e) {
+        e.preventDefault();
+        this.props.onSelect(this.props.data.next);
+    },
+
+    render: function() {
+        // console.log("RepositoryDocumentPager.render", this.props);
+
+        if (this.props.data) {
+            var previous, next;
+
+            if (this.props.data.previous) {
+                previous = (
+                    <li className="previous">
+                        <a href="#" onClick={this._onClickPrevious}><span aria-hidden="true">&larr;</span> {this.props.data.previous.name}</a>
+                    </li>
+                );
+            }
+            if (this.props.data.next) {
+                next = (
+                    <li className="next">
+                        <a href="#" onClick={this._onClickNext}>{this.props.data.next.name} <span aria-hidden="true">&rarr;</span></a>
+                    </li>
+                );
+            }
+
+            return (
+                <nav>
+                  <ul className="pager">
+                    {previous}{next}
+                  </ul>
+                </nav>
+            );
+        }
+
+        return null;
+    }
+});
+
 var RepositoryDocument = React.createClass({
 
     getState: function() {
         return {
             breadcrumb: RepoStore.getSelectedRepositoryBreadcrumb(),
-            document: RepoStore.getSelectedRepositoryDocument()
+            document: RepoStore.getSelectedRepositoryDocument(),
+            pager: RepoStore.getSelectedRepositoryPager()
         };
     },
 
@@ -118,7 +164,9 @@ var RepositoryDocument = React.createClass({
             <div className="col-md-9">
                 <br />
                 <RepositoryBreadcrumb data={this.state.breadcrumb} onSelect={this._onSelectItem} />
+                <RepositoryDocumentPager data={this.state.pager} onSelect={this._onSelectItem} />
                 <RepositoryDocumentContent data={this.state.document} />
+                <RepositoryDocumentPager data={this.state.pager} onSelect={this._onSelectItem} />
             </div>
         );
     }

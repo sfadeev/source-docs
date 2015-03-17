@@ -265,6 +265,19 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		return _repositoryDocument;
 	},
 
+	getSelectedRepositoryBreadcrumb: function() {	
+  		var breadcrumb = [],
+  			item = this.getSelectedRepositoryIndexItem();
+
+		while (item) {
+            breadcrumb.unshift(item);
+            item = item["sibling:parent"];
+
+        }
+
+  		return breadcrumb;
+	},
+
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
 	},

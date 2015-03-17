@@ -23,7 +23,7 @@ namespace SourceDocs
 
             Get["{path*}"] = parameters =>
             {
-                return View["index"];
+                return View["index2"];
             };
         }
     }

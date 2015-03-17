@@ -21487,25 +21487,7 @@ var AppActions = {
 module.exports = AppActions
 
 
-},{"../constants/AppConstants":173,"../dispatcher/AppDispatcher":174}],167:[function(require,module,exports){
-/** @jsx React.DOM */
-var React = require('react');
-
-var AppActions = require('../actions/AppActions');
-var RepositorySelector = require('./RepositorySelector');
-
-var App = React.createClass({displayName: "App",
-    render:function(){
-      return (
-        React.createElement(RepositorySelector, null)
-      )
-    }
-  });
-
-module.exports = App;
-
-
-},{"../actions/AppActions":166,"./RepositorySelector":172,"react":165}],168:[function(require,module,exports){
+},{"../constants/AppConstants":172,"../dispatcher/AppDispatcher":173}],167:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21562,19 +21544,98 @@ var RepositoryBranchList = React.createClass({displayName: "RepositoryBranchList
 
 module.exports = RepositoryBranchList;
 
-},{"react":165}],169:[function(require,module,exports){
+},{"react":165}],168:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
 
+var RepositoryBreadcrumbItem = React.createClass({displayName: "RepositoryBreadcrumbItem",
+
+    _onClick: function(e) {
+        e.preventDefault();
+
+        this.props.onSelect(this.props.data);
+    },
+
+    render: function() {
+        // console.log("RepositoryBreadcrumbItem.render", this.props);
+
+        var item;
+
+        if (this.props.active) {
+            return (
+                React.createElement("li", {className: "active"}, this.props.data.name)
+            );
+        }
+        
+        if (this.props.index != 0 && this.props.data.path) {
+            return (
+                React.createElement("li", null, React.createElement("a", {href: this.props.data.path, onClick: this._onClick}, this.props.data.name))
+            );
+        }
+
+        return (
+            React.createElement("li", null, this.props.data.name)
+        );
+    }
+});
+
+var RepositoryBreadcrumb = React.createClass({displayName: "RepositoryBreadcrumb",
+
+    render: function() {
+        // console.log("RepositoryBreadcrumb.render", this.props);
+
+        var lastIndex = this.props.data.length - 1;
+
+        var items = this.props.data.map(function(item, index) {
+            return (
+                React.createElement(RepositoryBreadcrumbItem, {data: item, onSelect: this.props.onSelect, index: index, active: (index == lastIndex)})
+            );
+        }, this);
+
+        return (
+            React.createElement("ol", {className: "breadcrumb"}, 
+                items
+            )
+        );
+    }
+});
+
+var RepositoryDocumentContent = React.createClass({displayName: "RepositoryDocumentContent",
+
+    /*componentDidMount: function () {
+        this.highlight();
+    },*/
+
+    componentDidUpdate: function () {
+        this.highlight();
+    },
+
+    highlight: function () {
+        var nodes = this.getDOMNode().querySelectorAll("pre code");
+        for (var i = 0; i < nodes.length; i = i + 1) {
+            hljs.highlightBlock(nodes[i]);
+        }
+    },
+    
+    render: function() {
+        // console.log("RepositoryDocumentContent.render", this.props);
+
+        return (
+            React.createElement("div", {className: "content", dangerouslySetInnerHTML: {__html: this.props.data ? this.props.data.content : null}})
+        );
+    }
+});
+
 var RepositoryDocument = React.createClass({displayName: "RepositoryDocument",
 
     getState: function() {
-      return {
-        document: RepoStore.getSelectedRepositoryDocument()
-      };
+        return {
+            breadcrumb: RepoStore.getSelectedRepositoryBreadcrumb(),
+            document: RepoStore.getSelectedRepositoryDocument()
+        };
     },
 
     getInitialState: function() {
@@ -21593,34 +21654,26 @@ var RepositoryDocument = React.createClass({displayName: "RepositoryDocument",
         this.setState(this.getState());
     },
 
-    /*componentDidMount: function () {
-        this.highlight();
-    },*/
-
-    componentDidUpdate: function () {
-        this.highlight();
-    },
-
-    highlight: function () {
-        var nodes = this.getDOMNode().querySelectorAll("pre code");
-        for (var i = 0; i < nodes.length; i = i + 1) {
-            hljs.highlightBlock(nodes[i]);
-        }
+    _onSelectItem: function(item) {
+        AppActions.selectRepositoryIndexItem(item.path);
     },
 
     render: function() {
         // console.log("RepositoryDocument.render", this.state);
 
         return (
-            React.createElement("div", {className: "content", 
-                dangerouslySetInnerHTML: {__html: this.state.document ? this.state.document.content : null}})
+            React.createElement("div", {className: "col-md-9"}, 
+                React.createElement("br", null), 
+                React.createElement(RepositoryBreadcrumb, {data: this.state.breadcrumb, onSelect: this._onSelectItem}), 
+                React.createElement(RepositoryDocumentContent, {data: this.state.document})
+            )
         );
     }
 });
 
 module.exports = RepositoryDocument;
 
-},{"../actions/AppActions":166,"../stores/RepoStore":176,"react":165}],170:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":175,"react":165}],169:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21772,7 +21825,7 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
 module.exports = RepositoryIndex;
 
-},{"../actions/AppActions":166,"../stores/RepoStore":176,"react":165}],171:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":175,"react":165}],170:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21834,7 +21887,7 @@ var RepositoryList = React.createClass({displayName: "RepositoryList",
 
 module.exports = RepositoryList;
 
-},{"react":165}],172:[function(require,module,exports){
+},{"react":165}],171:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -21896,7 +21949,7 @@ var RepositorySelector = React.createClass({displayName: "RepositorySelector",
 
 module.exports = RepositorySelector;
 
-},{"../actions/AppActions":166,"../stores/RepoStore":176,"./RepositoryBranchList":168,"./RepositoryList":171,"react":165}],173:[function(require,module,exports){
+},{"../actions/AppActions":166,"../stores/RepoStore":175,"./RepositoryBranchList":167,"./RepositoryList":170,"react":165}],172:[function(require,module,exports){
 module.exports = {
   LOAD_REPOSITORIES: 'LOAD_REPOSITORIES',
   LOAD_REPOSITORY_INDEX: 'LOAD_REPOSITORY_INDEX',
@@ -21909,7 +21962,7 @@ module.exports = {
 };
 
 
-},{}],174:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('object-assign');
 
@@ -21944,7 +21997,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 module.exports = AppDispatcher;
 
 
-},{"flux":14,"object-assign":19}],175:[function(require,module,exports){
+},{"flux":14,"object-assign":19}],174:[function(require,module,exports){
 /** @jsx React.DOM */
 // var jQuery = require('jquery-browserify');
 var bootstrap = require('bootstrap');
@@ -21952,14 +22005,14 @@ var React = require('react');
 
 // Not ideal to use createFactory, but don't know how to use JSX to solve this
 // Posted question at: https://gist.github.com/sebmarkbage/ae327f2eda03bf165261
-var App = require('./components/App.js');
+var RepositorySelector = require('./components/RepositorySelector.js');
 var RepositoryIndex = require('./components/RepositoryIndex.js');
 var RepositoryDocument = require('./components/RepositoryDocument.js');
 
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
 React.render(
-	React.createElement(App, null),
+	React.createElement(RepositorySelector, null),
 	document.getElementById('main')
 );
 
@@ -21970,13 +22023,13 @@ React.render(
 
 React.render(
 	React.createElement(RepositoryDocument, null),
-	document.getElementById('document-region')
+	document.getElementById('repo-content-region')
 );
 
 WebApiUtils.loadRepositories();
 
 
-},{"./components/App.js":167,"./components/RepositoryDocument.js":169,"./components/RepositoryIndex.js":170,"./utils/WebApiUtils.js":177,"bootstrap":1,"react":165}],176:[function(require,module,exports){
+},{"./components/RepositoryDocument.js":168,"./components/RepositoryIndex.js":169,"./components/RepositorySelector.js":171,"./utils/WebApiUtils.js":176,"bootstrap":1,"react":165}],175:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
@@ -22244,6 +22297,19 @@ var RepoStore = assign({}, EventEmitter.prototype, {
   		return _repositoryDocument;
 	},
 
+	getSelectedRepositoryBreadcrumb: function() {	
+  		var breadcrumb = [],
+  			item = this.getSelectedRepositoryIndexItem();
+
+		while (item) {
+            breadcrumb.unshift(item);
+            item = item["sibling:parent"];
+
+        }
+
+  		return breadcrumb;
+	},
+
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
 	},
@@ -22309,7 +22375,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 module.exports = RepoStore;
 
 
-},{"../constants/AppConstants":173,"../dispatcher/AppDispatcher":174,"../utils/WebApiUtils.js":177,"events":17,"object-assign":19}],177:[function(require,module,exports){
+},{"../constants/AppConstants":172,"../dispatcher/AppDispatcher":173,"../utils/WebApiUtils.js":176,"events":17,"object-assign":19}],176:[function(require,module,exports){
 // var $ = require('jquery');
 var AppActions = require('../actions/AppActions');
 
@@ -22341,4 +22407,4 @@ module.exports = {
 
 };
 
-},{"../actions/AppActions":166}]},{},[175])
+},{"../actions/AppActions":166}]},{},[174])

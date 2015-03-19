@@ -5,17 +5,17 @@ var RepositorySelector = require('./RepositorySelector');
 var RepositoryIndex = require('./RepositoryIndex.js');
 var RepositoryDocument = require('./RepositoryDocument.js');
 
-var App = React.createClass({
+var Repository = React.createClass({
 
     render: function() {
-        // console.log("App.render", this.state);
+        console.log("App.render", this.props);
 
         return (
             <div>
                 <div className="navbar navbar-default navbar-fixed-top">
                     <div className="container-fluid">
 
-                        <div class="navbar-header">
+                        <div className="navbar-header">
 
                             <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
                                 <span className="sr-only">Toggle navigation</span>
@@ -36,7 +36,7 @@ var App = React.createClass({
 
                 <div className="container-fluid">
                     <div className="row">
-                        <RepositoryIndex />
+                        <RepositoryIndex {...this.props} />
                         <RepositoryDocument />
                     </div>
                 </div>
@@ -46,4 +46,4 @@ var App = React.createClass({
 
 });
 
-module.exports = App;
+module.exports = Repository;

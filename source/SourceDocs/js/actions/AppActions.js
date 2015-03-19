@@ -2,7 +2,8 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 
 var AppActions = {
-	receiveRepositories: function(data) {
+
+    receiveRepositories: function(data) {
 		AppDispatcher.handleServerAction({
 			actionType:AppConstants.LOAD_REPOSITORIES,
 			data: data

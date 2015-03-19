@@ -229,6 +229,10 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		};
 	},
 
+	getSelectedRepositoryId: function() {
+		return _selectedRepositoryId;
+	},
+
 	getSelectedRepository: function() {
 		if (_selectedRepositoryId) {
 			return this._find(_repositories, function (item) {
@@ -236,6 +240,10 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  		});
   		}
   		return null;
+	},
+
+	getSelectedRepositoryBranchName: function() {
+		return _selectedRepositoryBranchId;
 	},
 
 	getSelectedRepositoryBranch: function() {	

@@ -1,5 +1,6 @@
 ﻿/** @jsx React.DOM */
 var React = require('react');
+var Navigation = require('react-router').Navigation;
 
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
@@ -82,9 +83,12 @@ var RepositoryIndexSearch = React.createClass({
 });
 
 var RepositoryIndex = React.createClass({
+    mixins: [Navigation],
 
     getState: function() {
       return {
+        selectedRepositoryId: RepoStore.getSelectedRepositoryId(),
+        selectedRepositoryBranchName: RepoStore.getSelectedRepositoryBranchName(),
         index: RepoStore.getSelectedRepositoryIndex()
       };
     },
@@ -114,6 +118,12 @@ var RepositoryIndex = React.createClass({
     },
 
     _onSelectItem: function(item) {
+        this.transitionTo('repo', {
+            repoId: this.state.selectedRepositoryId, 
+            branchName: this.state.selectedRepositoryBranchName, 
+            splat: item.path 
+        });
+
         AppActions.selectRepositoryIndexItem(item.path);
     },
 
@@ -132,7 +142,7 @@ var RepositoryIndex = React.createClass({
     },
 
     render: function() {
-        // console.log("RepositoryIndex.render", this.state);
+        console.log("RepositoryIndex.render", this.state, this.props);
 
         if (this.state.index && this.state.index.children) {
             return (

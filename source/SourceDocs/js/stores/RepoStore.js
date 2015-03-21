@@ -107,7 +107,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 			_repositories.title = null;
 	  	}
 
-	  	this.selectRepositoryBranch();
+	  	this.selectRepositoryBranch(_selectedRepositoryBranchId);
 	},
 
 	selectRepositoryBranch: function(name) {
@@ -163,6 +163,13 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 					
 					item.selected = true;
 					_selectedRepositoryDocumentPath = item.path;
+
+					/*this.contextTypes.router.transitionTo('repo', {
+			            repoId: _selectedRepositoryId, 
+			            branchName: _selectedRepositoryBranchId, 
+			            splat: _selectedRepositoryDocumentPath
+			        });*/
+
 					WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, _selectedRepositoryDocumentPath);
 
 					return true;
@@ -200,6 +207,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  		selected.selected = true;
 
   			_selectedRepositoryDocumentPath = selected.path;
+
+			/*this.contextTypes.router.transitionTo('repo', {
+                repoId: _selectedRepositoryId, 
+                branchName: _selectedRepositoryBranchId, 
+                splat: _selectedRepositoryDocumentPath
+            });*/
 
 	  		WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, _selectedRepositoryDocumentPath);
   		}
@@ -300,6 +313,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	},
 
 	emitChange: function() {
+		console.log('RepoStore.emitChange');
 		this.emit(CHANGE_EVENT);
 	},
 
@@ -315,6 +329,14 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		var action = payload.action;
 
 		switch(action.actionType) {
+			case AppConstants.TRANSITION:
+				_selectedRepositoryId = action.state.params.repoId;
+				_selectedRepositoryBranchId = action.state.params.branchName;
+				if (!_selectedRepositoryDocumentPath) _selectedRepositoryDocumentPath = action.state.params.splat;
+				// RepoStore.selectRepositoryIndexItem(action.state.params.splat);
+				// RepoStore.emitChange();
+				break;
+
 			case AppConstants.LOAD_REPOSITORIES:
 				RepoStore.setRepositories(action.data);
 				RepoStore.emitChange();
@@ -342,12 +364,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 			case AppConstants.SELECT_REPOSITORY_INDEX_ITEM:
 				RepoStore.selectRepositoryIndexItem(action.path);
-				RepoStore.emitChange();
+				// RepoStore.emitChange();
 				break;
 
 			case AppConstants.SELECT_SIBLING_REPOSITORY_INDEX_ITEM:
 				if (RepoStore.selectSiblingRepositoryIndexItem(action.direction)) {
-					RepoStore.emitChange();					
+					// RepoStore.emitChange();					
 				}
 				break;
 

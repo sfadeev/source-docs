@@ -8,6 +8,7 @@ var Route = Router.Route;
 
 var bootstrap = require('bootstrap');
 
+var AppActions = require('./actions/AppActions');
 var Repository = require('./components/Repository.js');
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
@@ -44,7 +45,7 @@ var routes = (
 );
 
 Router.run(routes, Router.HistoryLocation, function (Handler, state) {
-	console.log("Router.Handler", state);
+	AppActions.transition(state);
 	React.render(<Handler {...state.params} />, document.getElementById('app'));
 });
 

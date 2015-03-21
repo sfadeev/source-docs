@@ -170,10 +170,10 @@ var RepositoryDocument = React.createClass({
     },
 
     render: function() {
-        // console.log("RepositoryDocument.render", this.state);
+        console.log("RepositoryDocument.render", this.state);
 
         return (
-            <div className="col-md-9">
+            <div className="col-md-10">
                 <br />
                 <RepositoryBreadcrumb data={this.state.breadcrumb} onSelect={this._onSelectItem} />
                 <RepositoryDocumentPager data={this.state.pager} onSelect={this._onSelectItem} />

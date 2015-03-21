@@ -1,6 +1,6 @@
 ﻿/** @jsx React.DOM */
 var React = require('react');
-var Navigation = require('react-router').Navigation;
+var Router = require('react-router');
 
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
@@ -30,9 +30,7 @@ var RepositoryIndexItem = React.createClass({
 
         return (
             <li className={className}>
-                <a href={this.props.data.path} onClick={this._onClick}>
-                    {this.props.data.name}
-                </a>
+                <a href={this.props.data.path} onClick={this._onClick}>{this.props.data.name}</a>
                 {children}
             </li>
         );
@@ -83,7 +81,11 @@ var RepositoryIndexSearch = React.createClass({
 });
 
 var RepositoryIndex = React.createClass({
-    mixins: [Navigation],
+    // mixins: [Navigation],
+
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
 
     getState: function() {
       return {
@@ -118,13 +120,16 @@ var RepositoryIndex = React.createClass({
     },
 
     _onSelectItem: function(item) {
-        this.transitionTo('repo', {
-            repoId: this.state.selectedRepositoryId, 
-            branchName: this.state.selectedRepositoryBranchName, 
-            splat: item.path 
-        });
+        if (item.path) {
 
-        AppActions.selectRepositoryIndexItem(item.path);
+            this.context.router.transitionTo('repo', {
+                repoId: this.state.selectedRepositoryId, 
+                branchName: this.state.selectedRepositoryBranchName, 
+                splat: item.path
+            });
+
+            AppActions.selectRepositoryIndexItem(item.path);
+        }
     },
 
     _onSearchItem: function(term) {
@@ -146,7 +151,7 @@ var RepositoryIndex = React.createClass({
 
         if (this.state.index && this.state.index.children) {
             return (
-                <div className="col-md-3 sidebar navbar-default" role="navigation">
+                <div className="col-md-2 sidebar navbar-default" role="navigation">
                     <RepositoryIndexSearch value={this.state.index.searchTerm} onSearch={this._onSearchItem} />
                     <RepositoryIndexList children={this.state.index.children} level={1} onSelect={this._onSelectItem} />
                 </div>

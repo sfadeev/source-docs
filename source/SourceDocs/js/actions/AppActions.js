@@ -3,6 +3,13 @@ var AppConstants = require('../constants/AppConstants');
 
 var AppActions = {
 
+    transition: function(state) {
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.TRANSITION,
+			state: state
+		})
+	},
+
     receiveRepositories: function(data) {
 		AppDispatcher.handleServerAction({
 			actionType:AppConstants.LOAD_REPOSITORIES,

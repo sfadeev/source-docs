@@ -25756,6 +25756,13 @@ var AppConstants = require('../constants/AppConstants');
 
 var AppActions = {
 
+    transition: function(state) {
+		AppDispatcher.handleViewAction({
+			actionType:AppConstants.TRANSITION,
+			state: state
+		})
+	},
+
     receiveRepositories: function(data) {
 		AppDispatcher.handleServerAction({
 			actionType:AppConstants.LOAD_REPOSITORIES,
@@ -26098,10 +26105,10 @@ var RepositoryDocument = React.createClass({displayName: "RepositoryDocument",
     },
 
     render: function() {
-        // console.log("RepositoryDocument.render", this.state);
+        console.log("RepositoryDocument.render", this.state);
 
         return (
-            React.createElement("div", {className: "col-md-9"}, 
+            React.createElement("div", {className: "col-md-10"}, 
                 React.createElement("br", null), 
                 React.createElement(RepositoryBreadcrumb, {data: this.state.breadcrumb, onSelect: this._onSelectItem}), 
                 React.createElement(RepositoryDocumentPager, {data: this.state.pager, onSelect: this._onSelectItem}), 
@@ -26117,7 +26124,7 @@ module.exports = RepositoryDocument;
 },{"../actions/AppActions":212,"../stores/RepoStore":222,"react":211}],216:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
-var Navigation = require('react-router').Navigation;
+var Router = require('react-router');
 
 var AppActions = require('../actions/AppActions');
 var RepoStore = require('../stores/RepoStore');
@@ -26147,9 +26154,7 @@ var RepositoryIndexItem = React.createClass({displayName: "RepositoryIndexItem",
 
         return (
             React.createElement("li", {className: className}, 
-                React.createElement("a", {href: this.props.data.path, onClick: this._onClick}, 
-                    this.props.data.name
-                ), 
+                React.createElement("a", {href: this.props.data.path, onClick: this._onClick}, this.props.data.name), 
                 children
             )
         );
@@ -26200,7 +26205,11 @@ var RepositoryIndexSearch = React.createClass({displayName: "RepositoryIndexSear
 });
 
 var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
-    mixins: [Navigation],
+    // mixins: [Navigation],
+
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
 
     getState: function() {
       return {
@@ -26235,13 +26244,16 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
     },
 
     _onSelectItem: function(item) {
-        this.transitionTo('repo', {
-            repoId: this.state.selectedRepositoryId, 
-            branchName: this.state.selectedRepositoryBranchName, 
-            splat: item.path 
-        });
+        if (item.path) {
 
-        AppActions.selectRepositoryIndexItem(item.path);
+            this.context.router.transitionTo('repo', {
+                repoId: this.state.selectedRepositoryId, 
+                branchName: this.state.selectedRepositoryBranchName, 
+                splat: item.path
+            });
+
+            AppActions.selectRepositoryIndexItem(item.path);
+        }
     },
 
     _onSearchItem: function(term) {
@@ -26263,7 +26275,7 @@ var RepositoryIndex = React.createClass({displayName: "RepositoryIndex",
 
         if (this.state.index && this.state.index.children) {
             return (
-                React.createElement("div", {className: "col-md-3 sidebar navbar-default", role: "navigation"}, 
+                React.createElement("div", {className: "col-md-2 sidebar navbar-default", role: "navigation"}, 
                     React.createElement(RepositoryIndexSearch, {value: this.state.index.searchTerm, onSearch: this._onSearchItem}), 
                     React.createElement(RepositoryIndexList, {children: this.state.index.children, level: 1, onSelect: this._onSelectItem})
                 )
@@ -26402,6 +26414,7 @@ module.exports = RepositorySelector;
 
 },{"../actions/AppActions":212,"../stores/RepoStore":222,"./RepositoryBranchList":214,"./RepositoryList":217,"react":211}],219:[function(require,module,exports){
 module.exports = {
+  TRANSITION: 'TRANSITION',
   LOAD_REPOSITORIES: 'LOAD_REPOSITORIES',
   LOAD_REPOSITORY_INDEX: 'LOAD_REPOSITORY_INDEX',
   LOAD_REPOSITORY_DOCUMENT: 'LOAD_REPOSITORY_DOCUMENT',
@@ -26427,7 +26440,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'SERVER_ACTION',
       action: action
     };
-    // console.log("AppDispatcher.handleServerAction", payload);
+    console.log("AppDispatcher.handleServerAction", action);
     this.dispatch(payload);
   },
 
@@ -26440,7 +26453,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'VIEW_ACTION',
       action: action
     };
-    // console.log("AppDispatcher.handleViewAction", payload);
+    console.log("AppDispatcher.handleViewAction", action);
     this.dispatch(payload);
   }
 });
@@ -26459,6 +26472,7 @@ var Route = Router.Route;
 
 var bootstrap = require('bootstrap');
 
+var AppActions = require('./actions/AppActions');
 var Repository = require('./components/Repository.js');
 var WebApiUtils = require('./utils/WebApiUtils.js');
 
@@ -26495,14 +26509,14 @@ var routes = (
 );
 
 Router.run(routes, Router.HistoryLocation, function (Handler, state) {
-	console.log("Router.Handler", state);
+	AppActions.transition(state);
 	React.render(React.createElement(Handler, React.__spread({},  state.params)), document.getElementById('app'));
 });
 
 WebApiUtils.loadRepositories();
 
 
-},{"./components/Repository.js":213,"./utils/WebApiUtils.js":223,"bootstrap":1,"react":211,"react-router":44}],222:[function(require,module,exports){
+},{"./actions/AppActions":212,"./components/Repository.js":213,"./utils/WebApiUtils.js":223,"bootstrap":1,"react":211,"react-router":44}],222:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
@@ -26612,7 +26626,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 			_repositories.title = null;
 	  	}
 
-	  	this.selectRepositoryBranch();
+	  	this.selectRepositoryBranch(_selectedRepositoryBranchId);
 	},
 
 	selectRepositoryBranch: function(name) {
@@ -26668,6 +26682,13 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 					
 					item.selected = true;
 					_selectedRepositoryDocumentPath = item.path;
+
+					/*this.contextTypes.router.transitionTo('repo', {
+			            repoId: _selectedRepositoryId, 
+			            branchName: _selectedRepositoryBranchId, 
+			            splat: _selectedRepositoryDocumentPath
+			        });*/
+
 					WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, _selectedRepositoryDocumentPath);
 
 					return true;
@@ -26705,6 +26726,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	  		selected.selected = true;
 
   			_selectedRepositoryDocumentPath = selected.path;
+
+			/*this.contextTypes.router.transitionTo('repo', {
+                repoId: _selectedRepositoryId, 
+                branchName: _selectedRepositoryBranchId, 
+                splat: _selectedRepositoryDocumentPath
+            });*/
 
 	  		WebApiUtils.loadRepositoryDocument(_selectedRepositoryId, _selectedRepositoryBranchId, _selectedRepositoryDocumentPath);
   		}
@@ -26805,6 +26832,7 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 	},
 
 	emitChange: function() {
+		console.log('RepoStore.emitChange');
 		this.emit(CHANGE_EVENT);
 	},
 
@@ -26820,6 +26848,14 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 		var action = payload.action;
 
 		switch(action.actionType) {
+			case AppConstants.TRANSITION:
+				_selectedRepositoryId = action.state.params.repoId;
+				_selectedRepositoryBranchId = action.state.params.branchName;
+				if (!_selectedRepositoryDocumentPath) _selectedRepositoryDocumentPath = action.state.params.splat;
+				// RepoStore.selectRepositoryIndexItem(action.state.params.splat);
+				// RepoStore.emitChange();
+				break;
+
 			case AppConstants.LOAD_REPOSITORIES:
 				RepoStore.setRepositories(action.data);
 				RepoStore.emitChange();
@@ -26847,12 +26883,12 @@ var RepoStore = assign({}, EventEmitter.prototype, {
 
 			case AppConstants.SELECT_REPOSITORY_INDEX_ITEM:
 				RepoStore.selectRepositoryIndexItem(action.path);
-				RepoStore.emitChange();
+				// RepoStore.emitChange();
 				break;
 
 			case AppConstants.SELECT_SIBLING_REPOSITORY_INDEX_ITEM:
 				if (RepoStore.selectSiblingRepositoryIndexItem(action.direction)) {
-					RepoStore.emitChange();					
+					// RepoStore.emitChange();					
 				}
 				break;
 

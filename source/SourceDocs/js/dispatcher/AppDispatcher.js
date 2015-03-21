@@ -11,7 +11,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'SERVER_ACTION',
       action: action
     };
-    // console.log("AppDispatcher.handleServerAction", payload);
+    console.log("AppDispatcher.handleServerAction", action);
     this.dispatch(payload);
   },
 
@@ -24,7 +24,7 @@ var AppDispatcher = assign(new Dispatcher(), {
       source: 'VIEW_ACTION',
       action: action
     };
-    // console.log("AppDispatcher.handleViewAction", payload);
+    console.log("AppDispatcher.handleViewAction", action);
     this.dispatch(payload);
   }
 });

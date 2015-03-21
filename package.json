@@ -1,6 +1,16 @@
 {
   "name": "source-docs",
   "version": "0.0.1",
+  "author": "Sergey Fadeev",
+  "license": "MIT",
+  "homepage": "https://github.com/sfadeev/source-docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sfadeev/source-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sfadeev/source-docs/issues"
+  },
   "dependencies": {
     "ajax": "^0.0.4",
     "bootstrap": "^3.3.2",
@@ -20,15 +30,5 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sfadeev/source-docs.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/sfadeev/source-docs/issues"
-  },
-  "homepage": "https://github.com/sfadeev/source-docs"
+  }
 }

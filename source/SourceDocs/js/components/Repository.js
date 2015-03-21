@@ -8,7 +8,7 @@ var RepositoryDocument = require('./RepositoryDocument.js');
 var Repository = React.createClass({
 
     render: function() {
-        console.log("App.render", this.props);
+        // console.log("Repository.render", this.props);
 
         return (
             <div>

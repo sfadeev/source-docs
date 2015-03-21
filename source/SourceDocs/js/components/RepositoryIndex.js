@@ -142,7 +142,7 @@ var RepositoryIndex = React.createClass({
     },
 
     render: function() {
-        console.log("RepositoryIndex.render", this.state, this.props);
+        // console.log("RepositoryIndex.render", this.state, this.props);
 
         if (this.state.index && this.state.index.children) {
             return (

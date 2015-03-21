@@ -67,18 +67,30 @@ var RepositoryDocumentContent = React.createClass({
     },
 
     highlight: function () {
-        var nodes = this.getDOMNode().querySelectorAll("pre code");
-        for (var i = 0; i < nodes.length; i = i + 1) {
-            hljs.highlightBlock(nodes[i]);
+        var contentNode = React.findDOMNode(this.refs.content);
+        if (contentNode) {
+            var nodes = contentNode.querySelectorAll("pre code");
+            for (var i = 0; i < nodes.length; i = i + 1) {
+                hljs.highlightBlock(nodes[i]);
+            }
         }
     },
 
     render: function() {
         // console.log("RepositoryDocumentContent.render", this.props);
 
-        return (
-            <div className="content" dangerouslySetInnerHTML={{__html: this.props.data ? this.props.data.content : null}} />
-        );
+        if (this.props.data && this.props.data.content) {
+
+            var content = this.props.data.content;
+
+            function createMarkup() { return { __html: content }; };
+
+            return (
+                <div ref="content" className="content" dangerouslySetInnerHTML={ createMarkup() } />
+            );
+        }
+
+        return null;
     }
 });
 
